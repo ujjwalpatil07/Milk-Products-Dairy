@@ -27,7 +27,7 @@ export default function ProductVarietyCard({ image, name, rating, likes, type, p
 
     useEffect(() => {
         setLocalLikes(likes);
-    }, [likes])
+    }, [likes]);
 
     const handleAddProduct = (productId, price) => {
         if (quantity <= 0) {

@@ -14,7 +14,9 @@ export default function ContactPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = (e) => {
-
+        e.preventDefault();
+        
+        const { fullName, phone, email, message } = formData;
         if (!fullName.trim()) {
             toast.error("Please enter your full name.");
             return;
@@ -37,12 +39,9 @@ export default function ContactPage() {
             return;
         }
 
-
-        e.preventDefault();
-        const { fullName, phone, email, message } = formData;
         const whatsappMessage = `Hello! I'm ${fullName},\nPhone: ${phone}\nEmail: ${email}\nMessage: ${message}`;
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        window.open(`https://wa.me/9209143657?text=${encodedMessage}`, "_blank");
+        window.open(`https://wa.me/919209143657?text=${encodedMessage}`, "_blank");
     };
 
     return (

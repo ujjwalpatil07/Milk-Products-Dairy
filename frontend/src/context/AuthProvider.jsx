@@ -14,7 +14,15 @@ export const AuthProvider = ({ children }) => {
             mobileNo: 4578895623,
             role: "admin",
             shopName: "Sagar Milk Dairy & Sweets",
-            address: "Flat No. 202, Krishna Residency Sector 12, Kharghar Navi Mumbai, Maharashtra - 410210 India",
+            address: {
+                addressType: "Home",
+                name: "Nitin Gayke",
+                phone: "9876543210",
+                streetAddress: "123 Gokhale Nagar",
+                city: "Pune",
+                state: "Maharashtra",
+                pincode: "411016"
+            },
             discount: 5,
         }
     );

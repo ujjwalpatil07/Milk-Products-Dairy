@@ -44,8 +44,9 @@ export default function OrderCheckoutPage() {
       <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 mb-6">
         <h2 className="text-lg font-semibold">Deliver To:</h2>
         <p><span className="font-medium">Name:</span> {authUser.fullName}</p>
-        <p><span className="font-medium">Phone:</span> {authUser.phone || "N/A"}</p>
-        <p><span className="font-medium">Address:</span> {authUser.address}</p>
+        <p><span className="font-medium">Phone:</span> {authUser?.address?.phone || "N/A"}</p>
+        <p className="font-medium">Address: <span className="text-gray-500 dark:text-gray-300">{authUser?.address?.streetAddress}, {authUser?.address?.city}, {authUser?.address?.state}, {authUser?.address?.pincode}.</span></p>
+
         <Link to="/profile-update" className="text-blue-500 hover:underline mt-2 inline-block">Edit Address</Link>
       </div>
 

@@ -54,10 +54,9 @@ export default function CartPage() {
             <section className="max-w-4xl mx-auto my-5 px-3">
                 <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
                     <h1>Deliver To: <span className="text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{authUser?.fullName}</span></h1>
-                    <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{authUser?.address}</span></p>
-                    <div className="space-x-5">
-                        <Link to={"/profile-update"} className="text-blue-500 hover:text-blue-600">Update</Link>
-                        <button onClick={clearCart} className="px-2 border rounded-sm text-red-500 bg-red-500/10 hover:bg-red-500/20">Clear Cart</button>
+                    <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{authUser?.address?.streetAddress}, {authUser?.address?.city}, {authUser?.address?.state}, {authUser?.address?.pincode}.</span></p>
+                    <div className="space-x-5 flex justify-end">
+                        <Link to={"/profile-update"} className="text-blue-500 hover:text-blue-600 border px-2 rounded-sm">Change</Link>
                     </div>
                 </div>
             </section>
@@ -80,7 +79,7 @@ export default function CartPage() {
                                     <p className="font-semibold text-base text-gray-800 dark:text-white">{item?.name}</p>
                                     <p className="text-gray-600 dark:text-gray-300">
                                         {item?.selectedQuantity} {item?.quantityUnit} ×
-                                        <span className="text-blue-600 font-semibold ml-1">
+                                        <span className="text-blue-600 font-semibold ml-1 pe-1">
                                             ₹{item?.price.toFixed(2)}
                                         </span>
                                         = <span className="text-green-600 font-bold ml-1">₹{subtotal.toFixed(2)}</span>
@@ -138,6 +137,8 @@ export default function CartPage() {
                     Add More Products
                 </Link>
             </section>
+
+            
         </>
     )
 }
