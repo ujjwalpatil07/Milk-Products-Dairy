@@ -16,7 +16,7 @@ export default function ProductCard({ title, description, image, features }) {
         <h3 className="text-lg font-bold text-gray-800 dark:text-white">
           {title}
         </h3>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <p className="mt-2 text-gray-600 dark:text-gray-300 line-clamp-4">
           {description}
         </p>
         <ul className="space-y-2 my-3">

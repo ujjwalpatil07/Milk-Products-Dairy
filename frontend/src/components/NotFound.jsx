@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { ThemeContext } from "../context/ThemeProvider";
 import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
@@ -9,7 +10,7 @@ export default function NotFound() {
     const navigate = useNavigate();
 
     return (
-        <div className="h-screen w-full flex flex-col items-center justify-center px-4 bg-white text-gray-800 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300">
+        <div className="h-screen overflow-auto py-10 w-full flex flex-col items-center justify-center px-4 bg-white text-gray-800 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300">
 
             <div className="mb-6 flex items-center justify-center">
                 <img
@@ -31,9 +32,10 @@ export default function NotFound() {
 
             <button
                 onClick={() => navigate(-1)}
-                className="mt-4 px-6 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                className="flex items-center gap-2 mt-4 px-6 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 dark:bg-indigo-500 dark:hover:bg-indigo-600"
             >
-                Go Back Home
+                <KeyboardBackspaceIcon sx={{ fontSize: "1.2rem" }} /> 
+                <span>Go Back</span>
             </button>
 
         </div>

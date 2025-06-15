@@ -51,7 +51,7 @@ export default function SearchProducts() {
 
     return (
         <>
-            <div className="w-full pt-2 px-3 md:px-8">
+            <div className="w-full pt-2 px-3 lg:px-8">
                 <div className="px-2 py-2 bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white shadow-sm rounded-md flex items-center gap-2 transition-colors duration-300">
                     <div className="flex flex-1 items-center w-full md:w-2/3 gap-2">
                         <button onClick={() => setIsSidebarOpen(true)} className="flex md:hidden p-[5px] hover:bg-gray-500/10 border border-gray-500/50 rounded-md cursor-pointer">
@@ -64,7 +64,7 @@ export default function SearchProducts() {
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Search products..."
-                            className="w-full pl-2 md:pl-4 pr-4 py-1.5 rounded-md bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none"
+                            className="w-full pl-2 md:pl-4 pr-4 py-1.5 rounded-md bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none transition-colors duration-300"
                         />
 
                         <button
@@ -91,10 +91,10 @@ export default function SearchProducts() {
                             open={open}
                             onClose={() => handleClose(null)}
                         >
-                            {["Most Reviews", "Most Likes", "Price: Low to High", "Price: High to Low"].map((option) => (
+                            {["Clear", "Most Reviews", "Most Likes", "Sort by: Rating", "Price: Low to High", "Price: High to Low"].map((option) => (
                                 <MenuItem
                                     key={option}
-                                    onClick={() => handleClose(option)}
+                                    onClick={() => handleClose(option === "Clear" ? "Sort By" : option)}
                                     className="hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                     {option}
@@ -106,7 +106,7 @@ export default function SearchProducts() {
             </div>
 
             <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} >
-                <div  className="w-60 p-4 h-fit bg-white dark:bg-black/90 transition-colors duration-500" >
+                <div  className="w-60 p-4 bg-white dark:bg-black/90 h-full overflow-auto transition-colors duration-500" >
                     <ProductList />
                 </div>
             </Drawer>

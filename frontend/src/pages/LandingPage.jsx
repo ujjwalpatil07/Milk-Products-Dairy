@@ -45,7 +45,7 @@ export default function LandingPage() {
                     </p>
 
                     <Link
-                        to={authUser ? "/products" : "/login"}
+                        to={authUser ? "/home" : "/login"}
                         className="flex items-center gap-4 px-8 py-3 rounded-full font-semibold text-lg bg-[#843E71] text-white transition-colors duration-300 "
                     >
                         Get Started <EastIcon />
@@ -121,7 +121,7 @@ export default function LandingPage() {
                         />
                     </div>
 
-                    <div className="w-full md:w-1/2">
+                    <div className="w-full md:w-1/2 text-center md:text-left">
                         <h2 className="text-2xl font-bold mb-4">What Our Customers Say</h2>
                         <p className="text-gray-700 dark:text-gray-300 text-lg">
                             At <span className="font-semibold">Madhur Dairy and Daily Needs</span>, we provide fresh, nutritious, and

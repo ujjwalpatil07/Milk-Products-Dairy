@@ -19,14 +19,17 @@ import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
 import { UserAuthContext } from '../context/AuthProvider';
+import { CartContext } from '../context/CartProvider';
 
 export default function Navbar() {
+    
     const [open, setOpen] = useState(false);
+
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { authUser } = useContext(UserAuthContext);
+    const { cartItems } = useContext(CartContext);
 
     const location = useLocation();
-    const orderCount = 3;
 
     const toggleDrawer = (newOpen) => () => setOpen(newOpen);
 
@@ -36,9 +39,8 @@ export default function Navbar() {
     const navItems = [
         { label: 'Home', icon: <HomeIcon sx={{ fontSize: '1.2rem' }} />, path: '/home' },
         { label: 'Products', icon: <StorefrontIcon sx={{ fontSize: '1.2rem' }} />, path: '/products' },
-        { label: 'Our Services', icon: <BuildIcon sx={{ fontSize: '1.2rem' }} />, path: '/services' },
         { label: 'About Us', icon: <Diversity3Icon sx={{ fontSize: '1.2rem' }} />, path: '/about' },
-        { label: 'Contact Us', icon: <CallIcon sx={{ fontSize: '1.2rem' }} />, path: '/contact' },
+        { label: 'Contact Us', icon: <CallIcon sx={{ fontSize: '1.2rem' }} />, path: '/contact-us' },
     ];
 
     return (
@@ -56,7 +58,7 @@ export default function Navbar() {
                             src={theme === 'light' ? logoLightMode : logoDarkMode}
                             alt="logo"
                             loading='lazy'
-                            className="h-12 object-cover rounded-md"
+                            className="h-10 sm:h-12 object-cover rounded-md"
                         />
                     </Link>
                 </div>
@@ -72,10 +74,10 @@ export default function Navbar() {
                 <div className="flex items-center gap-4">
                     {
                         (authUser) && <Tooltip title="Cart">
-                            <Link to="/my-orders">
+                            <Link to="/cart">
                                 <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
                                     <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
-                                    <span className='ps-1 font-semibold text-lg text-gray-700'>{orderCount}</span>
+                                    <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
                                 </div>
                             </Link>
                         </Tooltip>
@@ -118,8 +120,8 @@ export default function Navbar() {
                     </div>
 
                     <div className='space-y-4'>
-                        {authUser && (<Link to="/my-orders" onClick={toggleDrawer(false)} className={linkStyle}>
-                            <Badge badgeContent={orderCount} color="primary">
+                        {authUser && (<Link to="/cart" onClick={toggleDrawer(false)} className={linkStyle}>
+                            <Badge badgeContent={cartItems?.length || 0} color="primary">
                                 <ShoppingCartIcon sx={{ fontSize: '1.2rem' }} />
                             </Badge>
                             My Orders

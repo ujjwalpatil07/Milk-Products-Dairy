@@ -56,7 +56,7 @@ export default function Footer() {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Contact</h3>
                         <ul className="space-y-2">
-                            <li><a href="/contact" className="hover:underline">Contact Us</a></li>
+                            <li><a href="/contact-us" className="hover:underline">Contact Us</a></li>
                             <li><a href="/support" className="hover:underline">Customer Support</a></li>
                             <li><a href="/feedback" className="hover:underline">Feedback</a></li>
                         </ul>
