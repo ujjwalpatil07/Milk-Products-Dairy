@@ -1,16 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-const ReviewSchema = new Schema(
-  {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    message: { type: String, required: true, maxlength: 1000 },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
-    date: { type: Date, default: Date.now },
-  },
-  { _id: false }
-);
-
 const VarietySchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
