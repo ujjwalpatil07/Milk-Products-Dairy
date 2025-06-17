@@ -17,54 +17,66 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import { UserAuthContext } from "../../context/AuthProvider";
+import axios from "axios";
 
 const Profile = () => {
 
-  const { authUser } = useContext(UserAuthContext);
+  const { authUser, setAuthUser, handleUserLogout } = useContext(UserAuthContext);
 
   const [activeSection, setActiveSection] = useState("account");
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const handleProfileImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("photo", file);
+    formData.append("id", authUser?._id);
+
     try {
-      const user = JSON.parse(localStorage.getItem("User"));
-      if (user) {
-        setProfileData(user);
+      const res = await axios.post("http://localhost:9000/user-profile/edit-profilePhoto", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (res?.data?.success) {
+        toast.success("Profile photo updated!");
+        setAuthUser(prev => ({ ...prev, photo: res.data.updatedPhoto }));
+      } else {
+        toast.error("Failed to update photo.");
       }
-    } catch {
-      toast.error("Failed to load user data.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong.");
     }
-  }, []);
+  };
 
   const renderSection = () => {
-    if (loading) return <p className="text-center">Loading...</p>;
-
     switch (activeSection) {
       case "account":
-        return <div className="section"><AccountInfo profile_id={profileData?._id} /></div>;
+        return <div className="section"><AccountInfo /></div>;
       case "addresses":
-        return <div className="section"><MyAddresses profile_id={profileData?._id} /></div>;
+        return <div className="section"><MyAddresses /></div>;
       case "orders":
-        return <div className="section"><MyOrders profile_id={profileData?._id} /></div>;
+        return <div className="section"><MyOrders /></div>;
       case "wishlist":
-        return <div className="section"><MyWishlist profile_id={profileData?._id} /></div>;
+        return <div className="section"><MyWishlist /></div>;
       case "payments":
-        return <div className="section"><Payments profile_id={profileData?._id} /></div>;
+        return <div className="section"><Payments /></div>;
       case "delete":
-        return <div className="section text-red-600 font-bold">Are you sure you want to delete your account?</div>;
+        return <div className="section py-10 text-center text-red-600 font-bold">Are you sure you want to delete your account?</div>;
       case "logout":
-        localStorage.removeItem("User");
+        handleUserLogout();
         toast.success("Logged out successfully.");
-        return <div className="section">You have been logged out.</div>;
+        break;
+
       default:
         return null;
     }
   };
 
-  if (!profileData || !authUser) {
+  if (!authUser) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center text-gray-600 dark:text-gray-300">
         <p className="text-xl font-semibold mb-4">User not found or not logged in.</p>
@@ -76,14 +88,36 @@ const Profile = () => {
   return (
     <div className="flex flex-col md:flex-row py-5 p-3 gap-5 max-w-5xl mx-auto">
       <aside className="w-full md:w-1/4 bg-white dark:bg-gray-500/20 p-4 shadow-md overflow-y-hidden rounded-md">
-        <div className="flex flex-col items-center mb-10">
-          <img
-            src={profileData?.photo}
-            alt="User"
-            className="rounded-full w-24 h-24 object-cover border"
-          />
-          <h2 className="text-xl font-bold mt-2 text-black dark:text-white">{profileData?.firstName} {profileData?.lastName}</h2>
+        <div className="flex flex-col items-center mb-10 relative group">
+          <div className="relative">
+            <img
+              src={authUser?.photo}
+              alt="User"
+              className="rounded-full w-24 h-24 object-cover border"
+            />
+
+            <label
+              htmlFor="profileImageInput"
+              className="absolute bottom-0 right-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 p-1 rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              title="Edit Photo"
+            >
+              <i className="fa-solid fa-pen-to-square"></i>
+            </label>
+
+            <input
+              type="file"
+              id="profileImageInput"
+              accept="image/*"
+              className="hidden"
+              onChange={handleProfileImageChange}
+            />
+          </div>
+
+          <h2 className="text-xl font-bold mt-2 text-black dark:text-white">
+            {authUser?.firstName} {authUser?.lastName}
+          </h2>
         </div>
+
         <nav className="mt-6 space-y-3">
           {[
             { key: "account", icon: <MdOutlineAccountCircle />, label: "Account" },

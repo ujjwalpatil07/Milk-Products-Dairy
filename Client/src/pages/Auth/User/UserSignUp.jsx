@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
+import { signupUser } from "../../../services/userService";
 
 export default function UserSignUp() {
   const navigate = useNavigate();
@@ -26,13 +27,15 @@ export default function UserSignUp() {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
       return toast.error("Passwords do not match");
     }
 
     try {
       setIsLoading(true);
-      const res = await axios.post("http://localhost:9000/u/signup", formData);
+
+      const res = await signupUser(formData);
       if (res.status === 201 || res.status === 200) {
         toast.success("OTP sent successfully");
         navigate("/signup/otp-verification", { state: { formData } });

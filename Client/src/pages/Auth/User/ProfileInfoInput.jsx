@@ -10,7 +10,6 @@ import { UserAuthContext } from "../../../context/AuthProvider";
 export default function ProfileInfoInput() {
   const navigate = useNavigate();
 
-  const { setAuthUser } = useContext(UserAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const getTextFieldStyles = (theme) => ({
@@ -100,7 +99,6 @@ export default function ProfileInfoInput() {
       });
 
       if (res?.data?.success) {
-        setAuthUser(response?.data?.user);
         localStorage.setItem("User", JSON.stringify(response?.data?.user));
         toast.success("Profile created successfully!");
         navigate("/home");

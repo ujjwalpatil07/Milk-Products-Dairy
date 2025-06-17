@@ -54,7 +54,7 @@ export default function OrderCheckoutPage() {
         <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
 
         {cartDetails.map((item, idx) => (
-          <div key={idx * 0.65} className="flex justify-between py-2 border-b border-dashed border-gray-300">
+          <div key={idx * 0.65} className="flex justify-between py-2 border-b border-dashed border-gray-500/50">
             <div>
               <p className="font-medium">{item.name}</p>
               <p className="text-sm text-gray-600 dark:text-gray-300">

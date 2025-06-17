@@ -2,10 +2,9 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
-import { AdminAuthContext } from "../../../context/AuthProvider";
+import { loginAdmin } from "../../../services/adminService";
 
 const getTextFieldStyles = (theme) => ({
   input: {
@@ -32,7 +31,6 @@ const getTextFieldStyles = (theme) => ({
 export default function AdminLogin() {
 
   const navigate = useNavigate();
-  const { setAuthUser } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -51,18 +49,22 @@ export default function AdminLogin() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      const res = await axios.post("http://localhost:9000/admin/login", formData);
-      if (res.data) {
-        setAuthUser(res?.data?.admin);
-        localStorage.setItem("Admin", JSON.stringify(res?.data?.admin));
+
+      const { email, password } = formData;
+      const data = await loginAdmin(email, password);
+
+      if (data) {
+        localStorage.setItem("Admin", JSON.stringify(data.admin));
         toast.success("Logged in successfully as Admin");
         navigate("/admin/dashboard");
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Login failed, try again");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

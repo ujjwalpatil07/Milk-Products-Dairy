@@ -1,13 +1,29 @@
-import express from "express"
-import wrapAsync from "../utils/wrapAsync.js"
-import { editProfile, getProfileData, getAddresses, saveNewAddress, deleteAddress, editAddress } from "../controllers/profileEdit.js";
+import express from "express";
+import wrapAsync from "../utils/wrapAsync.js";
+import {
+  editProfile,
+  getProfileData,
+  getAddresses,
+  saveNewAddress,
+  deleteAddress,
+  editAddress,
+  editProfilePhoto,
+} from "../controllers/profileEdit.js";
+import { upload } from "../config/cloudinary.js";
 const router = express.Router();
 
-router.put("/u/profile/edit", wrapAsync(editProfile))
-router.post("/u/get-addresses", wrapAsync(getAddresses))
-router.post("/u/profile", wrapAsync(getProfileData))
-router.post("/u/add-address", wrapAsync(saveNewAddress))
-router.post("/u/remove-address", wrapAsync(deleteAddress))
-router.put("/u/edit-address", wrapAsync(editAddress))
+router.put("/profile-edit", wrapAsync(editProfile));
+
+router.post("/get-addresses", wrapAsync(getAddresses));
+
+router.post("/profile", wrapAsync(getProfileData));
+
+router.post("/add-address", wrapAsync(saveNewAddress));
+
+router.post("/remove-address", wrapAsync(deleteAddress));
+
+router.put("/edit-address", wrapAsync(editAddress));
+
+router.post("/edit-profilePhoto", upload.single("photo"), wrapAsync(editProfilePhoto));
 
 export default router;

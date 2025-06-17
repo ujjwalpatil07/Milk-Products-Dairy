@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -12,14 +12,18 @@ import {
   FaMapPin,
 } from "react-icons/fa";
 import { Close } from "@mui/icons-material";
+import { UserAuthContext } from "../../../context/AuthProvider";
 
-export default function AccountInfo({ profile_id }) {
+export default function AccountInfo() {
+  
+  const { authUser } = useContext(UserAuthContext);
+
   const [edit, setEdit] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [editData, setEditData] = useState({
-    _id: profile_id,
+    _id: authUser?._id,
     firstName: "",
     lastName: "",
     address: {
@@ -39,7 +43,7 @@ export default function AccountInfo({ profile_id }) {
   const handleUserProfileData = async () => {
     try {
       setDataLoading(true);
-      const response = await axios.post("http://localhost:9000/u/profile", { profile_id });
+      const response = await axios.post("http://localhost:9000/user-profile/profile", { profile_id: authUser?._id });
 
       if (response?.data?.success) {
         setDbData(response.data.userData);
@@ -54,8 +58,8 @@ export default function AccountInfo({ profile_id }) {
   };
 
   useEffect(() => {
-    if (profile_id) handleUserProfileData();
-  }, [profile_id]);
+    if (authUser) handleUserProfileData();
+  }, [authUser]);
 
   useEffect(() => {
     if (dbData) {
@@ -84,9 +88,9 @@ export default function AccountInfo({ profile_id }) {
         return;
       }
       setIsLoading(true);
-      const response = await axios.put("http://localhost:9000/u/profile/edit", {
+      const response = await axios.put("http://localhost:9000/user-profile/profile-edit", {
         editData,
-        userId: profile_id,
+        userId: authUser?._id,
       });
 
       if (response?.data?.success) {

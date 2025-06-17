@@ -5,11 +5,10 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
-import { UserAuthContext } from "../../../context/AuthProvider";
+import { loginUser } from "../../../services/userService";
 
 export default function UserLogin() {
   const navigate = useNavigate();
-  const { setAuthUser } = useContext(UserAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -31,11 +30,14 @@ export default function UserLogin() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      const response = await axios.post("http://localhost:9000/u/login", formData);
-      if (response.status === 200) {
-        setAuthUser(response?.data?.user);
-        localStorage.setItem("User", JSON.stringify(response?.data?.user));
+
+      const { email, password } = formData;
+      const data = await loginUser(email, password);
+
+      if (data?.user) {
+        localStorage.setItem("User", JSON.stringify(data.user));
         toast.success("Login Successful!");
         navigate("/home");
       } else {
@@ -49,7 +51,6 @@ export default function UserLogin() {
     }
   };
 
-  // TextField custom styling for dark/light mode
   const getTextFieldStyles = (theme) => ({
     input: {
       color: theme === "dark" ? "#fff" : "#000",

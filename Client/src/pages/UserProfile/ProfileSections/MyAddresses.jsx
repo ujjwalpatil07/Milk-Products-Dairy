@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { HiPlus } from "react-icons/hi";
 import axios from "axios";
 import { toast } from "react-toastify";
-import PropTypes from "prop-types"
 import {
   User, Phone, Building2, Mail,
   X, Check, Home, MapPin, Locate, Plus, Trash2, Edit2
 } from "lucide-react";
+import { UserAuthContext } from "../../../context/AuthProvider";
 
-export default function MyAddresses({ profile_id }) {
+export default function MyAddresses() {
+
+  const { authUser } = useContext(UserAuthContext);
 
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,14 +29,14 @@ export default function MyAddresses({ profile_id }) {
   });
 
   useEffect(() => {
-    if (profile_id) getAddresses();
-  }, [profile_id]);
+    if (authUser) getAddresses();
+  }, [authUser]);
 
   const getAddresses = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/u/get-addresses", {
-        userId: profile_id,
+      const response = await axios.post("http://localhost:9000/user-profile/get-addresses", {
+        userId: authUser?._id,
       });
       if (response?.data?.success) {
         setAddresses(response.data.userAddresses);
@@ -53,8 +55,8 @@ export default function MyAddresses({ profile_id }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/u/add-address", {
-        userId: profile_id,
+      const response = await axios.post("http://localhost:9000/user-profile/add-address", {
+        userId: authUser?._id,
         address: newAddress,
       });
       if (response?.data?.success) {
@@ -82,7 +84,7 @@ export default function MyAddresses({ profile_id }) {
   const removeAddress = async (address) => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/u/remove-address", {
+      const response = await axios.post("http://localhost:9000/user-profile/remove-address", {
         addressId: address._id,
         userId: address.owner
       });
@@ -104,7 +106,7 @@ export default function MyAddresses({ profile_id }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.put("http://localhost:9000/u/edit-address", {
+      const res = await axios.put("http://localhost:9000/user-profile/edit-address", {
         addressId: selectedAddress._id,
         updatedData: selectedAddress,
       });
@@ -186,14 +188,20 @@ export default function MyAddresses({ profile_id }) {
               <div className="flex w-full mt-5 space-x-4">
                 <button
                   className="flex items-center gap-2 py-2 px-4 border border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 rounded-lg font-medium hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200"
-                  onClick={() => toggleModal("edit", true, item)}
+                  onClick={() => {
+                    setEditModal(true);
+                    setSelectedAddress(item);
+                  }}
                   aria-label={`Edit address for ${item.name}`}
                 >
                   <Edit2 size={16} /> Edit
                 </button>
                 <button
                   className="flex items-center gap-2 py-2 px-4 border border-red-600 dark:border-red-400 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-gray-600 transition-colors duration-200"
-                  onClick={() => toggleModal("remove", true, item)}
+                  onClick={() => {
+                    setRemoveModal(true);
+                    setSelectedAddress(item);
+                  }}
                   aria-label={`Remove address for ${item.name}`}
                 >
                   <Trash2 size={16} /> Remove
@@ -207,8 +215,8 @@ export default function MyAddresses({ profile_id }) {
       }
 
       {removeModal && selectedAddress && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fadeIn scale-95 animate-scaleIn">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center overflow-auto">
+          <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fadeIn scale-95 animate-scaleIn">
 
             <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 text-gray-800 dark:text-gray-100">
               Do you want to remove this address?
@@ -240,8 +248,8 @@ export default function MyAddresses({ profile_id }) {
       )}
 
       {editModal && selectedAddress && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-gray-900 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn animate-scaleIn">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto">
+          <div className="bg-white dark:bg-gray-500/50 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn animate-scaleIn">
 
             <h2 className="text-xl sm:text-2xl font-semibold text-center mb-6 text-gray-800 dark:text-gray-100">
               ✏️ Edit Address
@@ -495,8 +503,4 @@ export default function MyAddresses({ profile_id }) {
       )}
     </div>
   );
-}
-
-MyAddresses.propTypes = {
-  profile_id: PropTypes.string.isRequired
 }

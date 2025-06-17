@@ -40,7 +40,7 @@ export default function CartProductCard({ item, discount = 0 }) {
 
             <div className="flex-1">
                 <div className="flex justify-between">
-                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white line-clamp-1">{name}</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white line-clamp-1 pe-2">{name}</h2>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => setNewQty(prev => Math.max(0, prev - 0.5))}

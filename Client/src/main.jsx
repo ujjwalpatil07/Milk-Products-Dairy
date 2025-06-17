@@ -1,3 +1,11 @@
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function (key, value) {
+  const event = new Event("localStorageChange");
+  originalSetItem.apply(this, arguments);
+  window.dispatchEvent(event);
+};
+
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
