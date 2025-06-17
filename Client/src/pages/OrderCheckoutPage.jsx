@@ -7,7 +7,7 @@ import { products } from "../data/products";
 
 export default function OrderCheckoutPage() {
 
-  const { authUser } = useContext(UserAuthContext);
+  const { authUser, deliveryAddress } = useContext(UserAuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
@@ -22,11 +22,23 @@ export default function OrderCheckoutPage() {
   const totalAmount = subtotal - discountAmount;
 
   const handlePlaceOrder = () => {
-    clearCart(); 
-    navigate("/order-success"); 
+    clearCart();
+    navigate("/order-success");
   };
 
-  if (!authUser || cartItems?.length === 0) {
+  if (!authUser) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-white">You're not logged in.</h2>
+        <p className="text-gray-500 mb-4 dark:text-gray-300">Please log in to view your cart.</p>
+        <Link to={"/login"} className="text-blue-500 hover:text-blue-600" >
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
+
+  if (cartItems?.length === 0) {
     return (
       <div className="p-5 text-center flex flex-col items-center justify-center h-[300px]">
         <h2 className="text-xl font-semibold">No items to checkout</h2>
@@ -43,11 +55,10 @@ export default function OrderCheckoutPage() {
 
       <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 mb-6">
         <h2 className="text-lg font-semibold">Deliver To:</h2>
-        <p><span className="font-medium">Name:</span> {authUser.firstName} {authUser.lastName}</p>
-        <p><span className="font-medium">Phone:</span> {authUser?.mobileNo || "N/A"}</p>
-        <p className="font-medium">Address: <span className="text-gray-500 dark:text-gray-300">{authUser?.address?.streetAddress}, {authUser?.address?.city}, {authUser?.address?.pincode}.</span></p>
-
-        <Link to="/profile-update" className="text-blue-500 hover:underline mt-2 inline-block">Edit Address</Link>
+        <p><span className="font-medium">Name:</span> <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.name}</span></p>
+        <p>Mobile No: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.phone || "N/A"}</span></p>
+        <p>Address Type: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.addressType}</span></p>
+        <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.streetAddress}, {deliveryAddress?.city}, {deliveryAddress?.state}, {deliveryAddress?.pincode}.</span></p>
       </div>
 
       <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4">
