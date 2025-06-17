@@ -9,13 +9,41 @@ export const AuthProvider = ({ children }) => {
     const [authUser, setAuthUser] = useState(null);
     const [authAdmin, setAuthAdmin] = useState(null);
 
+    const [deliveryAddress, setDeliveryAddress] = useState(null);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const localUser = JSON.parse(localStorage.getItem("User"));
+                const storedAddress = JSON.parse(localStorage.getItem("deliveryAddress"));
+
+                if (storedAddress) {
+                    setDeliveryAddress(storedAddress);
+                }
+
                 if (localUser?._id && authUser?._id !== localUser?._id) {
                     const res = await axios.post(`http://localhost:9000/u/get-user`, { _id: localUser?._id });
-                    setAuthUser(res?.data?.user);
+                    const user = res?.data?.user;
+
+                    if (user) {
+                        setAuthUser(user);
+
+                        if (!storedAddress) {
+                            const generatedAddress = {
+                                owner: user._id,
+                                addressType: "Home",
+                                name: `${user.firstName} ${user.lastName}`,
+                                phone: user.mobileNo,
+                                streetAddress: user.address?.streetAddress || "",
+                                city: user.address?.city || "",
+                                state: "Maharashtra",
+                                pincode: user.address?.pincode || ""
+                            };
+
+                            localStorage.setItem("deliveryAddress", JSON.stringify(generatedAddress));
+                            setDeliveryAddress(generatedAddress);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error("User fetch failed", error);
@@ -67,9 +95,11 @@ export const AuthProvider = ({ children }) => {
 
     const value2 = useMemo(() => ({
         authUser,
+        deliveryAddress,
         setAuthUser,
+        setDeliveryAddress,
         handleUserLogout
-    }), [authUser]);
+    }), [authUser, deliveryAddress]);
 
     return (
         <AdminAuthContext.Provider value={value1}>

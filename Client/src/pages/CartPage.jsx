@@ -1,18 +1,25 @@
-import { useContext, useMemo } from "react"
+import React, { useContext, useMemo, useState } from "react"
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
 import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from "../context/CartProvider";
 import { getCartProductDetails } from "../utils/cartUtils";
 import { products } from "../data/products";
 import CartProductCard from "../components/CartComponents/CartProductCard";
+import SavedAddressList from "../components/CartComponents/SavedAddressList";
 
 export default function CartPage() {
 
-    const { authUser } = useContext(UserAuthContext);
+    const { authUser, deliveryAddress } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
     const discount = 5;
+
+    const [open, setOpen] = useState(false);
+    const handleDialogStatus = (status) => {
+        setOpen(status);
+    }
 
     const cartDetails = useMemo(
         () => getCartProductDetails(cartItems, products),
@@ -52,15 +59,21 @@ export default function CartPage() {
 
     return (
         <>
-            <section className="max-w-4xl mx-auto my-5 px-3">
-                <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
-                    <h1>Deliver To: <span className="text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{authUser?.firstName} {authUser?.lastName}</span></h1>
-                    <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{authUser?.address?.streetAddress}, {authUser?.address?.city}, {authUser?.address?.state}, {authUser?.address?.pincode}.</span></p>
-                    <div className="space-x-5 flex justify-end">
-                        <Link to={"/profile-update"} className="text-blue-500 hover:text-blue-600 border px-2 rounded-sm">Change</Link>
+            {
+                (deliveryAddress) && <section className="max-w-4xl mx-auto my-5 px-3">
+                    <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
+                        <h1>Deliver To: 
+                            <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{deliveryAddress?.name}</span>
+                            <span className="text-sm ms-3 px-3 rounded-full bg-gray-500/10 dark:bg-gray-200/50">{deliveryAddress?.addressType}</span>
+                        </h1>
+                        <p>Mobile No: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.phone}</span></p>
+                        <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.streetAddress}, {deliveryAddress?.city}, {deliveryAddress?.state}, {deliveryAddress?.pincode}.</span></p>
+                        <div className="space-x-5 flex justify-end">
+                            <button onClick={() => setOpen(true)} className="text-blue-500 hover:text-blue-600 border px-2 rounded-sm">Change</button>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            }
 
             <section className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5">
                 <div className="space-y-3 w-full md:flex-1">
@@ -139,7 +152,8 @@ export default function CartPage() {
                 </Link>
             </section>
 
-            
+            <SavedAddressList open={open} handleDialogStatus={handleDialogStatus} />
+
         </>
     )
 }

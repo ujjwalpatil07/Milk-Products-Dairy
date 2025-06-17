@@ -99,7 +99,7 @@ export default function ProfileInfoInput() {
       });
 
       if (res?.data?.success) {
-        localStorage.setItem("User", JSON.stringify(response?.data?.user));
+        localStorage.setItem("User", JSON.stringify(res?.data?.user));
         toast.success("Profile created successfully!");
         navigate("/home");
       } else {
