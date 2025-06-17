@@ -8,13 +8,15 @@ export default function OtpVerification() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const formData = location.state?.formData;
+  const formData = location?.state?.formData;
 
   useEffect(() => {
     if (!formData) {
       navigate("/signup");
     }
   }, [formData, navigate]);
+
+  console.log(formData)
 
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const [loading, setLoading] = useState(false);

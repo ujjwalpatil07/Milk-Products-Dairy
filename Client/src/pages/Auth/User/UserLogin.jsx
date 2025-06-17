@@ -148,7 +148,7 @@ export default function UserLogin() {
             {isLoading ? "Logging in..." : "Login"}
           </Button>
 
-          <div className="mt-5 text-sm text-black dark:text-gray-300 flex flex-col sm:flex-row items-center justify-center">
+          <div className="mt-5 text-sm text-black dark:text-gray-300 flex flex-row items-center justify-center">
             <p className="mr-1">Don't have an account?</p>
             <Link to="/signup" className="text-[#FF8682] hover:underline font-medium">
               Sign up

@@ -172,7 +172,7 @@ export default function AccountInfo() {
                   {...(field.inputProps || { onChange: handleInputChange })}
                 />
               ) : (
-                <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50">{field.display}</p>
+                  <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{field.display}</p>
               )}
             </div>
           ))}
@@ -194,7 +194,7 @@ export default function AccountInfo() {
                 <option value="Other">Other</option>
               </select>
             ) : (
-              <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50">{dbData?.gender}</p>
+              <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{dbData?.gender}</p>
             )}
           </div>
 
@@ -217,7 +217,7 @@ export default function AccountInfo() {
                 </p>
               </>
             ) : (
-              <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 text-sm leading-6">
+                <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 text-sm leading-6 hover:cursor-not-allowed">
                 {dbData?.address?.streetAddress || ""},<br />
                 {dbData?.address?.city || ""}, {dbData?.address?.state || ""} - {dbData?.address?.pincode || ""}
               </p>

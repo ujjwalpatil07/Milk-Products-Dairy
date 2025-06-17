@@ -2,13 +2,10 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import EastIcon from '@mui/icons-material/East';
-import happyFamily from "../assets/happyFamily.png";
 import { ThemeContext } from "../context/ThemeProvider";
 import { faqs, products } from "../data/products";
 import ProductCard from "../components/LandingComponents/ProductCard";
 import QuestionAnswer from "../components/LandingComponents/QuestionAnswer";
-import reviewDarkImage from "../assets/reviewDarkImage.png";
-import reviewLightImage from "../assets/reviewLightImage.png"
 import { features } from "../data/productGoodness ";
 import FeatureCard from "../components/LandingComponents/FeatureCard";
 import { UserAuthContext } from "../context/AuthProvider";
@@ -24,7 +21,7 @@ export default function LandingPage() {
         <>
             <section className="relative w-full overflow-hidden">
                 <img
-                    src={happyFamily}
+                    src={"https://res.cloudinary.com/dyahibuzy/image/upload/v1750157405/happyFamily_uuyftj.png"}
                     alt="Happy Family"
                     className="w-full h-auto object-cover"
                     loading="lazy"
@@ -93,9 +90,9 @@ export default function LandingPage() {
                 <h1 className="text-2xl md:text-4xl font-bold text-center mb-5">Why Choose Madhur Dairy & <br /> Daily Needs ?</h1>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {
-                       features?.map((feature, idx) => (
-                        <FeatureCard key={idx * 0.8} image={feature?.image} title={feature?.title} description={feature?.description} />
-                       ))
+                        features?.map((feature, idx) => (
+                            <FeatureCard key={idx * 0.8} image={feature?.image} title={feature?.title} description={feature?.description} />
+                        ))
                     }
                 </div>
             </section>
@@ -115,7 +112,7 @@ export default function LandingPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                     <div className="flex justify-center items-center w-full md:w-1/2">
                         <img
-                            src={theme === "light" ? reviewDarkImage : reviewLightImage}
+                            src={theme === "light" ? "https://res.cloudinary.com/dyahibuzy/image/upload/v1750157423/reviewDarkImage_nwyi9f.png" : "https://res.cloudinary.com/dyahibuzy/image/upload/v1750157422/reviewLightImage_gvenap.png"}
                             alt="Customer Reviews"
                             className="rounded-xl w-70 md:w-100 h-auto"
                         />

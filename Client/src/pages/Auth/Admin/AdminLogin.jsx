@@ -68,7 +68,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen scroll-smooth flex items-center overflow-auto bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300 p-3">
+    <div className="min-h-screen scroll-smooth flex items-center overflow-auto bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300 px-4 py-8">
 
       <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-xl px-6 py-10 w-full max-w-md h-fit mx-auto">
 

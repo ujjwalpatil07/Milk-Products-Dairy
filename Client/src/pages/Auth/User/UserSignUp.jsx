@@ -72,9 +72,9 @@ export default function UserSignUp() {
   });
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center px-3 py-8 bg-[#F0F1F3] dark:bg-[#121212] transition-all">
-      <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-xl px-3 py-10 w-full max-w-lg">
-        <form onSubmit={handleFormSubmit} className="flex flex-col items-center w-full gap-6">
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-xl px-6 py-10 w-full max-w-md">
+      <form onSubmit={handleFormSubmit} className="flex flex-col items-center w-full gap-6">
 
           <div className="flex justify-between bg-[#D595C3] dark:bg-[#843E71] w-full rounded-lg p-1">
             <button
@@ -168,14 +168,14 @@ export default function UserSignUp() {
           </p>
 
           {/* OR */}
-          <div className="flex items-center my-6 w-full">
+          <div className="flex items-center w-full">
             <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
             <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
             <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
           </div>
 
           {/* Social login */}
-          <div className="flex w-full justify-between pt-2">
+          <div className="flex w-full justify-between ">
             <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
               <i className="fa-brands fa-facebook"></i>
             </div>
