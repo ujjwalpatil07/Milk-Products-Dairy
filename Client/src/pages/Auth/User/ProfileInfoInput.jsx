@@ -107,6 +107,7 @@ export default function ProfileInfoInput() {
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Server error occurred!");
+      // console.log(err)
     } finally {
       setIsLoading(false);
     }

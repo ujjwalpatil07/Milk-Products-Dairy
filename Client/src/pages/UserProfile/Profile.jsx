@@ -8,6 +8,8 @@ import {
   MdPayment,
   MdArrowForward,
 } from "react-icons/md";
+import CircularProgress from '@mui/material/CircularProgress';
+
 import AccountInfo from "./ProfileSections/AccountInfo";
 import MyAddresses from "./ProfileSections/MyAddresses";
 import MyOrders from "./ProfileSections/MyOrders";
@@ -23,32 +25,59 @@ const Profile = () => {
 
   const { authUser, setAuthUser, handleUserLogout } = useContext(UserAuthContext);
 
-  const [activeSection, setActiveSection] = useState("account");
+  const [loading, setLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleProfileImageChange = async (e) => {
+  const [activeSection, setActiveSection] = useState("account");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(authUser?.photo || "");
+  const [showUpdateButton, setShowUpdateButton] = useState(false);
+
+  useEffect(() => {
+    if (authUser?.photo) {
+      setPhotoUrl(authUser.photo); // Reset photoUrl from backend on authUser load
+    }
+  }, [authUser]);
+
+
+  const handlePhotoChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) {
+      setSelectedFile(file);
+      setPhotoUrl(URL.createObjectURL(file));
+      setShowUpdateButton(true);
+    }
+  };
+
+  const handleProfileImageChange = async () => {
+    setLoading(true); 
 
     const formData = new FormData();
-    formData.append("photo", file);
+    formData.append("photo", selectedFile);
     formData.append("id", authUser?._id);
 
     try {
       const res = await axios.post("http://localhost:9000/user-profile/edit-profilePhoto", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
         },
       });
 
       if (res?.data?.success) {
         toast.success("Profile photo updated!");
-        setAuthUser(prev => ({ ...prev, photo: res.data.updatedPhoto }));
+        setAuthUser((prev) => ({ ...prev, photo: res.data.updatedPhoto }));
       } else {
         toast.error("Failed to update photo.");
       }
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong.");
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
+      setShowUpdateButton(false);
     }
   };
 
@@ -89,19 +118,32 @@ const Profile = () => {
     <div className="flex flex-col md:flex-row py-5 p-3 gap-5 max-w-5xl mx-auto">
       <aside className="w-full md:w-1/4 bg-white dark:bg-gray-500/20 p-4 shadow-md overflow-y-hidden rounded-md">
         <div className="flex flex-col items-center mb-10 relative group">
-          <div className="relative">
+          <div className="relative w-24 h-24">
             <img
-              src={authUser?.photo}
+              src={photoUrl || authUser?.photo}
               alt="User"
               className="rounded-full w-24 h-24 object-cover border"
             />
 
-            <label
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
+                <CircularProgress
+                  variant="determinate"
+                  value={uploadProgress}
+                  size={64}
+                  thickness={4}
+                  style={{ color: "#fff" }}
+                />
+              </div>
+            )}
+
+<label
               htmlFor="profileImageInput"
-              className="absolute bottom-0 right-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 p-1 rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              className={`absolute bottom-0 right-0 bg-white dark:bg-gray-800 border p-1 rounded-full transition
+    ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"}`}
               title="Edit Photo"
             >
-              <i className="fa-solid fa-pen-to-square"></i>
+              <i className="fa-solid fa-pen-to-square text-sm" />
             </label>
 
             <input
@@ -109,9 +151,33 @@ const Profile = () => {
               id="profileImageInput"
               accept="image/*"
               className="hidden"
-              onChange={handleProfileImageChange}
+              onChange={handlePhotoChange}
+              disabled={loading}
             />
+
           </div>
+
+
+          {showUpdateButton && (
+            <button
+              onClick={handleProfileImageChange}
+              disabled={loading}
+              className={`mt-2 px-4 py-1 rounded text-sm transition flex items-center gap-2
+                ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#414141] hover:bg-[#5a5a5a] text-white"}
+              `}
+            >
+              {loading ? (
+                <>
+                  <span>Updating</span>
+                  <CircularProgress size={18} color="inherit" />
+                </>
+              ) : (
+                "Update Photo"
+              )}
+            </button>
+
+          )}
+
 
           <h2 className="text-xl font-bold mt-2 text-black dark:text-white">
             {authUser?.firstName} {authUser?.lastName}
@@ -129,7 +195,7 @@ const Profile = () => {
             <button
               key={item.key}
               onClick={() => setActiveSection(item.key)}
-              className={`w-full flex items-center gap-2 px-4 py-2 text-left rounded transition duration-300 ${activeSection === item.key ? "bg-[#D595C3] text-white" : "hover:bg-[#D595C3] dark:hover:bg-[#843E71] text-black dark:text-white"
+              className={`w-full flex items-center gap-2 px-4 py-2 text-left rounded transition duration-300 ${activeSection === item.key ? "bg-[#D595C3] dark:bg-[#843E71] text-black dark:text-white" : "hover:bg-[#D595C3] dark:hover:bg-[#843E71] text-black dark:text-white"
                 }`}
             >
               {item.icon} {item.label}
