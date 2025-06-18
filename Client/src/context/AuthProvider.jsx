@@ -1,8 +1,9 @@
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, createContext } from "react";
 import axios from "axios";
 
 export const UserAuthContext = createContext();
 export const AdminAuthContext = createContext();
+
 
 export const AuthProvider = ({ children }) => {
 
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }) => {
 
         window.addEventListener("localStorageChange", fetchUserData);
         return () => window.removeEventListener("localStorageChange", fetchUserData);
-    }, []);
+    }, [authUser]);
 
     useEffect(() => {
         const fetchAdminData = async () => {
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
 
         window.addEventListener("localStorageChange", fetchAdminData);
         return () => window.removeEventListener("localStorageChange", fetchAdminData);
-    }, []);
+    }, [authAdmin]);
 
     const handleUserLogout = () => {
         setAuthUser(null);

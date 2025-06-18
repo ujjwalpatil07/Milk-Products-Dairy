@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   MdOutlineAccountCircle,
   MdLocationOn,
@@ -96,8 +96,6 @@ const Profile = () => {
       case "delete":
         return <div className="section py-10 text-center text-red-600 font-bold">Are you sure you want to delete your account?</div>;
       case "logout":
-        handleUserLogout();
-        toast.success("Logged out successfully.");
         break;
 
       default:
@@ -211,7 +209,10 @@ const Profile = () => {
           </button>
 
           <button
-            onClick={() => setActiveSection("logout")}
+            onClick={() => {
+              handleUserLogout();
+              toast.success("User Logged Out Successfully");
+            }}
             className={`w-full flex items-center gap-2 mt-2 px-4 py-2 text-left rounded text-gray-800 dark:text-white transition duration-300 ${activeSection === "logout" ? "bg-[#D595C3] text-white" : "hover:bg-[#D595C3] dark:hover:bg-[#843E71]"
               }`}
           >

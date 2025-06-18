@@ -15,7 +15,7 @@ import { Close } from "@mui/icons-material";
 import { UserAuthContext } from "../../../context/AuthProvider";
 
 export default function AccountInfo() {
-  
+
   const { authUser } = useContext(UserAuthContext);
 
   const [edit, setEdit] = useState(false);
@@ -50,7 +50,7 @@ export default function AccountInfo() {
       } else {
         console.log("Failed to fetch user data");
       }
-    } catch(error) {
+    } catch (error) {
       toast.error(error?.message || "Error fetching user data");
     } finally {
       setDataLoading(false);
@@ -116,7 +116,7 @@ export default function AccountInfo() {
     );
   }
 
-  if(!dbData) {
+  if (!dbData) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-500">Unable to fetch user data, please try again.</div>
     )
@@ -172,7 +172,7 @@ export default function AccountInfo() {
                   {...(field.inputProps || { onChange: handleInputChange })}
                 />
               ) : (
-                  <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{field.display}</p>
+                <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{field.display}</p>
               )}
             </div>
           ))}
@@ -217,7 +217,7 @@ export default function AccountInfo() {
                 </p>
               </>
             ) : (
-                <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 text-sm leading-6 hover:cursor-not-allowed">
+              <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 text-sm leading-6 hover:cursor-not-allowed">
                 {dbData?.address?.streetAddress || ""},<br />
                 {dbData?.address?.city || ""}, {dbData?.address?.state || ""} - {dbData?.address?.pincode || ""}
               </p>

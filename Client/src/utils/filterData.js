@@ -1,6 +1,6 @@
 import { getAverageRating } from "./averageRating";
 
-export const filterProducts = (products, productId) => {
+export const searchProducts = (products, productId) => {
   if (!productId) return products;
 
   const keyword = productId.replace(/-/g, " ").toLowerCase();

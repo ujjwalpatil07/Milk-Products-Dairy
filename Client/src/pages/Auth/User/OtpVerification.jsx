@@ -16,8 +16,6 @@ export default function OtpVerification() {
     }
   }, [formData, navigate]);
 
-  console.log(formData)
-
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);
@@ -90,8 +88,8 @@ export default function OtpVerification() {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               ref={(el) => (inputRefs.current[index] = el)}
-              className="h-14 w-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-center text-xl focus:outline-none focus:ring-2 focus:ring-[#843E71] transition"
-            />
+              className={`${loading ? "cursor-not-allowed" : "cursor-text"} h-14 w-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-center text-xl focus:outline-none focus:ring-2 focus:ring-[#843E71] transition`}
+              />
           ))}
         </div>
 

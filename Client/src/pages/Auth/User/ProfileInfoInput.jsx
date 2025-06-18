@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ThemeContext } from "../../../context/ThemeProvider";
-import { UserAuthContext } from "../../../context/AuthProvider";
+import { maharashtraCities } from "../../../data/cities";
 
 export default function ProfileInfoInput() {
   const navigate = useNavigate();
@@ -134,13 +134,13 @@ export default function ProfileInfoInput() {
 
           {/* Input fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <TextField label="First Name" name="firstName" value={profileInfo.firstName} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} />
-            <TextField label="Last Name" name="lastName" value={profileInfo.lastName} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} />
+            <TextField label="First Name" name="firstName" value={profileInfo.firstName} onChange={handleInputChange} disabled={isLoading} fullWidth required  sx={getTextFieldStyles(theme)} />
+            <TextField label="Last Name" name="lastName" value={profileInfo.lastName} onChange={handleInputChange} disabled={isLoading} fullWidth required sx={getTextFieldStyles(theme)} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <TextField label="Phone Number" name="mobileNo" value={profileInfo.mobileNo} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} />
-            <select name="gender" required value={profileInfo.gender} onChange={handleInputChange} className="border border-gray-300 rounded-md p-3 w-full text-black dark:text-white dark:bg-gray-700">
+            <TextField label="Phone Number" name="mobileNo" value={profileInfo.mobileNo} onChange={handleInputChange} disabled={isLoading} fullWidth required sx={getTextFieldStyles(theme)} />
+            <select name="gender" required value={profileInfo.gender} onChange={handleInputChange} disabled={isLoading} className="border border-gray-300 rounded-md p-3 w-full text-black dark:text-white dark:bg-gray-700">
               <option value="">Select Gender</option>
               <option value="Female">Female</option>
               <option value="Male">Male</option>
@@ -148,23 +148,23 @@ export default function ProfileInfoInput() {
             </select>
           </div>
 
-          <TextField label="Username" name="username" value={profileInfo.username} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} className="!mb-5" />
-          <TextField label="Shop Name" name="shopName" value={profileInfo.shopName} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} className="!mb-5" />
-          <TextField label="Address" name="streetAddress" value={profileInfo.address.streetAddress} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} className="!mb-5" />
+          <TextField label="Username" name="username" value={profileInfo.username} onChange={handleInputChange} disabled={isLoading} fullWidth required sx={getTextFieldStyles(theme)} className="!mb-5" />
+          <TextField label="Shop Name" name="shopName" value={profileInfo.shopName} onChange={handleInputChange} disabled={isLoading} fullWidth  sx={getTextFieldStyles(theme)} className="!mb-5" />
+          <TextField label="Address" name="streetAddress" value={profileInfo.address.streetAddress} onChange={handleInputChange} disabled={isLoading} fullWidth required sx={getTextFieldStyles(theme)} className="!mb-5" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <select name="city" required value={profileInfo.address.city} onChange={handleInputChange} className="border border-gray-300 rounded-md p-3 w-full text-black dark:text-white dark:bg-gray-700">
-              <option value="">Select City</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Jalgaon">Jalgaon</option>
+            <select name="city" required value={profileInfo.address.city} onChange={handleInputChange} disabled={isLoading} className="border border-gray-300 rounded-md p-3 w-full text-black dark:text-white dark:bg-gray-700">
+              <option >Select City</option>
+              {maharashtraCities.map((city, idx) => {
+                return <option value={city} key={idx}>{city}</option>
+              })}
             </select>
-            <TextField label="Pincode" name="pincode" value={profileInfo.pincode} onChange={handleInputChange} fullWidth required sx={getTextFieldStyles(theme)} />
+            <TextField label="Pincode" name="pincode" value={profileInfo.pincode} onChange={handleInputChange} disabled={isLoading} fullWidth required sx={getTextFieldStyles(theme)} />
           </div>
 
           <div className="flex flex-col gap-2 mt-4 text-sm font-medium">
             <label className="flex items-center gap-2">
-              <input type="checkbox" className="accent-[#843E71]" /> I agree to all
+              <input type="checkbox" className="accent-[#843E71]" required/> I agree to all
               <span className="text-[#FF8682]"> Terms </span> and
               <span className="text-[#FF8682]"> Privacy Policies</span>
             </label>

@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { signupUser } from "../../../services/userService";
@@ -99,6 +98,7 @@ export default function UserSignUp() {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
             variant="outlined"
             fullWidth
             required
@@ -113,6 +113,7 @@ export default function UserSignUp() {
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleInputChange}
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
               variant="outlined"
               fullWidth
               required
@@ -132,6 +133,7 @@ export default function UserSignUp() {
               type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={handleInputChange}
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
               variant="outlined"
               fullWidth
               required

@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginUser } from "../../../services/userService";
