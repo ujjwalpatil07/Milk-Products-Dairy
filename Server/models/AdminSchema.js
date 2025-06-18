@@ -37,13 +37,7 @@ const AdminSchema = new mongoose.Schema(
       required: true,
       match: [/^\d{10}$/, "Mobile number must be 10 digits"],
     },
-
-    factoryName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
+    
     factoryAddress: {
       street: { type: String, trim: true },
       city: { type: String, trim: true },

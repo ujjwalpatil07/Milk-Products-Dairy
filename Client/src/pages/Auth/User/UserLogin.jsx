@@ -2,13 +2,14 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginUser } from "../../../services/userService";
+import { AdminAuthContext } from "../../../context/AuthProvider";
 
 export default function UserLogin() {
   const navigate = useNavigate();
+  const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -38,6 +39,7 @@ export default function UserLogin() {
 
       if (data?.user) {
         localStorage.setItem("User", JSON.stringify(data.user));
+        handleAdminLogout();
         toast.success("Login Successful!");
         navigate("/home");
       } else {

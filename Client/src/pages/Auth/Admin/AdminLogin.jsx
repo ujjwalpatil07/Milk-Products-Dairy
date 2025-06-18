@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginAdmin } from "../../../services/adminService";
+import { UserAuthContext } from "../../../context/AuthProvider";
 
 const getTextFieldStyles = (theme) => ({
   input: {
@@ -31,6 +32,7 @@ const getTextFieldStyles = (theme) => ({
 export default function AdminLogin() {
 
   const navigate = useNavigate();
+  const { handleUserLogout } = useContext(UserAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +59,7 @@ export default function AdminLogin() {
 
       if (data) {
         localStorage.setItem("Admin", JSON.stringify(data.admin));
+        handleUserLogout();
         toast.success("Logged in successfully as Admin");
         navigate("/admin/dashboard");
       }

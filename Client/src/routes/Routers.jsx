@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom"
-import Layout from "../layouts/Layout"
+import Layout from "../layouts/Layout";
+import AdminLayout from "../layouts/AdminLayout";
 
 import UserLogin from "../pages/Auth/User/UserLogin";
 import UserSignUp from "../pages/Auth/User/UserSignUp";
@@ -17,6 +18,7 @@ import ProductDetailsPage from "../pages/ProductDetailsPage"
 import CartPage from "../pages/CartPage"
 import ContactPage from "../pages/ContactPage"
 import OrderCheckoutPage from "../pages/OrderCheckoutPage"
+import Dashboard from "../pages/Admin/Dashboard";
 
 export default function Routers() {
     return (
@@ -32,6 +34,7 @@ export default function Routers() {
             <Route path="/signup/info-input" element={<ProfileInfoInput />} />
             <Route path="/user-profile" element={<Layout><Profile /></Layout>} />
 
+            <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
 
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
             <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />

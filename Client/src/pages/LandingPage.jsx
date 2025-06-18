@@ -10,7 +10,6 @@ import { features } from "../data/productGoodness ";
 import FeatureCard from "../components/LandingComponents/FeatureCard";
 import { UserAuthContext } from "../context/AuthProvider";
 
-
 export default function LandingPage() {
 
     const { authUser } = useContext(UserAuthContext);
@@ -28,9 +27,9 @@ export default function LandingPage() {
                 />
 
                 <div className="md:absolute py-16 px-3 text-center top-0 left-0 md:bg-black/30 w-full h-full flex flex-col justify-center items-center">
-                    <h1 className="text-xl sm:text-4xl md:text-5xl mb-2 font-bold text-gray-900 dark:text-gray-100 md:text-white">WellCome to</h1>
+                    <h1 className="text-xl sm:text-4xl md:text-5xl mb-2 font-bold text-gray-900 dark:text-gray-100 md:text-white">WelCome to</h1>
                     <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent inline-block " >
-                        Dadhur Dairy & Daily Needs
+                        Madhur Dairy & Daily Needs
                     </h1>
 
                     <p className="text-xl md:text-2xl mb-6 font-semibold text-gray-900 dark:text-gray-100 md:text-gray-100">

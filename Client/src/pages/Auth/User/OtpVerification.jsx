@@ -16,8 +16,6 @@ export default function OtpVerification() {
     }
   }, [formData, navigate]);
 
-  console.log(formData)
-
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef([]);

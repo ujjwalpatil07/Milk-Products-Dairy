@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   MdOutlineAccountCircle,
   MdLocationOn,
@@ -50,7 +50,7 @@ const Profile = () => {
   };
 
   const handleProfileImageChange = async () => {
-    setLoading(true); 
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("photo", selectedFile);
@@ -137,7 +137,7 @@ const Profile = () => {
               </div>
             )}
 
-<label
+            <label
               htmlFor="profileImageInput"
               className={`absolute bottom-0 right-0 bg-white dark:bg-gray-800 border p-1 rounded-full transition
     ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"}`}

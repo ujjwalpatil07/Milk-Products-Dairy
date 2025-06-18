@@ -1,5 +1,5 @@
 const originalSetItem = localStorage.setItem;
-localStorage.setItem = function (key, value) {
+localStorage.setItem = function () {
   const event = new Event("localStorageChange");
   originalSetItem.apply(this, arguments);
   window.dispatchEvent(event);
