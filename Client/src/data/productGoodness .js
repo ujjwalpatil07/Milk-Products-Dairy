@@ -1,7 +1,3 @@
-import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
-import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
-import ThermostatAutoIcon from "@mui/icons-material/ThermostatAuto";
-import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import DeliveryPerson from "../assets/deliveryPerson.png"
 import freshProducts from "../assets/freshProducts.jpg"
 import freshMilk from "../assets/freshMilk.jpg"
@@ -80,33 +76,6 @@ export const testimonials = [
       "Love their dedication to quality. The creaminess and flavor make it a staple in my household.",
     name: "Manish Gupta",
     platform: "Facebook",
-  },
-];
-
-export const productWorkflow = [
-  {
-    icon: LocalDrinkIcon,
-    title: "Milking Twice a Day",
-    description:
-      "We source milk from farmers on the outskirts of your city for complete freshness and purity.",
-  },
-  {
-    icon: ScienceOutlinedIcon,
-    title: "100+ Tests Everyday",
-    description:
-      "We quality test all milk for adulteration every single day to ensure purity.",
-  },
-  {
-    icon: ThermostatAutoIcon,
-    title: "Pasteurization & Packing at 4°C",
-    description:
-      "Maintaining milk at 4°C improves its shelf life and prevents harmful bacteria growth.",
-  },
-  {
-    icon: DeliveryDiningIcon,
-    title: "Assured 7 AM Doorstep Delivery",
-    description:
-      "Fresh milk & best quality groceries delivered to your doorstep every morning.",
   },
 ];
 

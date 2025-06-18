@@ -1,4 +1,34 @@
-import { productWorkflow } from "../data/productGoodness ";
+import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import ThermostatAutoIcon from "@mui/icons-material/ThermostatAuto";
+import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
+
+const productWorkflow = [
+    {
+        icon: <LocalDrinkIcon sx={{ fontSize: 50 }} />,
+        title: "Milking Twice a Day",
+        description:
+            "We source milk from farmers on the outskirts of your city for complete freshness and purity.",
+    },
+    {
+        icon: <ScienceOutlinedIcon sx={{ fontSize: 50 }} />,
+        title: "100+ Tests Everyday",
+        description:
+            "We quality test all milk for adulteration every single day to ensure purity.",
+    },
+    {
+        icon: <ThermostatAutoIcon sx={{ fontSize: 50 }} />,
+        title: "Pasteurization & Packing at 4°C",
+        description:
+            "Maintaining milk at 4°C improves its shelf life and prevents harmful bacteria growth.",
+    },
+    {
+        icon: <DeliveryDiningIcon sx={{ fontSize: 50 }} />,
+        title: "Assured 7 AM Doorstep Delivery",
+        description:
+            "Fresh milk & best quality groceries delivered to your doorstep every morning.",
+    },
+];
 
 export default function ProductProcess() {
     return (
@@ -17,16 +47,17 @@ export default function ProductProcess() {
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
                     {productWorkflow.map(({ icon, title, description }, i) => (
                         <div
-                            key={i * 0.6}
+                            key={i * 0.5}
                             className="flex flex-col items-center text-center p-3"
                         >
-                            <icon className="text-gray-600 dark:text-white mb-4" sx={{ fontSize: 50 }} />
+                            <div className="text-gray-600 dark:text-white mb-4">{icon}</div>
                             <h3 className="text-[1.1rem] font-semibold text-gray-900 dark:text-white mb-2">
                                 {title}
                             </h3>
                             <p className="text-gray-600 dark:text-gray-300">{description}</p>
                         </div>
                     ))}
+
                 </div>
             </div>
         </section>

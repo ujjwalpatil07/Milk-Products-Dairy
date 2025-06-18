@@ -1,10 +1,12 @@
 import React, { useContext, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Star, StarBorder } from "@mui/icons-material";
+import Pagination from "@mui/material/Pagination";
 import { getAverageRating } from "../../utils/averageRating";
 import { ThemeContext } from "../../context/ThemeProvider";
 import ReviewCard from "./ReviewCart";
 import { filterReviews } from "../../utils/filterReviews";
+import ReviewForm from "./ReviewForm";
 
 const filters = [
   { label: "All Reviews", value: "all" },
@@ -14,22 +16,34 @@ const filters = [
 ];
 
 
-export default function ReviewSection({ reviews }) {
+export default function ReviewSection({ reviews, productId }) {
 
   const { theme } = useContext(ThemeContext);
   const [selected, setSelected] = useState("all");
+  const [page, setPage] = useState(1);
+  const reviewsPerPage = 10;
+
 
   const filteredReviews = useMemo(
     () => filterReviews(reviews, selected),
     [reviews, selected]
-  )
+  );
+
+  const paginatedReviews = useMemo(() => {
+    const startIndex = (page - 1) * reviewsPerPage;
+    return filteredReviews.slice(startIndex, startIndex + reviewsPerPage);
+  }, [filteredReviews, page]);
+
 
   const totalReviews = reviews.length;
-
   const averageRating = getAverageRating(reviews);
 
   const handleFilterClick = (value) => {
     setSelected(value);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
   };
 
   if (!Array.isArray(reviews) || reviews.length === 0) {
@@ -137,7 +151,7 @@ export default function ReviewSection({ reviews }) {
         </div>
 
         <div className="space-y-5 flex-1">
-          {filteredReviews.length === 0 ? (
+          {filteredReviews?.length === 0 ? (
             <div className="p-4 text-center text-gray-600 dark:text-gray-300">
               No reviews match this filter.
             </div>
@@ -147,19 +161,37 @@ export default function ReviewSection({ reviews }) {
                 Showing {filteredReviews.length} review{filteredReviews.length > 1 ? "s" : ""}
               </div>
 
-              {filteredReviews.map((review, idx) => (
+              {paginatedReviews.map((review) => (
                 <ReviewCard
-                  key={idx * 0.95}
+                  key={review._id}
+                  id={review?._id}
+                  productId={productId}
                   username={review?.userId?.username}
-                  image={review?.userId?.image}
+                  image={review?.userId?.photo}
                   message={review?.message}
-                  date={review?.date}
+                  date={review?.createdAt}
                   rating={review?.rating}
                   likes={review?.likes}
+                  postedUserId={review?.userId?._id}
                 />
               ))}
+
+              {filteredReviews.length > reviewsPerPage && (
+                <div className="pt-4 flex justify-center">
+                  <Pagination
+                    count={Math.ceil(filteredReviews.length / reviewsPerPage)}
+                    page={page}
+                    onChange={handlePageChange}
+                    variant="outlined"
+                    shape="rounded"
+                    color="primary"
+                  />
+                </div>
+              )}
             </>
           )}
+
+          <ReviewForm productId={productId} />
         </div>
       </div>
     </>
@@ -176,4 +208,5 @@ ReviewSection.propTypes = {
       likes: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ),
+  productId: PropTypes.string.isRequired
 };

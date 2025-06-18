@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -6,9 +6,10 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from "../context/CartProvider";
 import { getCartProductDetails } from "../utils/cartUtils";
-import { products } from "../data/products";
 import CartProductCard from "../components/CartComponents/CartProductCard";
 import SavedAddressList from "../components/CartComponents/SavedAddressList";
+import { getProducts } from "../services/productServices";
+import { toast } from "react-toastify";
 
 export default function CartPage() {
 
@@ -17,14 +18,43 @@ export default function CartPage() {
     const discount = 5;
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [allProducts, setAllProducts] = useState([]);
+
+    useEffect(() => {
+        const getAllProducts = async () => {
+            try {
+                const res = await getProducts();
+                if (res?.success) {
+                    setAllProducts(res.products || []);
+                }
+            } catch (error) {
+                toast.error("Failed to fetch products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getAllProducts();
+    }, []);
+
     const handleDialogStatus = (status) => {
         setOpen(status);
     }
 
     const cartDetails = useMemo(
-        () => getCartProductDetails(cartItems, products),
-        [cartItems, products]
+        () => getCartProductDetails(cartItems, allProducts),
+        [cartItems, allProducts]
     );
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
+                <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+                <span className="text-xl">Loading product...</span>
+            </div>
+        );
+    }
 
     if (!authUser) {
         return (
@@ -62,7 +92,7 @@ export default function CartPage() {
             {
                 (deliveryAddress) && <section className="max-w-4xl mx-auto my-5 px-3">
                     <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
-                        <h1>Deliver To: 
+                        <h1>Deliver To:
                             <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{deliveryAddress?.name}</span>
                             <span className="text-sm ms-3 px-3 rounded-full bg-gray-500/10 dark:bg-gray-200/50">{deliveryAddress?.addressType}</span>
                         </h1>
@@ -143,10 +173,10 @@ export default function CartPage() {
                 </div>
             </section>
 
-            <section className="max-w-4xl mx-auto my-20 px-3 flex justify-center">
+            <section className="max-w-4xl mx-auto my-10 px-3 flex justify-center">
                 <Link
                     to="/products"
-                    className="w-fit text-center  bg-[#843E71] text-white py-2 px-3 rounded-md hover:bg-[#843e71d4] transition"
+                    className="w-fit text-center bg-[#843E71] text-white py-2 px-3 rounded-md hover:bg-[#843e71d4] transition"
                 >
                     Add More Products
                 </Link>

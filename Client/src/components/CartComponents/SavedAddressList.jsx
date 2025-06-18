@@ -44,11 +44,14 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
   let addressContent;
   if (loading) {
     addressContent = (
-      <p className="text-gray-700 dark:text-gray-200">Loading addresses...</p>
+      <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3 pb-10 pt-6">
+        <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <span>Loading addresses...</span>
+      </div>
     );
   } else if (addresses.length === 0) {
     addressContent = (
-      <p className="text-gray-600 dark:text-gray-300">No addresses found.</p>
+      <p className="text-gray-600 dark:text-gray-300 text-center pb-10 pt-6">No addresses found.</p>
     );
   } else {
     addressContent = (

@@ -6,30 +6,39 @@ import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { Link } from "react-router-dom";
 import { slugify } from "../../utils/slugify";
 import { useContext, useState } from "react";
-import { products } from "../../data/products";
 import { UserAuthContext } from "../../context/AuthProvider";
+import { productLike } from "../../services/productServices";
 
-export default function RecommendedCard({ image, name, description, likes = [], rating }) {
+export default function RecommendedCard({ id, image, name, description, likes = [], rating }) {
 
   const { authUser } = useContext(UserAuthContext);
 
   const [localLikes, setLocalLikes] = useState(likes);
+  const [likeLoading, setLikeLoading] = useState(false);
 
-  const handleLikeProduct = (productId) => {
-    const category = products?.find(cat => cat.varieties.some(v => v.name === productId));
-
-    if (!category) return;
-
-    const product = category?.varieties?.find(v => v.name === productId);
-
-    if (!product?.likes?.includes(authUser?.name)) {
-      product?.likes?.push(authUser?.name);
-      setLocalLikes(prevLikes => [...prevLikes, authUser?.name]);
-      toast.success("You liked the product!");
-    } else {
-      toast.info("You already liked this product.");
+  const handleLikeProduct = async (productId) => {
+    if (!authUser?._id) {
+      toast.error("Please log in to like products.");
+      return;
     }
-  }
+
+    if (localLikes.includes(authUser._id)) {
+      toast.info("You already liked this product.");
+      return;
+    }
+
+    setLikeLoading(true);
+
+    try {
+      const { message, updatedLikes } = await productLike(productId, authUser._id);
+      setLocalLikes(updatedLikes);
+      toast.success(message || "You liked the product!");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to like product.");
+    } finally {
+      setLikeLoading(false);
+    }
+  };
 
   return (
     <div className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300">
@@ -54,8 +63,16 @@ export default function RecommendedCard({ image, name, description, likes = [], 
         )}
 
         {!localLikes?.includes(authUser?._id) && (
-          <button onClick={() => handleLikeProduct(name)} className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer">
-            <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+          <button
+            onClick={() => handleLikeProduct(id)}
+            className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer"
+            disabled={likeLoading}
+          >
+            {likeLoading ? (
+              <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
+            ) : (
+              <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+            )}
           </button>
         )}
       </div>
@@ -88,6 +105,7 @@ export default function RecommendedCard({ image, name, description, likes = [], 
 
 
 RecommendedCard.propTypes = {
+  id: PropTypes.string.isRequired,
   image: PropTypes.string,
   name: PropTypes.string.isRequired,
   description: PropTypes.string,

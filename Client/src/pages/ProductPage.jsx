@@ -1,46 +1,46 @@
 import { useParams } from "react-router-dom";
 
-import { products } from "../data/products";
-import ProductCard from "../components/ProductComponents/ProductCard";
-import { applySortToFilteredProducts, getTopVarietiesByReviewsAndLikes, recommendProducts, searchProducts } from "../utils/filterData";
+import ProductVarietyCart from "../components/ProductComponents/ProductVarietyCard";
+import { getTopProductsByReviewsAndLikes, recommendProducts, searchProducts, sortProducts } from "../utils/filterData";
 import ProductList from "../components/ProductComponents/ProductList";
 import SearchProducts from "../components/ProductComponents/SearchProducts";
 import RecommendedCard from "../components/ProductComponents/RecommendedCard";
 import { getAverageRating } from "../utils/averageRating";
 import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../context/ProductProvider";
-
 import { getProducts } from "../services/productServices";
+import { getRandomImage } from "../utils/imagePicker";
 
 export default function ProductPage() {
 
+    const { productId } = useParams();
+    const { filter } = useContext(ProductContext);
+
+    const [loading, setLoading] = useState(true);
     const [fetchedProducts, setFetchedProducts] = useState();
 
     useEffect(() => {
         const fetchProducts = async () => {
-          try {
-            const dbProducts = await getProducts(); // await resolves the Promise
-            // console.log(dbProducts.products); // You get actual data here
-            setFetchedProducts(dbProducts?.products);
-          } catch (err) {
-            console.error("Error fetching products:", err);
-          }
+            try {
+                const dbProducts = await getProducts();
+                setFetchedProducts(Array.isArray(dbProducts?.products) ? dbProducts.products : []);
+            } catch (err) {
+                console.error("Error fetching products:", err);
+            } finally {
+                setLoading(false);
+            }
         };
-      
-        fetchProducts();
-      }, []);
 
-      console.log(fetchedProducts)
-    const { productId } = useParams();
-    const { filter } = useContext(ProductContext);
+        fetchProducts();
+    }, [productId]);
 
     const [visibleCount, setVisibleCount] = useState(5);
     const [visibleCount1, setVisibleCount1] = useState(3);
 
-    const filteredProducts = searchProducts(products, productId);
-    const recommendedProducts = recommendProducts(products, productId);
-    const topVarieties = getTopVarietiesByReviewsAndLikes(filteredProducts);
-    const sortedFilteredProducts = applySortToFilteredProducts(filteredProducts, filter);
+    const filteredProducts = searchProducts(fetchedProducts ?? [], productId);
+    const recommendedProducts = recommendProducts(fetchedProducts ?? [], productId);
+    const topProducts = getTopProductsByReviewsAndLikes(filteredProducts ?? []);
+    const sortedFilteredProducts = sortProducts(filteredProducts ?? [], filter);
 
     return (
         <>
@@ -53,85 +53,106 @@ export default function ProductPage() {
                 </div>
 
                 <div className="flex-1 space-y-5">
-                    <section className="w-full">
-                        {sortedFilteredProducts.length === 0 ? (
-                            <div className="text-center text-gray-500 dark:text-gray-300 py-25">
-                                No products found matching your search/filter.
+                    {loading ? (
+                        <div className="w-full flex justify-center text-gray-500 dark:text-gray-300 py-16 text-lg">
+                            <div className="w-fit flex items-center gap-3">
+                                <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+                                <p>Loading...</p>
                             </div>
-                        ) : (
-                            sortedFilteredProducts.map((product, index) => (
-                                <ProductCard key={index * 0.9} product={product} />
-                            ))
-                        )}
-                    </section>
-
-                    {(recommendedProducts?.length > 0) && (
-                        <section className="pt-10 lg:px-6">
-                            <h2 className="text-lg font-semibold py-2">Recommended</h2>
-
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5">
-                                {
-                                    recommendedProducts
-                                        .slice(0, visibleCount)
-                                        .map((variety, idx) => (
-                                            <RecommendedCard
-                                                key={idx * 0.8}
-                                                image={variety?.image?.[0] || ""}
-                                                name={variety?.name}
-                                                description={variety?.description}
-                                                likes={variety?.likes || []}
-                                                rating={getAverageRating(variety?.reviews)}
-                                            />
-                                        ))
-                                }
-                            </div>
-
-                            {visibleCount < recommendedProducts.length && (
-                                <div className="text-center pt-4">
-                                    <button
-                                        onClick={() => setVisibleCount(prev => prev + 5)}
-                                        className="bg-[#213448] text-white px-6 py-2 rounded-full shadow-md transition cursor-pointer"
-                                    >
-                                        Load More
-                                    </button>
-                                </div>
-                            )}
-                        </section>
-                    )}
-
-                    {(topVarieties?.length > 0) && (<section className="lg:px-6 ">
-                        <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
-                            Most Reviews & Likes
-                        </h2>
-
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 py-4">
-                            {
-                                topVarieties?.slice(0, visibleCount1).map((variety, idx) => (
-                                    <RecommendedCard
-                                        key={idx * 0.7}
-                                        image={variety?.image?.[0] || ""}
-                                        name={variety?.name}
-                                        description={variety?.description}
-                                        likes={variety?.likes || []}
-                                        rating={getAverageRating(variety?.reviews)}
-                                    />
-                                ))
-                            }
                         </div>
+                    ) : (
+                        <>
+                            <section className="w-full lg:px-6">
+                                {(sortedFilteredProducts?.length ?? 0) === 0 ? (
+                                    <div className="py-20 text-center">No products found matching your search/filter.</div>
+                                ) : (
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5 border-b border-dashed border-gray-500/50">
+                                        {sortedFilteredProducts.map((product, index) => (
+                                            <ProductVarietyCart
+                                                key={product?._id || index}
+                                                id={product?._id}
+                                                image={getRandomImage(product?.image || []) || null} 
+                                                name={product?.name || "Unnamed Product"}
+                                                rating={getAverageRating(product?.reviews || []) || 0}
+                                                likes={Array.isArray(product?.likes) ? product.likes : []}
+                                                type={product?.type || "Unknown"}
+                                                price={product?.price || 0}
+                                                minQuantity={product?.minQuantity || 1}
+                                                stock={product?.stock || 0}
+                                                quantityUnit={product?.quantityUnit || "unit"}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </section>
 
-                        {visibleCount1 < topVarieties?.length && (
-                            <div className="text-center pt-4">
-                                <button
-                                    onClick={() => setVisibleCount1(prev => prev + 3)}
-                                    className="bg-[#213448] text-white px-6 py-2 rounded-full shadow-md transition cursor-pointer"
-                                >
-                                    Load More
-                                </button>
-                            </div>
-                        )}
-                    </section>
+                            {recommendedProducts?.length > 0 && (
+                                <section className="pt-10 lg:px-6">
+                                    <h2 className="text-lg font-semibold py-2">Recommended</h2>
+
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5">
+                                        {recommendedProducts.slice(0, visibleCount).map((variety, idx) => (
+                                            <RecommendedCard
+                                                key={variety?._id || idx}
+                                                id={variety._id}
+                                                image={variety?.image?.[0] || ""}
+                                                name={variety?.name || "Unknown Product"}
+                                                description={variety?.description || "No description"}
+                                                likes={variety?.likes || []}
+                                                rating={getAverageRating(variety?.reviews || [])}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {visibleCount < recommendedProducts.length && (
+                                        <div className="text-center pt-4">
+                                            <button
+                                                onClick={() => setVisibleCount(prev => prev + 5)}
+                                                className="bg-[#213448] text-white px-6 py-2 rounded-full shadow-md transition cursor-pointer"
+                                            >
+                                                Load More
+                                            </button>
+                                        </div>
+                                    )}
+                                </section>
+                            )}
+
+                            {topProducts?.length > 0 && (
+                                <section className="lg:px-6 ">
+                                    <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
+                                        Most Reviews & Likes
+                                    </h2>
+
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 py-4">
+                                        {topProducts.slice(0, visibleCount1).map((variety, idx) => (
+                                            <RecommendedCard
+                                                key={variety?._id || idx}
+                                                id={variety._id}
+                                                image={variety?.image?.[0] || ""}
+                                                name={variety?.name || "Unnamed"}
+                                                description={variety?.description || "No description available"}
+                                                likes={variety?.likes ?? []}
+                                                rating={getAverageRating(variety?.reviews ?? [])}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {visibleCount1 < topProducts.length && (
+                                        <div className="text-center pt-4">
+                                            <button
+                                                onClick={() => setVisibleCount1(prev => prev + 3)}
+                                                className="bg-[#213448] text-white px-6 py-2 rounded-full shadow-md transition cursor-pointer"
+                                            >
+                                                Load More
+                                            </button>
+                                        </div>
+                                    )}
+                                </section>
+                            )}
+                        </>
                     )}
                 </div>
+
             </div>
 
             <br />

@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import EastIcon from '@mui/icons-material/East';
 import { ThemeContext } from "../context/ThemeProvider";

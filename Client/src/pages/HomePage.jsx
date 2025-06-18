@@ -105,7 +105,7 @@ export default function HomePage() {
 
                 <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {products.slice(0, productCount).map((product, index) => (
-                        <OfferingProductCard key={index * 0.7} title={product.title} image={product.image} />
+                        <OfferingProductCard key={index * 0.7} title={product?.title} image={product?.image} />
                     ))}
                 </div>
 

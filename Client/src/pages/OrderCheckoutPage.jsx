@@ -1,9 +1,10 @@
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartProvider";
 import { UserAuthContext } from "../context/AuthProvider";
 import { getCartProductDetails } from "../utils/cartUtils";
-import { products } from "../data/products";
+import { getProducts } from "../services/productServices";
+import { toast } from "react-toastify";
 
 export default function OrderCheckoutPage() {
 
@@ -11,9 +12,30 @@ export default function OrderCheckoutPage() {
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    const getAllProducts = async () => {
+      try {
+        const res = await getProducts();
+        if (res?.success) {
+          setAllProducts(res?.products || []);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllProducts();
+  }, []);
+
+
   const cartDetails = useMemo(
-    () => getCartProductDetails(cartItems, products),
-    [cartItems, products]
+    () => getCartProductDetails(cartItems, allProducts),
+    [cartItems, allProducts]
   );
 
   const subtotal = cartDetails.reduce((acc, item) => acc + item.price * item.selectedQuantity, 0);
@@ -25,6 +47,16 @@ export default function OrderCheckoutPage() {
     clearCart();
     navigate("/order-success");
   };
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
+        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <span className="text-xl">Loading product...</span>
+      </div>
+    );
+  }
 
   if (!authUser) {
     return (

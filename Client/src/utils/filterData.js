@@ -1,117 +1,97 @@
 import { getAverageRating } from "./averageRating";
 
 export const searchProducts = (products, productId) => {
-  if (!productId) return products;
+  if (!productId || !Array.isArray(products)) return products ?? [];
 
   const keyword = productId.replace(/-/g, " ").toLowerCase();
 
   return products.filter((product) => {
-    const titleMatch = product?.title?.toLowerCase().includes(keyword);
-    const varietyMatch = product?.varieties?.some((variety) =>
-      variety?.name?.toLowerCase().includes(keyword)
-    );
-
-    return titleMatch || varietyMatch;
+    const nameMatch = product?.name?.toLowerCase()?.includes(keyword) ?? false;
+    const categoryMatch = product?.category?.toLowerCase()?.includes(keyword) ?? false;
+    return nameMatch || categoryMatch;
   });
 };
 
 export const recommendProducts = (products, productId) => {
-  if (!productId) return [];
+  if (!productId || !Array.isArray(products)) return [];
 
   const keywords = productId.replace(/-/g, " ").toLowerCase().split(/\s+/);
 
-  const recommendedVarieties = [];
+  const recommendedProducts = products.filter((product) => {
+    const descriptionTokens = product?.description?.toLowerCase()?.split(/\s+/) ?? [];
+    const typeTokens = product?.type?.toLowerCase()?.split(/\s+/) ?? [];
+    const unitTokens = product?.quantityUnit?.toLowerCase()?.split(/\s+/) ?? [];
 
-  products.forEach((product) => {
-    const descriptionTokens =
-      product?.description?.toLowerCase().split(/\s+/) || [];
-
-    product?.varieties?.forEach((variety) => {
-      const typeTokens = variety?.type?.toLowerCase().split(/\s+/) || [];
-      const unitTokens =
-        variety?.quantityUnit?.toLowerCase().split(/\s+/) || [];
-
-      const allTokens = [...typeTokens, ...unitTokens, ...descriptionTokens];
-
-      const hasMatch = keywords.some((kw) => allTokens.includes(kw));
-
-      if (hasMatch) {
-        recommendedVarieties.push(variety);
-      }
-    });
+    const allTokens = [...descriptionTokens, ...typeTokens, ...unitTokens];
+    return keywords.some((kw) => allTokens.includes(kw));
   });
 
-  // Shuffle results
-  for (let i = recommendedVarieties.length - 1; i > 0; i--) {
+  // Shuffle
+  for (let i = recommendedProducts.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [recommendedVarieties[i], recommendedVarieties[j]] = [
-      recommendedVarieties[j],
-      recommendedVarieties[i],
+    [recommendedProducts[i], recommendedProducts[j]] = [
+      recommendedProducts[j],
+      recommendedProducts[i],
     ];
   }
 
-  return recommendedVarieties;
+  return recommendedProducts;
 };
 
-export const getTopVarietiesByReviewsAndLikes = (products) => {
-  const allVarieties = [];
+export const getTopProductsByReviewsAndLikes = (products) => {
+  if (!Array.isArray(products)) return [];
 
-  products.forEach((product) => {
-    product.varieties.forEach((variety) => {
-      const varietyLikes = variety.likes?.length || 0;
+  const scoredProducts = products.map((product) => {
+    const likesCount = product?.likes?.length ?? 0;
+    const reviews = Array.isArray(product?.reviews) ? product.reviews : [];
+    const reviewCount = reviews.length;
 
-      const totalReviewLikes =
-        variety.reviews?.reduce((sum, review) => {
-          return sum + (review.likes?.length || 0);
-        }, 0) || 0;
+    const totalReviewLikes = reviews.reduce((sum, review) => {
+      return sum + (review?.likes?.length ?? 0);
+    }, 0);
 
-      const totalScore = varietyLikes + totalReviewLikes;
+    const totalScore = likesCount + totalReviewLikes + reviewCount;
 
-      allVarieties.push({
-        ...variety,
-        totalScore,
-      });
-    });
+    return {
+      ...product,
+      totalScore,
+    };
   });
 
-  allVarieties.sort((a, b) => b.totalScore - a.totalScore);
-
-  return allVarieties;
+  return scoredProducts.sort((a, b) => b.totalScore - a.totalScore);
 };
 
-export const sortVarieties = (varieties, filterType) => {
-  if (!Array.isArray(varieties)) return [];
+export const sortProducts = (products, filterType) => {
+  if (!Array.isArray(products)) return [];
 
   switch (filterType) {
     case "Most Reviews":
-      return [...varieties].sort(
-        (a, b) => (b.reviews?.length || 0) - (a.reviews?.length || 0)
+      return [...products].sort(
+        (a, b) => (b.reviews?.length ?? 0) - (a.reviews?.length ?? 0)
       );
 
     case "Most Likes":
-      return [...varieties].sort(
-        (a, b) => (b?.likes?.length || 0) - (a?.likes?.length || 0)
+      return [...products].sort(
+        (a, b) => (b.likes?.length ?? 0) - (a.likes?.length ?? 0)
       );
 
     case "Price: Low to High":
-      return [...varieties].sort((a, b) => a?.price - b?.price);
+      return [...products].sort(
+        (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity)
+      );
 
     case "Price: High to Low":
-      return [...varieties].sort((a, b) => b?.price - a?.price);
+      return [...products].sort(
+        (a, b) => (b.price ?? 0) - (a.price ?? 0)
+      );
 
     case "Sort by: Rating":
-      return [...varieties].sort(
-        (a, b) => getAverageRating(b.reviews) - getAverageRating(a.reviews)
+      return [...products].sort(
+        (a, b) => getAverageRating(b.reviews ?? []) - getAverageRating(a.reviews ?? [])
       );
 
     default:
-      return varieties;
+      return products;
   }
 };
 
-export const applySortToFilteredProducts = (products, filterType) => {
-  return products.map((product) => ({
-    ...product,
-    varieties: sortVarieties(product?.varieties, filterType),
-  }));
-};

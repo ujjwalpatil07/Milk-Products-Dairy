@@ -1,71 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
-// const ProductSchema = new mongoose.Schema(
-//   {
-//     title: {
-//       type: String,
-//       required: true,
-//       trim: true,
-//     },
-
-//     description: {
-//       type: String,
-//       trim: true,
-//     },
-
-//     image: {
-//       type: String,
-//       trim: true,
-//     },
-
-//     features: {
-//       type: [String],
-//       validate: [(arr) => arr.length <= 10, "Maximum 10 features allowed"],
-//       default: [],
-//     },
-
-//     varieties: [
-//       {
-//         type: Schema.Types.ObjectId,
-//         ref: "Variety",
-//         required: true,
-//       },
-//     ],
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
 
 const ProductSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
-    category: {
-      type: String,
-      enum: [
-        "Milk",
-        "Curd (Dahi)",
-        "Paneer",
-        "Butter",
-        "Ghee (Clarified Butter)",
-        "Cheese",
-        "Cream",
-        "Buttermilk (Chaas)",
-        "Lassi",
-        "Flavored Milk",
-        "Milk Powder",
-        "Condensed Milk",
-        "Khoa / Mawa",
-        "Yogurt",
-        "Ice Cream",
-        "Shrikhand",
-        "Whey Protein",
-        "Dairy-Based Sweets (e.g., Rasgulla, Gulab Jamun, Kalakand)",
-      ],
-    },
+    name: { type: String, required: true },
+    category: { type: String, required: true, default: "Milk" },
 
-    description: { type: String, trim: true },
-    wishlisted: { type: Boolean, default: false },
+    description: { type: String },
 
     image: {
       type: [String],
@@ -85,6 +26,8 @@ const ProductSchema = new Schema(
 
     price: { type: Number, required: true, min: 0 },
 
+    type: { type: String },
+    
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
 
     nutrition: {
@@ -103,7 +46,5 @@ const ProductSchema = new Schema(
   },
   { timestamps: true }
 );
-
-// export default mongoose.model("Variety", VarietySchema);
 
 export default mongoose.model("Product", ProductSchema);

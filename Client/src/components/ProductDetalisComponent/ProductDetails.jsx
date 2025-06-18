@@ -11,25 +11,25 @@ import { UserAuthContext } from "../../context/AuthProvider";
 import { CartContext } from "../../context/CartProvider";
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
-import { products } from "../../data/products";
+import { productLike } from "../../services/productServices";
 
-export default function ProductDetails({ name, description, image = [], minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
+export default function ProductDetails({ id, name, description, image = [], minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
 
     const navigate = useNavigate();
     const { authUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
 
     const minQty = Number(minQuantity) || 1;
-    const existing = cartItems?.find(item => item?.productId === name);
-
+    const existing = cartItems?.find(item => item?.productId === id);
 
     const [quantity, setQuantity] = useState(0);
-    const [selectedImage, setSelectedImage] = useState(image[0]);
+    const [selectedImage, setSelectedImage] = useState(image[0] || "");
     const [localLikes, setLocalLikes] = useState(likes || []);
+    const [likeLoading, setLikeLoading] = useState(false);
 
     useEffect(() => {
         setLocalLikes(likes || []);
-    }, [name]);
+    }, [id, likes]);
 
     useEffect(() => {
         setSelectedImage(image[0]);
@@ -50,19 +50,27 @@ export default function ProductDetails({ name, description, image = [], minQuant
         toast.success("Product added to cart!");
     }
 
-    const handleLikeProduct = (productId) => {
-        const category = products?.find(cat => cat.varieties.some(v => v.name === productId));
+    const handleLikeProduct = async (productId) => {
+        if (!authUser?._id) {
+            toast.error("Please log in to like products.");
+            return;
+        }
 
-        if (!category) return;
-
-        const product = category?.varieties?.find(v => v.name === productId);
-
-        if (!product?.likes?.includes(authUser?._id)) {
-            product?.likes?.push(authUser?._id);
-            setLocalLikes(prevLikes => [...prevLikes, authUser?._id]);
-            toast.success("You liked the product!");
-        } else {
+        if (localLikes.includes(authUser._id)) {
             toast.info("You already liked this product.");
+            return;
+        }
+
+        setLikeLoading(true);
+
+        try {
+            const { message, updatedLikes } = await productLike(productId, authUser._id);
+            setLocalLikes(updatedLikes);
+            toast.success(message || "You liked the product!");
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Failed to like product.");
+        } finally {
+            setLikeLoading(false);
         }
     }
 
@@ -93,15 +101,23 @@ export default function ProductDetails({ name, description, image = [], minQuant
                     }
 
                     {!localLikes?.includes(authUser?._id) && (
-                        <button onClick={() => handleLikeProduct(name)} className="absolute top-2 right-2 md:top-7 md:right-7 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer">
-                            <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                        <button
+                            onClick={() => handleLikeProduct(id)}
+                            className="absolute top-4 right-4 md:top-8 md:right-8 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer"
+                            disabled={likeLoading}
+                        >
+                            {likeLoading ? (
+                                <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
+                            ) : (
+                                <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                            )}
                         </button>
                     )}
 
                 </div>
 
                 <div className="flex justify-center gap-2 flex-wrap">
-                    {image?.slice(0, 4)?.map((img, idx) => (
+                    {image?.map((img, idx) => (
                         <button
                             key={idx * 0.8}
                             onClick={() => setSelectedImage(img)}
@@ -130,7 +146,9 @@ export default function ProductDetails({ name, description, image = [], minQuant
                     </div>
                     <span className="border-e-2 border-gray-300 dark:border-gray-500 py-[5.2px]"></span>
                     <div className="text-yellow-500 font-semibold flex items-center gap-2">
-                        <Rating sx={{ fontSize: "1rem" }} name="read-only" value={avgRating} readOnly />
+                        <div className="dark:bg-white flex p-0.5 rounded">
+                            <Rating sx={{ fontSize: "1rem" }} name="read-only" value={avgRating} readOnly />
+                        </div>
                         <span>{avgRating}</span>
                         <span className="text-gray-500 dark:text-gray-300 text-sm">({reviewsLength} reviews)</span>
                     </div>
@@ -142,7 +160,7 @@ export default function ProductDetails({ name, description, image = [], minQuant
 
                 {stock > 0 ? (
                     <div className="bg-red-600 text-white px-2 rounded text-[14px] inline-block mb-1">
-                        AVAILABILITY: ONLY {stock} {quantityUnit.toUpperCase()} IN STOCK
+                        AVAILABILITY: ONLY {stock} {(quantityUnit || "").toUpperCase()} IN STOCK
                     </div>
                 ) : (
                     <div className="text-red-600 font-semibold text-[14px] mb-1">
@@ -237,13 +255,13 @@ export default function ProductDetails({ name, description, image = [], minQuant
 
                 <div className="py-5 grid grid-cols-2 gap-2">
                     <button
-                        onClick={() => handleBuyProductNow(name, price)}
+                        onClick={() => handleBuyProductNow(id, price)}
                         className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
                     >
                         <span>Buy Now</span>
                     </button>
                     <button
-                        onClick={() => handleAddProduct(name, price)}
+                        onClick={() => handleAddProduct(id, price)}
                         disabled={quantity === 0 || quantity > stock}
                         className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
@@ -258,6 +276,7 @@ export default function ProductDetails({ name, description, image = [], minQuant
 };
 
 ProductDetails.propTypes = {
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.arrayOf(PropTypes.string),
