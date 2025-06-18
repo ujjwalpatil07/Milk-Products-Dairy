@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { maharashtraCities } from "../../../data/cities";
+import { AdminAuthContext } from "../../../context/AuthProvider";
 
 export default function ProfileInfoInput() {
   const navigate = useNavigate();
 
+  const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
   const getTextFieldStyles = (theme) => ({
@@ -100,6 +102,7 @@ export default function ProfileInfoInput() {
 
       if (res?.data?.success) {
         localStorage.setItem("User", JSON.stringify(res?.data?.user));
+        handleAdminLogout();
         toast.success("Profile created successfully!");
         navigate("/home");
       } else {

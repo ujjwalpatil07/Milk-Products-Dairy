@@ -2,38 +2,11 @@ import mongoose, { Schema } from "mongoose";
 
 const OrderSchema = new Schema(
   {
-    customerDetails: {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      email: {
-        type: String,
-        required: true,
-        match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
-      },
-      mobileNo: {
-        type: String,
-        required: true,
-        match: [/^\d{10}$/, "Mobile number must be 10 digits"],
-      },
-      address: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        pincode: {
-          type: String,
-          required: true,
-          match: [/^\d{6}$/, "Pincode must be 6 digits"],
-        },
-      },
+    address: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+      required: true,
     },
-
     productsData: [
       {
         productId: {

@@ -10,7 +10,7 @@ export default function NotFound() {
     const navigate = useNavigate();
 
     return (
-        <div className="h-screen overflow-auto py-10 w-full flex flex-col items-center justify-center px-4 bg-white text-gray-800 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300">
+        <div className="h-screen overflow-auto py-10 w-full flex flex-col items-center px-4 bg-white text-gray-800 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300">
 
             <div className="mb-6 flex items-center justify-center">
                 <img
