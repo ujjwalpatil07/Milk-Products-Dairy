@@ -86,7 +86,7 @@ export const handleInfoInput = async (req, res) => {
   res.status(201).json({
     success: true,
     message: "User updated",
-    user: { _id: updatedUser?._id, email: updatedUser?.email },
+    user: { _id: updatedUser?._id, email : updatedUser?.email },
   });
 };
 

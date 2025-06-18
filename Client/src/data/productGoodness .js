@@ -85,25 +85,25 @@ export const testimonials = [
 
 export const productWorkflow = [
   {
-    Icon: LocalDrinkIcon,
+    icon: LocalDrinkIcon,
     title: "Milking Twice a Day",
     description:
       "We source milk from farmers on the outskirts of your city for complete freshness and purity.",
   },
   {
-    Icon: ScienceOutlinedIcon,
+    icon: ScienceOutlinedIcon,
     title: "100+ Tests Everyday",
     description:
       "We quality test all milk for adulteration every single day to ensure purity.",
   },
   {
-    Icon: ThermostatAutoIcon,
+    icon: ThermostatAutoIcon,
     title: "Pasteurization & Packing at 4°C",
     description:
       "Maintaining milk at 4°C improves its shelf life and prevents harmful bacteria growth.",
   },
   {
-    Icon: DeliveryDiningIcon,
+    icon: DeliveryDiningIcon,
     title: "Assured 7 AM Doorstep Delivery",
     description:
       "Fresh milk & best quality groceries delivered to your doorstep every morning.",

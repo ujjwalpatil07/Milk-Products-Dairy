@@ -15,12 +15,12 @@ export default function ProductProcess() {
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
-                    {productWorkflow.map(({ Icon, title, description }, i) => (
+                    {productWorkflow.map(({ icon, title, description }, i) => (
                         <div
                             key={i * 0.6}
                             className="flex flex-col items-center text-center p-3"
                         >
-                            <Icon className="text-gray-600 dark:text-white mb-4" sx={{ fontSize: 50 }} />
+                            <icon className="text-gray-600 dark:text-white mb-4" sx={{ fontSize: 50 }} />
                             <h3 className="text-[1.1rem] font-semibold text-gray-900 dark:text-white mb-2">
                                 {title}
                             </h3>

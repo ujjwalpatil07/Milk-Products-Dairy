@@ -98,6 +98,7 @@ export default function UserSignUp() {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
             variant="outlined"
             fullWidth
             required
@@ -112,6 +113,7 @@ export default function UserSignUp() {
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handleInputChange}
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
               variant="outlined"
               fullWidth
               required
@@ -131,6 +133,7 @@ export default function UserSignUp() {
               type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={handleInputChange}
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
               variant="outlined"
               fullWidth
               required

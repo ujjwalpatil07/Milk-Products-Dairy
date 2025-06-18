@@ -2,23 +2,42 @@ import { useParams } from "react-router-dom";
 
 import { products } from "../data/products";
 import ProductCard from "../components/ProductComponents/ProductCard";
-import { applySortToFilteredProducts, filterProducts, getTopVarietiesByReviewsAndLikes, recommendProducts } from "../utils/filterData";
+import { applySortToFilteredProducts, getTopVarietiesByReviewsAndLikes, recommendProducts, searchProducts } from "../utils/filterData";
 import ProductList from "../components/ProductComponents/ProductList";
 import SearchProducts from "../components/ProductComponents/SearchProducts";
 import RecommendedCard from "../components/ProductComponents/RecommendedCard";
 import { getAverageRating } from "../utils/averageRating";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ProductContext } from "../context/ProductProvider";
+
+import { getProducts } from "../services/productServices";
 
 export default function ProductPage() {
 
+    const [fetchedProducts, setFetchedProducts] = useState();
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+          try {
+            const dbProducts = await getProducts(); // await resolves the Promise
+            // console.log(dbProducts.products); // You get actual data here
+            setFetchedProducts(dbProducts?.products);
+          } catch (err) {
+            console.error("Error fetching products:", err);
+          }
+        };
+      
+        fetchProducts();
+      }, []);
+
+      console.log(fetchedProducts)
     const { productId } = useParams();
     const { filter } = useContext(ProductContext);
 
     const [visibleCount, setVisibleCount] = useState(5);
     const [visibleCount1, setVisibleCount1] = useState(3);
 
-    const filteredProducts = filterProducts(products, productId);
+    const filteredProducts = searchProducts(products, productId);
     const recommendedProducts = recommendProducts(products, productId);
     const topVarieties = getTopVarietiesByReviewsAndLikes(filteredProducts);
     const sortedFilteredProducts = applySortToFilteredProducts(filteredProducts, filter);
