@@ -60,6 +60,7 @@ const ProductSchema = new Schema(
 
     shelfLife: { type: String },
     expiryDate : {type : Date },
+    discount: {type : Number, default : 10},
 
     reviews: [
       {

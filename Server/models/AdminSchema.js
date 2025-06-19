@@ -10,7 +10,7 @@ const AdminSchema = new mongoose.Schema(
 
     username: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
       unique: true,
       minlength: 3,
@@ -34,7 +34,7 @@ const AdminSchema = new mongoose.Schema(
 
     mobileNo: {
       type: String,
-      required: true,
+      // required: true,
       match: [/^\d{10}$/, "Mobile number must be 10 digits"],
     },
     
