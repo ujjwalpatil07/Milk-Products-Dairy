@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { LocationOn, Phone, Email } from "@mui/icons-material";
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -15,7 +17,7 @@ export default function ContactPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         const { fullName, phone, email, message } = formData;
         if (!fullName.trim()) {
             toast.error("Please enter your full name.");
@@ -47,7 +49,12 @@ export default function ContactPage() {
     return (
         <div className="flex flex-col md:flex-row gap-6 my-10 p-3 max-w-5xl mx-auto">
 
-            <div className="md:w-1/2 space-y-4 p-3">
+            <motion.div
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="md:w-1/2 space-y-4 p-3"
+            >
                 <h2 className="text-2xl font-bold text-[#843E71]">Contact Information</h2>
                 <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
                     <LocationOn className="text-[#843E71]" sx={{ fontSize: "1.3rem" }} />
@@ -64,9 +71,12 @@ export default function ContactPage() {
                 <p className="text-sm mt-4 text-gray-600 dark:text-gray-400">
                     We are here to assist you. Please fill out the form to get in touch or ask your query directly.
                 </p>
-            </div>
+            </motion.div>
 
-            <form
+            <motion.form
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
                 className="md:w-1/2 space-y-4"
                 onSubmit={handleSubmit}
             >
@@ -142,8 +152,7 @@ export default function ContactPage() {
                 >
                     Send via WhatsApp
                 </button>
-            </form>
-
+            </motion.form>
         </div>
     );
 }

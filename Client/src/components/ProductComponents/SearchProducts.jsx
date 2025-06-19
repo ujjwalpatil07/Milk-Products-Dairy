@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from "react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import {
     Menu,
     MenuItem,
@@ -51,7 +53,13 @@ export default function SearchProducts() {
 
     return (
         <>
-            <div className="w-full pt-2 px-3 lg:px-8">
+            <motion.div
+                className="w-full pt-2 px-3 lg:px-8"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+
                 <div className="px-2 py-2 bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white shadow-sm rounded-md flex items-center gap-2 transition-colors duration-300">
                     <div className="flex flex-1 items-center w-full md:w-2/3 gap-2">
                         <button onClick={() => setIsSidebarOpen(true)} className="flex md:hidden p-[5px] hover:bg-gray-500/10 border border-gray-500/50 rounded-md cursor-pointer">
@@ -103,10 +111,10 @@ export default function SearchProducts() {
                         </Menu>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             <Drawer open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} >
-                <div  className="w-60 p-4 bg-white dark:bg-black/90 h-full overflow-auto transition-colors duration-500" >
+                <div className="w-60 p-4 bg-white dark:bg-black/90 h-full overflow-auto transition-colors duration-500" >
                     <ProductList />
                 </div>
             </Drawer>

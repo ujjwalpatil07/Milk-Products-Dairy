@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { HiPlus } from "react-icons/hi";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -30,9 +30,9 @@ export default function MyAddresses() {
 
   useEffect(() => {
     if (authUser) getAddresses();
-  }, [authUser]);
+  }, [authUser, getAddresses]);
 
-  const getAddresses = async () => {
+  const getAddresses = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.post("http://localhost:9000/user-profile/get-addresses", {
@@ -49,7 +49,7 @@ export default function MyAddresses() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authUser]);
 
   const addAddress = async (e) => {
     e.preventDefault();

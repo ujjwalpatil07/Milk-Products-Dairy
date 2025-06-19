@@ -1,10 +1,14 @@
 import React, { useContext, useMemo, useState } from "react";
 import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { Star, StarBorder } from "@mui/icons-material";
+import Pagination from "@mui/material/Pagination";
 import { getAverageRating } from "../../utils/averageRating";
 import { ThemeContext } from "../../context/ThemeProvider";
 import ReviewCard from "./ReviewCart";
 import { filterReviews } from "../../utils/filterReviews";
+import ReviewForm from "./ReviewForm";
 
 const filters = [
   { label: "All Reviews", value: "all" },
@@ -14,35 +18,54 @@ const filters = [
 ];
 
 
-export default function ReviewSection({ reviews }) {
+export default function ReviewSection({ reviews, productId }) {
 
   const { theme } = useContext(ThemeContext);
   const [selected, setSelected] = useState("all");
+  const [page, setPage] = useState(1);
+  const reviewsPerPage = 10;
+
 
   const filteredReviews = useMemo(
     () => filterReviews(reviews, selected),
     [reviews, selected]
-  )
+  );
+
+  const paginatedReviews = useMemo(() => {
+    const startIndex = (page - 1) * reviewsPerPage;
+    return filteredReviews.slice(startIndex, startIndex + reviewsPerPage);
+  }, [filteredReviews, page]);
+
 
   const totalReviews = reviews.length;
-
   const averageRating = getAverageRating(reviews);
 
   const handleFilterClick = (value) => {
     setSelected(value);
   };
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
   if (!Array.isArray(reviews) || reviews.length === 0) {
     return (
-      <div className="p-6 rounded-xl text-center text-gray-600 dark:text-gray-300">
-        <p>No reviews available yet.</p>
+      <div>
+        <p className="rounded-xl text-center text-gray-600 dark:text-gray-300 py-10">No reviews available yet.</p>
+
+        <ReviewForm productId={productId} />
       </div>
     );
   }
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-10 p-6 mb-5 rounded-lg border border-dashed border-gray-400 dark:border-gray-600">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex flex-col md:flex-row gap-10 p-6 mb-5 rounded-lg border border-dashed border-gray-400 dark:border-gray-600"
+      >
 
         <div className="flex items-center w-full md:w-1/3 space-x-5">
           <div className="relative w-24 h-24 md:w-30 md:h-30 flex items-center justify-center text-center">
@@ -115,9 +138,14 @@ export default function ReviewSection({ reviews }) {
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex gap-5 flex-col sm:flex-row">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+        className="flex gap-5 flex-col sm:flex-row"
+      >
 
         <div className="w-full h-fit sm:w-50 md:w-60 border border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-3 space-y-3">
           <h1 className="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-200">Reviews Filter</h1>
@@ -137,7 +165,7 @@ export default function ReviewSection({ reviews }) {
         </div>
 
         <div className="space-y-5 flex-1">
-          {filteredReviews.length === 0 ? (
+          {filteredReviews?.length === 0 ? (
             <div className="p-4 text-center text-gray-600 dark:text-gray-300">
               No reviews match this filter.
             </div>
@@ -147,21 +175,39 @@ export default function ReviewSection({ reviews }) {
                 Showing {filteredReviews.length} review{filteredReviews.length > 1 ? "s" : ""}
               </div>
 
-              {filteredReviews.map((review, idx) => (
+              {paginatedReviews.map((review) => (
                 <ReviewCard
-                  key={idx * 0.95}
+                  key={review._id}
+                  id={review?._id}
+                  productId={productId}
                   username={review?.userId?.username}
-                  image={review?.userId?.image}
+                  image={review?.userId?.photo}
                   message={review?.message}
-                  date={review?.date}
+                  date={review?.createdAt}
                   rating={review?.rating}
                   likes={review?.likes}
+                  postedUserId={review?.userId?._id}
                 />
               ))}
+
+              {filteredReviews?.length > reviewsPerPage && (
+                <div className="pt-4 flex justify-center">
+                  <Pagination
+                    count={Math.ceil(filteredReviews.length / reviewsPerPage)}
+                    page={page}
+                    onChange={handlePageChange}
+                    variant="outlined"
+                    shape="rounded"
+                    color="primary"
+                  />
+                </div>
+              )}
             </>
           )}
+
+          <ReviewForm productId={productId} />
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }
@@ -176,4 +222,5 @@ ReviewSection.propTypes = {
       likes: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ),
+  productId: PropTypes.string.isRequired
 };

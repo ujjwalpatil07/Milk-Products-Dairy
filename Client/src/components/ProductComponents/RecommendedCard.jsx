@@ -1,38 +1,56 @@
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { Link } from "react-router-dom";
 import { slugify } from "../../utils/slugify";
 import { useContext, useState } from "react";
-import { products } from "../../data/products";
 import { UserAuthContext } from "../../context/AuthProvider";
+import { productLike } from "../../services/productServices";
 
-export default function RecommendedCard({ image, name, description, likes = [], rating }) {
+export default function RecommendedCard({ id, image, name, description, likes = [], rating }) {
 
   const { authUser } = useContext(UserAuthContext);
 
   const [localLikes, setLocalLikes] = useState(likes);
+  const [likeLoading, setLikeLoading] = useState(false);
 
-  const handleLikeProduct = (productId) => {
-    const category = products?.find(cat => cat.varieties.some(v => v.name === productId));
-
-    if (!category) return;
-
-    const product = category?.varieties?.find(v => v.name === productId);
-
-    if (!product?.likes?.includes(authUser?.name)) {
-      product?.likes?.push(authUser?.name);
-      setLocalLikes(prevLikes => [...prevLikes, authUser?.name]);
-      toast.success("You liked the product!");
-    } else {
-      toast.info("You already liked this product.");
+  const handleLikeProduct = async (productId) => {
+    if (!authUser?._id) {
+      toast.error("Please log in to like products.");
+      return;
     }
-  }
+
+    if (localLikes.includes(authUser._id)) {
+      toast.info("You already liked this product.");
+      return;
+    }
+
+    setLikeLoading(true);
+
+    try {
+      const { message, updatedLikes } = await productLike(productId, authUser._id);
+      setLocalLikes(updatedLikes);
+      toast.success(message || "You liked the product!");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to like product.");
+    } finally {
+      setLikeLoading(false);
+    }
+  };
 
   return (
-    <div className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300">
+    <motion.div
+      className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 30 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      whileHover={{ scale: 1.02 }}
+    >
       <div className="relative h-44 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
         {(!image || image === "null") ? (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -54,8 +72,16 @@ export default function RecommendedCard({ image, name, description, likes = [], 
         )}
 
         {!localLikes?.includes(authUser?._id) && (
-          <button onClick={() => handleLikeProduct(name)} className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer">
-            <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+          <button
+            onClick={() => handleLikeProduct(id)}
+            className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer"
+            disabled={likeLoading}
+          >
+            {likeLoading ? (
+              <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
+            ) : (
+              <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+            )}
           </button>
         )}
       </div>
@@ -82,12 +108,13 @@ export default function RecommendedCard({ image, name, description, likes = [], 
           <Link to={`/product-details/${slugify(name)}`} className="text-sm border border-[#843E71] text-[#843E71] px-3 py-1 rounded-full ">View Product</Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 
 RecommendedCard.propTypes = {
+  id: PropTypes.string.isRequired,
   image: PropTypes.string,
   name: PropTypes.string.isRequired,
   description: PropTypes.string,

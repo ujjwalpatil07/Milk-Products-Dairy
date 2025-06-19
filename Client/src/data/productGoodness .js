@@ -1,7 +1,3 @@
-import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
-import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
-import ThermostatAutoIcon from "@mui/icons-material/ThermostatAuto";
-import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import DeliveryPerson from "../assets/deliveryPerson.png"
 import freshProducts from "../assets/freshProducts.jpg"
 import freshMilk from "../assets/freshMilk.jpg"

@@ -7,7 +7,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { CartContext } from "../../context/CartProvider";
 
 export default function CartProductCard({ item, discount = 0 }) {
-    const { name, image, price, selectedQuantity, quantityUnit, type, stock } = item;
+
+    const { id, name, image, price, selectedQuantity, quantityUnit, type, stock } = item;
     const { removeFromCart, updateCartItem } = useContext(CartContext);
 
     const [newQty, setNewQty] = useState(selectedQuantity || 0);
@@ -18,9 +19,9 @@ export default function CartProductCard({ item, discount = 0 }) {
 
     useEffect(() => {
         if (newQty !== selectedQuantity && newQty > 0 && newQty <= stock) {
-            updateCartItem(name, newQty);
+            updateCartItem(id, newQty);
         }
-    }, [newQty]);
+    }, [id, newQty, selectedQuantity, stock, updateCartItem]);
 
     const originalPrice = price;
     const discountedPrice = discount > 0 ? Math.round(price - (price * discount) / 100) : price;
@@ -90,7 +91,7 @@ export default function CartProductCard({ item, discount = 0 }) {
 
                 <div className="flex items-center gap-2 mt-3">
                     <button
-                        onClick={() => removeFromCart(name)}
+                        onClick={() => removeFromCart(id)}
                         className="px-3 py-1 rounded text-sm text-[#843E71] hover:bg-[#843E7120] border shadow-md disabled:cursor-not-allowed"
                     >
                         Remove From Cart
@@ -103,6 +104,7 @@ export default function CartProductCard({ item, discount = 0 }) {
 
 CartProductCard.propTypes = {
     item: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         image: PropTypes.string,
         price: PropTypes.number.isRequired,

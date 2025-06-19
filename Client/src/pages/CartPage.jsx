@@ -1,14 +1,17 @@
-import React, { useContext, useMemo, useState } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from "../context/CartProvider";
 import { getCartProductDetails } from "../utils/cartUtils";
-import { products } from "../data/products";
 import CartProductCard from "../components/CartComponents/CartProductCard";
 import SavedAddressList from "../components/CartComponents/SavedAddressList";
+import { getProducts } from "../services/productServices";
+import { toast } from "react-toastify";
 
 export default function CartPage() {
 
@@ -17,14 +20,43 @@ export default function CartPage() {
     const discount = 5;
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [allProducts, setAllProducts] = useState([]);
+
+    useEffect(() => {
+        const getAllProducts = async () => {
+            try {
+                const res = await getProducts();
+                if (res?.success) {
+                    setAllProducts(res.products || []);
+                }
+            } catch (error) {
+                toast.error("Failed to fetch products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getAllProducts();
+    }, []);
+
     const handleDialogStatus = (status) => {
         setOpen(status);
     }
 
     const cartDetails = useMemo(
-        () => getCartProductDetails(cartItems, products),
-        [cartItems, products]
+        () => getCartProductDetails(cartItems, allProducts),
+        [cartItems, allProducts]
     );
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
+                <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+                <span className="text-xl">Loading product...</span>
+            </div>
+        );
+    }
 
     if (!authUser) {
         return (
@@ -60,9 +92,14 @@ export default function CartPage() {
     return (
         <>
             {
-                (deliveryAddress) && <section className="max-w-4xl mx-auto my-5 px-3">
+                (deliveryAddress) && <motion.section
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="max-w-4xl mx-auto my-5 px-3"
+                >
                     <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
-                        <h1>Deliver To: 
+                        <h1>Deliver To:
                             <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{deliveryAddress?.name}</span>
                             <span className="text-sm ms-3 px-3 rounded-full bg-gray-500/10 dark:bg-gray-200/50">{deliveryAddress?.addressType}</span>
                         </h1>
@@ -72,17 +109,27 @@ export default function CartPage() {
                             <button onClick={() => setOpen(true)} className="text-blue-500 hover:text-blue-600 border px-2 rounded-sm">Change</button>
                         </div>
                     </div>
-                </section>
+                </motion.section>
             }
 
-            <section className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5">
-                <div className="space-y-3 w-full md:flex-1">
+            <motion.section
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5"
+            >
+                <motion.div layout className="space-y-3 w-full md:flex-1">
                     {cartDetails.map((item, idx) => (
                         <CartProductCard key={idx * 0.55} item={item} discount={discount || 0} />
                     ))}
-                </div>
+                </motion.div>
 
-                <div className="w-full md:w-70 bg-white dark:bg-gray-500/20 rounded-lg h-fit p-3">
+                <motion.div
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="w-full md:w-70 bg-white dark:bg-gray-500/20 rounded-lg h-fit p-3"
+                >
                     <h1 className="p-2 text-2xl font-bold border-b border-dashed border-gray-500/50 dark:border-gray-300/50 text-center">Price Details</h1>
 
                     <div className="space-y-4 mt-3 text-sm text-gray-700 dark:text-gray-200">
@@ -140,17 +187,23 @@ export default function CartPage() {
                         </Link>
                     </div>
 
-                </div>
-            </section>
+                </motion.div>
+            </motion.section>
 
-            <section className="max-w-4xl mx-auto my-20 px-3 flex justify-center">
+            <motion.section
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="max-w-4xl mx-auto my-10 px-3 flex justify-center"
+            >
                 <Link
                     to="/products"
-                    className="w-fit text-center  bg-[#843E71] text-white py-2 px-3 rounded-md hover:bg-[#843e71d4] transition"
+                    className="w-fit text-center bg-[#843E71] text-white py-2 px-3 rounded-md hover:bg-[#843e71d4] transition"
                 >
                     Add More Products
                 </Link>
-            </section>
+            </motion.section>
+
 
             <SavedAddressList open={open} handleDialogStatus={handleDialogStatus} />
 

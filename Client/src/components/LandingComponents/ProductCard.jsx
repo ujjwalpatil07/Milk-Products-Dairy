@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import CheckIcon from '@mui/icons-material/Check';
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 export default function ProductCard({ title, description, image, features }) {
 

@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import EastIcon from '@mui/icons-material/East';
 import { ThemeContext } from "../context/ThemeProvider";
@@ -26,7 +27,12 @@ export default function LandingPage() {
                     loading="lazy"
                 />
 
-                <div className="md:absolute py-16 px-3 text-center top-0 left-0 md:bg-black/30 w-full h-full flex flex-col justify-center items-center">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="md:absolute py-16 px-3 text-center top-0 left-0 md:bg-black/30 w-full h-full flex flex-col justify-center items-center"
+                >
                     <h1 className="text-xl sm:text-4xl md:text-5xl mb-2 font-bold text-gray-900 dark:text-gray-100 md:text-white">WelCome to</h1>
                     <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent inline-block " >
                         Madhur Dairy & Daily Needs
@@ -46,13 +52,20 @@ export default function LandingPage() {
                     >
                         Get Started <EastIcon />
                     </Link>
-                </div>
+                </motion.div>
             </section>
 
             <section className="md:pb-16 md:pt-16 px-3 md:px-20">
-                <h2 className="text-2xl md:text-4xl font-bold mb-5 md:mb-5 text-gray-900 dark:text-gray-100">
+                <motion.h2
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="text-2xl md:text-4xl font-bold mb-5 md:mb-5 text-gray-900 dark:text-gray-100"
+                >
                     Our Product Categories
-                </h2>
+                </motion.h2>
+
 
                 <div className="space-y-14 max-w-7xl mx-auto">
                     {
@@ -86,7 +99,16 @@ export default function LandingPage() {
             </section>
 
             <section className="max-w-6xl mx-auto px-4 pb-10 pt-5">
-                <h1 className="text-2xl md:text-4xl font-bold text-center mb-5">Why Choose Madhur Dairy & <br /> Daily Needs ?</h1>
+                <motion.h1
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="text-2xl md:text-4xl font-bold text-center mb-5"
+                >
+                    Why Choose Madhur Dairy & <br /> Daily Needs ?
+                </motion.h1>
+
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {
                         features?.map((feature, idx) => (
@@ -97,9 +119,16 @@ export default function LandingPage() {
             </section>
 
             <section className="max-w-3xl mx-auto px-3 py-10">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+                <motion.h2
+                    initial={{ opacity: 0, y: -20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="text-2xl font-bold mb-6 text-gray-800 dark:text-white"
+                >
                     Frequently Asked Questions
-                </h2>
+                </motion.h2>
+
                 <div className="space-y-4">
                     {faqs.map((faq, index) => (
                         <QuestionAnswer key={index * 0.5} question={faq.question} answer={faq.answer} />
@@ -108,25 +137,44 @@ export default function LandingPage() {
             </section>
 
             <section className="max-w-5xl mx-auto px-4 py-10">
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                    <div className="flex justify-center items-center w-full md:w-1/2">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="flex flex-col md:flex-row items-center gap-8"
+                >
+                    <motion.div
+                        initial={{ x: -50, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="flex justify-center items-center w-full md:w-1/2"
+                    >
                         <img
                             src={theme === "light" ? "https://res.cloudinary.com/dyahibuzy/image/upload/v1750157423/reviewDarkImage_nwyi9f.png" : "https://res.cloudinary.com/dyahibuzy/image/upload/v1750157422/reviewLightImage_gvenap.png"}
                             alt="Customer Reviews"
                             className="rounded-xl w-70 md:w-100 h-auto"
                         />
-                    </div>
+                    </motion.div>
 
-                    <div className="w-full md:w-1/2 text-center md:text-left">
+                    <motion.div
+                        initial={{ x: 50, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="w-full md:w-1/2 text-center md:text-left"
+                    >
                         <h2 className="text-2xl font-bold mb-4">What Our Customers Say</h2>
                         <p className="text-gray-700 dark:text-gray-300 text-lg">
                             At <span className="font-semibold">Madhur Dairy and Daily Needs</span>, we provide fresh, nutritious, and
                             high-quality milky products loved by families and especially ideal for small children. Our customers' feedback
                             reflects our commitment to quality and health!
                         </p>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </section>
+
         </>
     );
 }

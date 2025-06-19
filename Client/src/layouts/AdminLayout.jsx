@@ -49,7 +49,7 @@ export default function AdminLayout({ children }) {
         <SidebarProvider>
             <div ref={scrollRef} className="h-screen scroll-smooth flex overflow-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
                 <Sidebar />
-                <main className="flex-1 h-full overflow-auto">
+                <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
                     <AdminNavbar />
                     {children}
                 </main>

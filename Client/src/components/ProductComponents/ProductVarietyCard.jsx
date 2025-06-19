@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,19 +13,20 @@ import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { slugify } from "../../utils/slugify";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { CartContext } from "../../context/CartProvider";
-import { products } from "../../data/products";
+import { productLike } from "../../services/productServices";
 import { Tooltip } from "@mui/material";
 
-export default function ProductVarietyCard({ image, name, rating, likes, type, price, minQuantity, stock, quantityUnit }) {
+export default function ProductVarietyCard({ id, image, name, rating, likes, type, price, minQuantity, stock, quantityUnit }) {
 
     const { authUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
-
     const minQty = Number(minQuantity) || 1;
-    const existing = cartItems?.find(item => item?.productId === name);
+    const existing = cartItems?.find(item => item?.productId === id);
 
     const [quantity, setQuantity] = useState(0);
     const [localLikes, setLocalLikes] = useState(likes);
+    const [likeLoading, setLikeLoading] = useState(false);
+
 
     useEffect(() => {
         setLocalLikes(likes);
@@ -44,24 +47,39 @@ export default function ProductVarietyCard({ image, name, rating, likes, type, p
         toast.success("Product added to cart!");
     }
 
-    const handleLikeProduct = (productId) => {
-        const category = products?.find(cat => cat.varieties.some(v => v.name === productId));
-
-        if (!category) return;
-
-        const product = category?.varieties?.find(v => v.name === productId);
-
-        if (!product?.likes?.includes(authUser?._id)) {
-            product?.likes?.push(authUser?._id);
-            setLocalLikes(prevLikes => [...prevLikes, authUser?._id]);
-            toast.success("You liked the product!");
-        } else {
-            toast.info("You already liked this product.");
+    const handleLikeProduct = async (productId) => {
+        if (!authUser?._id) {
+            toast.error("Please log in to like products.");
+            return;
         }
-    }
+
+        if (localLikes.includes(authUser._id)) {
+            toast.info("You already liked this product.");
+            return;
+        }
+
+        setLikeLoading(true);
+
+        try {
+            const { message, updatedLikes } = await productLike(productId, authUser._id);
+            setLocalLikes(updatedLikes);
+            toast.success(message || "You liked the product!");
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Failed to like product.");
+        } finally {
+            setLikeLoading(false);
+        }
+    };
 
     return (
-        <div className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300">
+        <motion.div
+            className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            whileHover={{ scale: 1.02 }}
+        >
             <div className="relative h-44 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
                 {(!image || image === "null") ? (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -83,10 +101,19 @@ export default function ProductVarietyCard({ image, name, rating, likes, type, p
                 )}
 
                 {!localLikes?.includes(authUser?._id) && (
-                    <button onClick={() => handleLikeProduct(name)} className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer">
-                        <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                    <button
+                        onClick={() => handleLikeProduct(id)}
+                        className="absolute top-2 right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer"
+                        disabled={likeLoading}
+                    >
+                        {likeLoading ? (
+                            <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
+                        ) : (
+                            <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                        )}
                     </button>
                 )}
+
             </div>
 
             <div className="p-4">
@@ -177,7 +204,7 @@ export default function ProductVarietyCard({ image, name, rating, likes, type, p
                     </div>
 
                     <button
-                        onClick={() => handleAddProduct(name, price)}
+                        onClick={() => handleAddProduct(id, price)}
                         disabled={quantity === 0 || quantity > stock}
                         className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#843E71] hover:bg-[#843E71] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
@@ -186,14 +213,15 @@ export default function ProductVarietyCard({ image, name, rating, likes, type, p
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
 ProductVarietyCard.propTypes = {
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     image: PropTypes.string,
-    minQuantity: PropTypes.string.isRequired,
+    minQuantity: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
     stock: PropTypes.number,

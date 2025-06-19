@@ -1,9 +1,12 @@
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { CartContext } from "../context/CartProvider";
 import { UserAuthContext } from "../context/AuthProvider";
 import { getCartProductDetails } from "../utils/cartUtils";
-import { products } from "../data/products";
+import { getProducts } from "../services/productServices";
+import { toast } from "react-toastify";
 
 export default function OrderCheckoutPage() {
 
@@ -11,9 +14,30 @@ export default function OrderCheckoutPage() {
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    const getAllProducts = async () => {
+      try {
+        const res = await getProducts();
+        if (res?.success) {
+          setAllProducts(res?.products || []);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllProducts();
+  }, []);
+
+
   const cartDetails = useMemo(
-    () => getCartProductDetails(cartItems, products),
-    [cartItems, products]
+    () => getCartProductDetails(cartItems, allProducts),
+    [cartItems, allProducts]
   );
 
   const subtotal = cartDetails.reduce((acc, item) => acc + item.price * item.selectedQuantity, 0);
@@ -25,6 +49,16 @@ export default function OrderCheckoutPage() {
     clearCart();
     navigate("/order-success");
   };
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
+        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <span className="text-xl">Loading product...</span>
+      </div>
+    );
+  }
 
   if (!authUser) {
     return (
@@ -50,18 +84,40 @@ export default function OrderCheckoutPage() {
   }
 
   return (
-    <section className="max-w-4xl mx-auto my-10 px-4">
-      <h1 className="text-2xl font-bold mb-4 text-[#843E71] dark:text-white">Confirm Delivery Details</h1>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-4xl mx-auto my-10 px-4"
+    >
+      <motion.h1
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-2xl font-bold mb-4 text-[#843E71] dark:text-white"
+      >
+        Confirm Delivery Details
+      </motion.h1>
 
-      <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 mb-6">
+      <motion.div
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
+        className="bg-white dark:bg-gray-500/20 rounded-lg p-4 mb-6"
+      >
         <h2 className="text-lg font-semibold">Deliver To:</h2>
         <p><span className="font-medium">Name:</span> <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.name}</span></p>
         <p>Mobile No: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.phone || "N/A"}</span></p>
         <p>Address Type: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.addressType}</span></p>
         <p className="mb-2">Address: <span className="text-gray-500 dark:text-gray-300">{deliveryAddress?.streetAddress}, {deliveryAddress?.city}, {deliveryAddress?.state}, {deliveryAddress?.pincode}.</span></p>
-      </div>
+      </motion.div>
 
-      <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4">
+      <motion.div
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.4, duration: 0.4 }}
+        className="bg-white dark:bg-gray-500/20 rounded-lg p-4"
+      >
         <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
 
         {cartDetails.map((item, idx) => (
@@ -83,9 +139,14 @@ export default function OrderCheckoutPage() {
           <p>Discount ({discountPercent}%): <span className="float-right text-red-500">- &#8377;{discountAmount.toFixed(2)}</span></p>
           <p className="text-lg font-bold">Total Payable: <span className="float-right text-green-600">&#8377;{totalAmount.toFixed(2)}</span></p>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-6 flex justify-between">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="mt-6 flex justify-between"
+      >
         <Link
           to="/cart"
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
@@ -98,7 +159,7 @@ export default function OrderCheckoutPage() {
         >
           Place Order
         </button>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
