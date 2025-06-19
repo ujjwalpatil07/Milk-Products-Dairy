@@ -6,35 +6,35 @@ import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 
 import { formatNumberWithCommas } from "../../../utils/format"
 
-export default function InventorySummary() {
+export default function InventorySummary({ totalProducts, totalStock, lowStockCount, outOfStockProducts, expiringSoonCount }) {
   const inventorySummaryData = [
     {
       name: "Quantity in Hand",
-      value: 1200,
+      value: totalStock,
       icon: <InventoryIcon className="text-green-600" />,
       bg: "bg-green-100 dark:bg-green-800/30",
     },
     {
       name: "Low Stock",
-      value: 85,
+      value: lowStockCount,
       icon: <ReportProblemIcon className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
       name: "Out of Stock",
-      value: 32,
+      value: outOfStockProducts,
       icon: <ErrorOutlineIcon className="text-red-600" />,
       bg: "bg-red-100 dark:bg-red-800/30",
     },
     {
       name: "Near Expiry",
-      value: 18,
+      value: expiringSoonCount,
       icon: <AccessTimeIcon className="text-orange-600" />,
       bg: "bg-orange-100 dark:bg-orange-800/30",
     },
     {
       name: "Total Stock Items",
-      value: 156,
+      value: totalProducts,
       icon: <FormatListNumberedIcon className="text-blue-600" />,
       bg: "bg-blue-100 dark:bg-blue-800/30",
     },

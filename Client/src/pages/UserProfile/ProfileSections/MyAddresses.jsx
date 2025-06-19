@@ -28,10 +28,6 @@ export default function MyAddresses() {
     pincode: "",
   });
 
-  useEffect(() => {
-    if (authUser) getAddresses();
-  }, [authUser, getAddresses]);
-
   const getAddresses = useCallback(async () => {
     setLoading(true);
     try {
@@ -50,6 +46,10 @@ export default function MyAddresses() {
       setLoading(false);
     }
   }, [authUser]);
+
+  useEffect(() => {
+    if (authUser) getAddresses();
+  }, [authUser, getAddresses]);
 
   const addAddress = async (e) => {
     e.preventDefault();

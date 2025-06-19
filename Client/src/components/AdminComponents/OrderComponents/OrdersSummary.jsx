@@ -1,43 +1,45 @@
+import React from "react";
 import CategoryIcon from '@mui/icons-material/Category';
-import InventoryIcon from '@mui/icons-material/Inventory'; 
+import InventoryIcon from '@mui/icons-material/Inventory';
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-// import { formatNumberWithCommas } from "../../../utils/format"
+import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban  } from "lucide-react";
 
-export default function OverallInventory({ totalCategories, totalStock, lowStockCount, outOfStockProducts, expiringSoonCount }) {
+export default function OrdersSummary() {
   const inventorySummaryData = [
     {
-      name: "Categories",
-      value: totalCategories,
-      icon: <CategoryIcon className="text-green-600" />,
+      name: "Total Orders",
+      value: 50,
+      icon: <ShoppingCart size={ 28} className="text-green-600"/>,
       bg: "bg-green-100 dark:bg-green-800/30",
     },
     {
-      name: "Total Stock Quantity",
-      value: totalStock,
-      icon: <InventoryIcon className="text-yellow-600" />,
+      name: "Total Orders Recieved",
+      value: 41,
+      icon: <BookCheck size={28} className="text-yellow-600"/>,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
-      name: "Low Stock Items",
-      value: lowStockCount,
-      icon: <TrendingDownIcon className="text-red-600" />,
-      bg: "bg-red-100 dark:bg-red-800/30",
-    },
-    {
-      name: "Out of Stock",
-      value: outOfStockProducts,
-      icon: <ErrorOutlineIcon className="text-orange-600" />,
+      name: "Total Returned Orders",
+      value: 63,
+      icon: <Undo2 size={28} className="text-orange-600" />,
       bg: "bg-orange-100 dark:bg-orange-800/30",
     },
     {
-      name: "Expiring Soon",
-      value: expiringSoonCount,
-      icon: <AccessTimeIcon className="text-blue-600" />,
+      name: "Total Canceled Orders",
+      value: 34,
+      icon: <Ban size={28} className="text-red-600" />,
+      bg: "bg-red-100 dark:bg-red-800/30",
+    },
+    {
+      name: "Total Drafted Orders",
+      value: 3,
+      icon: <NotepadTextDashedIcon size={28} className="text-blue-600" />,
       bg: "bg-blue-100 dark:bg-blue-800/30",
     },
   ];
+
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold mb-4"> Inventary Summary </h2>

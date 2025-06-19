@@ -20,6 +20,7 @@ import ContactPage from "../pages/ContactPage"
 import OrderCheckoutPage from "../pages/OrderCheckoutPage"
 import Dashboard from "../pages/Admin/Dashboard";
 import Inventory from "../pages/Admin/Inventory";
+import Orders from "../pages/Admin/Orders";
 
 export default function Routers() {
     return (
@@ -37,6 +38,7 @@ export default function Routers() {
 
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
             <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
+            <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
 
 
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
