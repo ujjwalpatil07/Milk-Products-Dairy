@@ -6,6 +6,7 @@ import AuthAdminRoute from "./routes/AuthRoutes/authAdminRoute.mjs";
 import AuthUserRoute from "./routes/AuthRoutes/authUserRoute.mjs";
 import ProfileEditRoute from "./routes/profileEditRoutes.mjs";
 import ProductsRoutes from "./routes/productRoutes.mjs"
+import InventoryRoutes from "./routes/inventoryRoutes.mjs"
 import { connectDB } from "./config/db.js";
 
 dotenv.config();
@@ -25,6 +26,8 @@ app.use("/u", AuthUserRoute);
 app.use("/user-profile", ProfileEditRoute);
 
 app.use("/products", ProductsRoutes);
+
+app.use("/inventory", InventoryRoutes);
 
 app.get("*", (req, res) => {
   res.send({ result: "Hey, you are looking for a page that doesn't exist!" });

@@ -3,9 +3,31 @@ import mongoose, { Schema } from "mongoose";
 
 const ProductSchema = new Schema(
   {
-    name: { type: String, required: true },
-    category: { type: String, required: true, default: "Milk" },
-
+    name: { type: String, required: true, trim: true, unique : true },
+    category: {
+      type: String,
+      enum: [
+        "Milk",
+        "Curd (Dahi)",
+        "Paneer",
+        "Butter",
+        "Ghee (Clarified Butter)",
+        "Cheese",
+        "Cream",
+        "Buttermilk (Chaas)",
+        "Lassi",
+        "Flavored Milk",
+        "Milk Powder",
+        "Condensed Milk",
+        "Khoa / Mawa",
+        "Yogurt",
+        "Ice Cream",
+        "Shrikhand",
+        "Whey Protein",
+        "Dairy-Based Sweets (e.g., Rasgulla, Gulab Jamun, Kalakand)",
+      ],
+    },
+      
     description: { type: String },
 
     image: {
@@ -19,10 +41,11 @@ const ProductSchema = new Schema(
     quantityUnit: {
       type: String,
       required: true,
-      enum: ["Litre", "Kg", "Gram", "Pack"],
+      enum: ["Litre", "Ml", "Kg", "Gram", "Pack"],
     },
 
     stock: { type: Number, default: 0, min: 0 },
+    thresholdVal : {type: Number},
 
     price: { type: Number, required: true, min: 0 },
 
@@ -36,6 +59,7 @@ const ProductSchema = new Schema(
     },
 
     shelfLife: { type: String },
+    expiryDate : {type : Date },
 
     reviews: [
       {
