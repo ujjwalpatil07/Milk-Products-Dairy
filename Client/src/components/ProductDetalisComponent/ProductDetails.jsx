@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -83,7 +85,12 @@ export default function ProductDetails({ id, name, description, image = [], minQ
 
     return (
         <>
-            <div className="relative">
+            <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative"
+            >
                 <div className="mb-4 md:p-5">
                     {
                         (!selectedImage || selectedImage === 'null') ? (<div className="w-full h-[200px] md:h-[400px] flex flex-col items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 rounded-xl" >
@@ -134,9 +141,14 @@ export default function ProductDetails({ id, name, description, image = [], minQ
                     ))}
 
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="flex-1">
+            <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex-1"
+            >
                 <h2 className="text-2xl font-bold mb-1">{name}</h2>
 
                 <div className="flex items-center gap-3 mb-1 flex-wrap">
@@ -270,7 +282,7 @@ export default function ProductDetails({ id, name, description, image = [], minQ
                     </button>
                 </div>
 
-            </div>
+            </motion.div>
         </>
     );
 };

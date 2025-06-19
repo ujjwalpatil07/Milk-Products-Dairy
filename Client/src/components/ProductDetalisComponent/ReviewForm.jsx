@@ -1,5 +1,7 @@
 import React, { useContext, useState } from "react";
 import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { Rating } from "@mui/material";
 import { toast } from "react-toastify";
 import { addNewProductReview } from "../../services/productServices";
@@ -40,11 +42,12 @@ const ReviewForm = ({ productId }) => {
                 toast.success("Review submitted successfully!");
                 setMessage("");
                 setRating(5);
-                
+
             } else {
                 toast.error(data?.error || "Failed to submit review.");
             }
         } catch (error) {
+            console.log(error)
             toast.error(error?.response?.data?.error || error.message || "Failed to submit review.");
         } finally {
             setLoading(false);
@@ -52,10 +55,14 @@ const ReviewForm = ({ productId }) => {
     };
 
     return (
-        <form
+        <motion.form
             onSubmit={handleSubmitReview}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="space-y-2 p-3 rounded-lg bg-white dark:bg-gray-500/20 transition-colors duration-300 max-w-xl"
         >
+
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
                 Write a Review
             </h2>
@@ -79,30 +86,30 @@ const ReviewForm = ({ productId }) => {
 
             <div className="flex justify-between items-center">
                 <div>
-                <label
-                    htmlFor="review-rating"
-                    className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                    Rating
-                </label>
-                <Rating
-                    id="review-rating"
-                    name="product-rating"
-                    value={rating}
-                    precision={1}
-                    onChange={(event, newValue) => setRating(newValue)}
-                />
-            </div>
+                    <label
+                        htmlFor="review-rating"
+                        className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                        Rating
+                    </label>
+                    <Rating
+                        id="review-rating"
+                        name="product-rating"
+                        value={rating}
+                        precision={1}
+                        onChange={(event, newValue) => setRating(newValue)}
+                    />
+                </div>
 
-            <button
-                type="submit"
-                disabled={loading}
-                className="bg-[#843E71] hover:bg-[#6d2b5f] text-white font-medium px-6 py-2 rounded-md transition disabled:opacity-60"
-            >
-                {loading ? "Submitting..." : "Submit Review"}
-            </button>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-[#843E71] hover:bg-[#6d2b5f] text-white font-medium px-6 py-2 rounded-md transition disabled:opacity-60"
+                >
+                    {loading ? "Submitting..." : "Submit Review"}
+                </button>
             </div>
-        </form>
+        </motion.form>
     );
 };
 

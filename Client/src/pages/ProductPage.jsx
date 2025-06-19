@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
-
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import ProductVarietyCart from "../components/ProductComponents/ProductVarietyCard";
 import { getTopProductsByReviewsAndLikes, recommendProducts, searchProducts, sortProducts } from "../utils/filterData";
 import ProductList from "../components/ProductComponents/ProductList";
@@ -62,7 +63,12 @@ export default function ProductPage() {
                         </div>
                     ) : (
                         <>
-                            <section className="w-full lg:px-6">
+                            <motion.section
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="w-full lg:px-6"
+                            >
                                 {(sortedFilteredProducts?.length ?? 0) === 0 ? (
                                     <div className="py-20 text-center">No products found matching your search/filter.</div>
                                 ) : (
@@ -71,7 +77,7 @@ export default function ProductPage() {
                                             <ProductVarietyCart
                                                 key={product?._id || index}
                                                 id={product?._id}
-                                                image={getRandomImage(product?.image || []) || null} 
+                                                image={getRandomImage(product?.image || []) || null}
                                                 name={product?.name || "Unnamed Product"}
                                                 rating={getAverageRating(product?.reviews || []) || 0}
                                                 likes={Array.isArray(product?.likes) ? product.likes : []}
@@ -84,10 +90,15 @@ export default function ProductPage() {
                                         ))}
                                     </div>
                                 )}
-                            </section>
+                            </motion.section>
 
                             {recommendedProducts?.length > 0 && (
-                                <section className="pt-10 lg:px-6">
+                                <motion.section
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                    className="pt-10 lg:px-6"
+                                >
                                     <h2 className="text-lg font-semibold py-2">Recommended</h2>
 
                                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5">
@@ -114,11 +125,16 @@ export default function ProductPage() {
                                             </button>
                                         </div>
                                     )}
-                                </section>
+                                </motion.section>
                             )}
 
                             {topProducts?.length > 0 && (
-                                <section className="lg:px-6 ">
+                                <motion.section
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.4 }}
+                                    className="lg:px-6"
+                                >
                                     <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
                                         Most Reviews & Likes
                                     </h2>
@@ -147,7 +163,7 @@ export default function ProductPage() {
                                             </button>
                                         </div>
                                     )}
-                                </section>
+                                </motion.section>
                             )}
                         </>
                     )}

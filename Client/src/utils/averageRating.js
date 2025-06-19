@@ -1,6 +1,9 @@
 export const getAverageRating = (reviews) => {
-  if (!reviews || reviews?.length === 0) return 0;
+  if (!Array.isArray(reviews) || reviews.length === 0) return 0;
 
-  const total = reviews?.reduce((sum, review) => sum + review?.rating, 0);
-  return parseFloat((total / reviews?.length)?.toFixed(1));
+  const sum = reviews.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+  const average = sum / reviews.length;
+
+  return isNaN(average) ? 0 : average;
 };
+

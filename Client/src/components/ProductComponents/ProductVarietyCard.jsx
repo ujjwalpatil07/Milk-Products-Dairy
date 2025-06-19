@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
@@ -56,7 +58,7 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
             return;
         }
 
-        setLikeLoading(true); 
+        setLikeLoading(true);
 
         try {
             const { message, updatedLikes } = await productLike(productId, authUser._id);
@@ -70,7 +72,14 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
     };
 
     return (
-        <div className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300">
+        <motion.div
+            className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            whileHover={{ scale: 1.02 }}
+        >
             <div className="relative h-44 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
                 {(!image || image === "null") ? (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -204,7 +213,7 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 

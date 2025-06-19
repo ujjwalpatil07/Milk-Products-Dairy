@@ -1,20 +1,42 @@
 import PropTypes from "prop-types";
 import EastIcon from '@mui/icons-material/East';
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 export default function OfferingCard({ image, title, description }) {
     return (
-        <div className="overflow-hidden transition md:hover:scale-105 duration-300">
-            <img src={image} alt={title} className="w-full h-52 object-cover rounded-lg" />
+        <motion.div
+            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="overflow-hidden transition duration-300"
+        >
+            <motion.img
+                src={image}
+                alt={title}
+                loading="lazy"
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-52 object-cover rounded-lg"
+            />
             <div className="p-4 text-center">
-                <h3 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">{title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-2">{description}</p>
+                <h3 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+                    {title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-2">
+                    {description}
+                </p>
 
-                <Link to="/products" className="gap-2 text-blue-500 hover:text-blue-600 hover:underline">
-                    Shop <EastIcon sx={{ fontSize: "1.1rem" }}/>
+                <Link
+                    to="/products"
+                    className="gap-2 text-blue-500 hover:text-blue-600 hover:underline inline-flex items-center"
+                >
+                    Shop <EastIcon sx={{ fontSize: "1.1rem" }} />
                 </Link>
             </div>
-        </div>
+        </motion.div>
     );
 }
 

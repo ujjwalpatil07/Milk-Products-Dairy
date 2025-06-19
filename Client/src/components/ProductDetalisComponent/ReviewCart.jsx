@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import { UserAuthContext } from "../../context/AuthProvider"
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Rating } from "@mui/material";
 import {
@@ -109,7 +111,12 @@ export default function ReviewCard({ id, productId, username, image, message, da
 
     return (
         <>
-            <div className="w-full p-4 rounded-lg space-y-2 border border-dashed border-gray-400 dark:border-gray-600">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="w-full p-4 rounded-lg space-y-2 border border-dashed border-gray-400 dark:border-gray-600"
+            >
 
                 <Rating
                     value={editRating}
@@ -211,7 +218,7 @@ export default function ReviewCard({ id, productId, username, image, message, da
 
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             <Dialog
                 open={open}

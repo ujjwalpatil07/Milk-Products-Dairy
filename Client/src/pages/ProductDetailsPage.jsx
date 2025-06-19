@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 import { Pagination } from "@mui/material";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
@@ -123,13 +125,22 @@ export default function ProductDetailsPage() {
             }
 
             {
-                (relatedProducts?.length > 0 && !recommendProductLoading) && <section className="px-3 md:px-6 pb-6 md:pb-10 md:max-w-6xl mx-auto">
+                (relatedProducts?.length > 0 && !recommendProductLoading) && <motion.section
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="px-3 md:px-6 pb-6 md:pb-10 md:max-w-6xl mx-auto"
+                >
+
                     <h1 className="border-t border-dashed border-gray-500/50 pb-2 pt-5 text-xl font-semibold">Related Product</h1>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
                         {currentItems.map((product, idx) => (
-                            <div
-                                key={idx * 0.5}
+                            <motion.div
+                                key={product?._id || idx}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.05, duration: 0.4 }}
                                 className="bg-white dark:bg-gray-500/20 transition-colors duration-300 rounded-lg shadow-md overflow-hidden hover:shadow-lg"
                             >
                                 {!product?.image?.[0] ? (
@@ -163,7 +174,7 @@ export default function ProductDetailsPage() {
                                         {product?.description || ""}
                                     </p>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
 
@@ -194,7 +205,7 @@ export default function ProductDetailsPage() {
                         </div>
                     )}
 
-                </section>
+                </motion.section>
             }
 
             {

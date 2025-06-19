@@ -4,16 +4,24 @@ import {
   ExpandLess as ExpandLessIcon
 } from "@mui/icons-material";
 import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function QuestionAnswer({ question, answer }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const toggleExpand = () => setIsExpanded(!isExpanded);
+  const toggleExpand = () => setIsExpanded((prev) => !prev);
 
   if (!question || !answer) return null;
 
   return (
-    <div className="mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f1f1f] transition-all duration-300 shadow-sm">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f1f1f] transition-all duration-300 shadow-sm"
+    >
       <button
         onClick={toggleExpand}
         className="w-full flex justify-between items-center p-4 text-left bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#333] transition-colors duration-200"
@@ -30,15 +38,23 @@ export default function QuestionAnswer({ question, answer }) {
         )}
       </button>
 
-      <div
-        id={`faq-content-${question}`}
-        className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-96' : 'max-h-0'}`}
-      >
-        <div className="p-4 text-gray-600 dark:text-gray-300">
-          {answer}
-        </div>
-      </div>
-    </div>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            id={`faq-content-${question}`}
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="p-4 text-gray-600 dark:text-gray-300">
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

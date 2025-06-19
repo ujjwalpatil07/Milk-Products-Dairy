@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
@@ -90,7 +92,12 @@ export default function CartPage() {
     return (
         <>
             {
-                (deliveryAddress) && <section className="max-w-4xl mx-auto my-5 px-3">
+                (deliveryAddress) && <motion.section
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="max-w-4xl mx-auto my-5 px-3"
+                >
                     <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
                         <h1>Deliver To:
                             <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">{deliveryAddress?.name}</span>
@@ -102,17 +109,27 @@ export default function CartPage() {
                             <button onClick={() => setOpen(true)} className="text-blue-500 hover:text-blue-600 border px-2 rounded-sm">Change</button>
                         </div>
                     </div>
-                </section>
+                </motion.section>
             }
 
-            <section className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5">
-                <div className="space-y-3 w-full md:flex-1">
+            <motion.section
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5"
+            >
+                <motion.div layout className="space-y-3 w-full md:flex-1">
                     {cartDetails.map((item, idx) => (
                         <CartProductCard key={idx * 0.55} item={item} discount={discount || 0} />
                     ))}
-                </div>
+                </motion.div>
 
-                <div className="w-full md:w-70 bg-white dark:bg-gray-500/20 rounded-lg h-fit p-3">
+                <motion.div
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="w-full md:w-70 bg-white dark:bg-gray-500/20 rounded-lg h-fit p-3"
+                >
                     <h1 className="p-2 text-2xl font-bold border-b border-dashed border-gray-500/50 dark:border-gray-300/50 text-center">Price Details</h1>
 
                     <div className="space-y-4 mt-3 text-sm text-gray-700 dark:text-gray-200">
@@ -170,17 +187,23 @@ export default function CartPage() {
                         </Link>
                     </div>
 
-                </div>
-            </section>
+                </motion.div>
+            </motion.section>
 
-            <section className="max-w-4xl mx-auto my-10 px-3 flex justify-center">
+            <motion.section
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="max-w-4xl mx-auto my-10 px-3 flex justify-center"
+            >
                 <Link
                     to="/products"
                     className="w-fit text-center bg-[#843E71] text-white py-2 px-3 rounded-md hover:bg-[#843e71d4] transition"
                 >
                     Add More Products
                 </Link>
-            </section>
+            </motion.section>
+
 
             <SavedAddressList open={open} handleDialogStatus={handleDialogStatus} />
 

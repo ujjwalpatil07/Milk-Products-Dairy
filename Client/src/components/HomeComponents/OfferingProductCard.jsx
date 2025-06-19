@@ -3,13 +3,31 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Link } from "react-router-dom";
 import { slugify } from "../../utils/slugify";
 
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+
 export default function OfferingProductCard({ image, title }) {
     return (
-        <div className="relative bg-white dark:bg-gray-800 shadow-md rounded-2xl group transition sm:hover:scale-105 duration-300 mb-5 md:mb-10">
-            <img src={image} alt={title} className="w-full h-64 object-cover rounded-xl" />
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="relative bg-white dark:bg-gray-800 shadow-md rounded-2xl group transition duration-300 mb-5 md:mb-10"
+        >
+            <motion.img
+                src={image}
+                alt={title}
+                loading="lazy"
+                className="w-full h-64 object-cover rounded-xl"
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.3 }}
+            />
+
             <div className="absolute rounded-xl inset-0 bg-black/20 bg-opacity-30 flex items-end justify-center">
                 <h3 className="text-3xl font-bold text-white p-10">{title}</h3>
             </div>
+
             <div className="absolute -bottom-5 left-1/2 -translate-x-1/2">
                 <Link
                     to={`/products/${slugify(title)}`}
@@ -18,7 +36,7 @@ export default function OfferingProductCard({ image, title }) {
                     View All <ArrowForwardIcon fontSize="small" />
                 </Link>
             </div>
-        </div>
+        </motion.div>
     );
 }
 

@@ -19,7 +19,7 @@ const ProductSchema = new Schema(
     quantityUnit: {
       type: String,
       required: true,
-      enum: ["Liter", "Kg", "Gram", "Pack"],
+      enum: ["Litre", "Kg", "Gram", "Pack"],
     },
 
     stock: { type: Number, default: 0, min: 0 },

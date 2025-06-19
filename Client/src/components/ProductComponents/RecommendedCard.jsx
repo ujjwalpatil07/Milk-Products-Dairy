@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
@@ -41,7 +43,14 @@ export default function RecommendedCard({ id, image, name, description, likes = 
   };
 
   return (
-    <div className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300">
+    <motion.div
+      className="rounded-lg h-fit overflow-hidden relative shadow-md bg-white dark:bg-gray-500/20 transition-colors duration-300"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 30 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      whileHover={{ scale: 1.02 }}
+    >
       <div className="relative h-44 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
         {(!image || image === "null") ? (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -99,7 +108,7 @@ export default function RecommendedCard({ id, image, name, description, likes = 
           <Link to={`/product-details/${slugify(name)}`} className="text-sm border border-[#843E71] text-[#843E71] px-3 py-1 rounded-full ">View Product</Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
