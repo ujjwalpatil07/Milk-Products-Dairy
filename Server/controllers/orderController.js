@@ -106,13 +106,18 @@ export const addNewOrder = async (req, res) => {
   user.orders.push(savedOrder._id);
   await user.save();
 
+  const bulkOperations = validatedProducts.map((item) => ({
+    updateOne: {
+      filter: { _id: item.productId },
+      update: { $inc: { stock:-item.productQuantity } },
+    },
+  }));
+
+  await Product.bulkWrite(bulkOperations);
+
   return res.status(201).json({
     success: true,
     message: "Order created successfully",
     orderId: savedOrder._id,
   });
 };
-
-export const getAllUserOrders = async (req, res) => {
-  const { userId } = req.body;
-}

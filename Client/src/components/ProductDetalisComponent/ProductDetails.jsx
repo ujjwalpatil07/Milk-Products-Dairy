@@ -9,13 +9,15 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
-import { UserAuthContext } from "../../context/AuthProvider";
-import { CartContext } from "../../context/CartProvider";
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
+import { UserAuthContext } from "../../context/AuthProvider";
+import { CartContext } from "../../context/CartProvider";
 import { productLike } from "../../services/productServices";
+import { getDiscountedPrice } from "../../utils/helper";
+import { formatNumberWithCommas } from "../../utils/format";
 
-export default function ProductDetails({ id, name, description, image = [], minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
+export default function ProductDetails({ id, name, description, image = [], discount, minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
 
     const navigate = useNavigate();
     const { authUser } = useContext(UserAuthContext);
@@ -35,9 +37,14 @@ export default function ProductDetails({ id, name, description, image = [], minQ
 
     useEffect(() => {
         setSelectedImage(image[0]);
-    }, [image])
+    }, [image]);
 
-    const handleAddProduct = (productId, price) => {
+    const priceNumber = Number(price) || 0;
+    const discountPercent = Number(discount) || 0;
+    const { discountedPrice, saved } = getDiscountedPrice(priceNumber, discountPercent);
+
+
+    const handleAddProduct = (productId) => {
         if (quantity <= 0) {
             toast.error("Please select quantity.");
             return;
@@ -47,7 +54,7 @@ export default function ProductDetails({ id, name, description, image = [], minQ
             return;
         }
 
-        addToCart(productId, quantity, price);
+        addToCart(productId, quantity, discountedPrice);
         setQuantity(0);
         toast.success("Product added to cart!");
     }
@@ -76,9 +83,9 @@ export default function ProductDetails({ id, name, description, image = [], minQ
         }
     }
 
-    const handleBuyProductNow = (productId, price) => {
+    const handleBuyProductNow = (productId) => {
         if (quantity > 0) {
-            handleAddProduct(productId, price);
+            handleAddProduct(productId);
         }
         navigate('/cart');
     }
@@ -171,7 +178,7 @@ export default function ProductDetails({ id, name, description, image = [], minQ
                 </div>
 
                 {stock > 0 ? (
-                    <div className="bg-red-600 text-white px-2 rounded text-[14px] inline-block mb-1">
+                    <div className="bg-red-600/10 text-red-500 px-2 rounded text-[14px] inline-block mb-1">
                         AVAILABILITY: ONLY {stock} {(quantityUnit || "").toUpperCase()} IN STOCK
                     </div>
                 ) : (
@@ -211,7 +218,32 @@ export default function ProductDetails({ id, name, description, image = [], minQ
                 )}
 
                 <div className="flex items-center justify-between pt-3">
-                    <h1 className="text-xl md:text-3xl font-bold">&#8377; {price} / {quantityUnit}</h1>
+                    <div className="mb-3">
+                        {discountPercent > 0 ? (
+                            <>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <span className="text-2xl md:text-3xl font-bold text-[#843E71]">
+                                        &#8377;{formatNumberWithCommas(discountedPrice)}
+                                    </span>
+                                    <span className="text-gray-500 dark:text-gray-300 text-base line-through">
+                                        &#8377;{formatNumberWithCommas(priceNumber)}
+                                    </span>
+                                    <span className="bg-green-100 dark:bg-green-800/30 text-green-700 dark:text-green-300 text-xs px-2 py-0.5 rounded-full font-semibold flex items-center">
+                                        {discountPercent}% OFF
+                                    </span>
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-300">
+                                    You save &#8377;{formatNumberWithCommas(saved)}
+                                </div>
+                            </>
+                        ) : (
+                            <h1 className="text-2xl md:text-3xl font-bold text-[#843E71]">
+                                &#8377;{formatNumberWithCommas(priceNumber)}
+                            </h1>
+                        )}
+                    </div>
+
+
                     <div className="flex items-center gap-2">
                         <Tooltip
                             title={quantity <= 0 ? "Minimum quantity reached" : "Decrease quantity"}
@@ -267,13 +299,13 @@ export default function ProductDetails({ id, name, description, image = [], minQ
 
                 <div className="py-5 grid grid-cols-2 gap-2">
                     <button
-                        onClick={() => handleBuyProductNow(id, price)}
+                        onClick={() => handleBuyProductNow(id)}
                         className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
                     >
                         <span>Buy Now</span>
                     </button>
                     <button
-                        onClick={() => handleAddProduct(id, price)}
+                        onClick={() => handleAddProduct(id)}
                         disabled={quantity === 0 || quantity > stock}
                         className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
@@ -292,6 +324,7 @@ ProductDetails.propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.arrayOf(PropTypes.string),
+    discount: PropTypes.number.isRequired,
     minQuantity: PropTypes.number.isRequired,
     quantityUnit: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,

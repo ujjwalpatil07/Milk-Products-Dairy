@@ -102,6 +102,7 @@ export default function ProductDetailsPage() {
                         name={selectedProduct?.name || "Unnamed Product"}
                         description={selectedProduct?.description || "No description available."}
                         image={selectedProduct?.image || []}
+                        discount={selectedProduct?.discount || 0}
                         minQuantity={selectedProduct?.minQuantity || 1}
                         quantityUnit={selectedProduct?.quantityUnit || "Unit"}
                         type={selectedProduct?.type || "N/A"}

@@ -1,13 +1,15 @@
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useDebounce } from "use-debounce";
 import ProductVarietyCart from "../components/ProductComponents/ProductVarietyCard";
 import { getTopProductsByReviewsAndLikes, recommendProducts, searchProducts, sortProducts } from "../utils/filterData";
 import ProductList from "../components/ProductComponents/ProductList";
 import SearchProducts from "../components/ProductComponents/SearchProducts";
 import RecommendedCard from "../components/ProductComponents/RecommendedCard";
 import { getAverageRating } from "../utils/averageRating";
-import { useContext, useEffect, useState } from "react";
+
 import { ProductContext } from "../context/ProductProvider";
 import { getProducts } from "../services/productServices";
 import { getRandomImage } from "../utils/imagePicker";
@@ -19,6 +21,10 @@ export default function ProductPage() {
 
     const [loading, setLoading] = useState(true);
     const [fetchedProducts, setFetchedProducts] = useState();
+    const [query, setQuery] = useState(productId || "");
+    const [debouncedQuery] = useDebounce(query, 300);
+    const [visibleCount, setVisibleCount] = useState(5);
+    const [visibleCount1, setVisibleCount1] = useState(3);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -32,26 +38,42 @@ export default function ProductPage() {
             }
         };
 
+        setQuery(productId);
         fetchProducts();
     }, [productId]);
 
-    const [visibleCount, setVisibleCount] = useState(5);
-    const [visibleCount1, setVisibleCount1] = useState(3);
+    const handleInputChange = (e) => {
+        setQuery(e.target.value);
+    }
 
-    const filteredProducts = searchProducts(fetchedProducts ?? [], productId);
-    const recommendedProducts = recommendProducts(fetchedProducts ?? [], productId);
+    const filteredProducts = useMemo(() => {
+        return searchProducts(fetchedProducts ?? [], debouncedQuery);
+    }, [fetchedProducts, debouncedQuery]);
+
+    const recommendedProducts = useMemo(() => {
+        return recommendProducts(fetchedProducts ?? [], debouncedQuery);
+    }, [fetchedProducts, debouncedQuery]);
+
     const topProducts = getTopProductsByReviewsAndLikes(filteredProducts ?? []);
-    const sortedFilteredProducts = sortProducts(filteredProducts ?? [], filter);
+
+    const sortedFilteredProducts = useMemo(() => {
+        return sortProducts(filteredProducts ?? [], filter);
+    }, [filteredProducts, filter]);
 
     return (
         <>
-            <SearchProducts />
+            <SearchProducts query={query} handleInputChange={handleInputChange} />
 
             <div className="w-full px-3 lg:px-8 py-3 flex flex-col sm:flex-row md:gap-5">
 
-                <div className="hidden md:block w-60 p-4 h-fit bg-white dark:bg-gray-500/20 rounded-lg shadow-sm transition-colors duration-500">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="hidden md:block w-60 p-4 h-fit bg-white dark:bg-gray-500/20 rounded-lg shadow-sm transition-colors duration-500"
+                >
                     <ProductList />
-                </div>
+                </motion.div>
 
                 <div className="flex-1 space-y-5">
                     {loading ? (
@@ -79,6 +101,7 @@ export default function ProductPage() {
                                                 id={product?._id}
                                                 image={getRandomImage(product?.image || []) || null}
                                                 name={product?.name || "Unnamed Product"}
+                                                discount={product?.discount || 0}
                                                 rating={getAverageRating(product?.reviews || []) || 0}
                                                 likes={Array.isArray(product?.likes) ? product.likes : []}
                                                 type={product?.type || "Unknown"}
@@ -168,7 +191,6 @@ export default function ProductPage() {
                         </>
                     )}
                 </div>
-
             </div>
 
             <br />

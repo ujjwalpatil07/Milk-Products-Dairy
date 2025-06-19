@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
+import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import {
@@ -11,19 +12,12 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ProductContext } from "../../context/ProductProvider";
-import { useNavigate, useParams } from "react-router-dom";
-import { slugify } from "../../utils/slugify";
 import ProductList from "./ProductList";
 
-export default function SearchProducts() {
+export default function SearchProducts({ query, handleInputChange }) {
 
     const { filter, setFilter } = useContext(ProductContext);
-    const { productId } = useParams();
 
-    const navigate = useNavigate();
-
-
-    const [query, setQuery] = useState(productId || "");
     const [anchorEl, setAnchorEl] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -33,23 +27,6 @@ export default function SearchProducts() {
         if (value) setFilter(value);
         setAnchorEl(null);
     };
-
-    useEffect(() => {
-        setQuery(productId || "");
-    }, [productId]);
-
-    const handleSearch = () => {
-        const trimmedQuery = query.trim();
-        if (trimmedQuery !== "") {
-            navigate(`/products/${slugify(trimmedQuery)}`);
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            handleSearch();
-        }
-    }
 
     return (
         <>
@@ -66,23 +43,20 @@ export default function SearchProducts() {
                             <KeyboardArrowRightIcon className="text-gray-700 dark:text-white" />
                         </button>
 
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Search products..."
-                            className="w-full pl-2 md:pl-4 pr-4 py-1.5 rounded-md bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none transition-colors duration-300"
-                        />
+                        <div className="relative w-full">
+                            <input
+                                type="text"
+                                value={query}
+                                onChange={handleInputChange}
+                                placeholder="Search products..."
+                                className="w-full pl-4 pr-10 py-1.5 rounded-md bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none transition-colors duration-300"
+                            />
+                            <SearchIcon
+                                sx={{ fontSize: "1.2rem" }}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300"
+                            />
+                        </div>
 
-                        <button
-                            type="button"
-                            onClick={handleSearch}
-                            className="bg-[#843E71] p-2 md:p-1.5 text-white rounded-md flex items-center gap-2 cursor-pointer"
-                        >
-                            <SearchIcon sx={{ fontSize: "1.2rem" }} />
-                            <span className="hidden sm:flex">Search</span>
-                        </button>
                     </div>
 
                     <div className="flex items-center w-fit border border-gray-500/50 rounded-md">
@@ -121,3 +95,8 @@ export default function SearchProducts() {
         </>
     )
 }
+
+SearchProducts.propTypes = {
+  query: PropTypes.string.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
+};

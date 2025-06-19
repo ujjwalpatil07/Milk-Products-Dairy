@@ -99,7 +99,7 @@ export default function OrderCheckoutPage() {
         toast.success("Order placed successfully!");
         clearCart();
         setOpen(false);
-        navigate(`/my-orders`);
+        navigate(`/user-profile/orders`);
       } else {
         toast.error(response?.message || "Failed to place order");
       }

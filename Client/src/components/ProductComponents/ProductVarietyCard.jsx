@@ -10,13 +10,17 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
+import { Tooltip } from "@mui/material";
+
 import { slugify } from "../../utils/slugify";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { CartContext } from "../../context/CartProvider";
 import { productLike } from "../../services/productServices";
-import { Tooltip } from "@mui/material";
+import { getDiscountedPrice } from "../../utils/helper";
+import { formatNumberWithCommas } from "../../utils/format";
 
-export default function ProductVarietyCard({ id, image, name, rating, likes, type, price, minQuantity, stock, quantityUnit }) {
+
+export default function ProductVarietyCard({ id, image, name, discount, rating, likes, type, price, minQuantity, stock, quantityUnit }) {
 
     const { authUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
@@ -26,6 +30,10 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
     const [quantity, setQuantity] = useState(0);
     const [localLikes, setLocalLikes] = useState(likes);
     const [likeLoading, setLikeLoading] = useState(false);
+
+    const priceNumber = Number(price);
+    const discountPercent = Number(discount) || 0;
+    const { discountedPrice, saved } = getDiscountedPrice(priceNumber, discountPercent);
 
 
     useEffect(() => {
@@ -133,10 +141,29 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
                 <p className="text-sm mb-2 dark:text-gray-300">
                     Type: <span className="font-medium">{type}</span>
                 </p>
-                <p className="text-sm mb-2 dark:text-gray-300">
-                    Price: <span className="font-bold text-[#843E71] dark:text-white">&#8377;{price}</span>
-                    <span> / {quantityUnit}</span>
-                </p>
+                {discountPercent > 0 ? (
+                    <div className="mb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-lg font-bold text-[#b02e8d]">
+                                &#8377;{formatNumberWithCommas(discountedPrice)}
+                            </span>
+                            <span className="text-sm text-gray-400 line-through">
+                                &#8377;{formatNumberWithCommas(priceNumber)}
+                            </span>
+                            <span className="bg-green-100 dark:bg-green-800/30 text-green-700 dark:text-green-300 text-xs px-2 py-0.5 rounded-full font-semibold">
+                                {discountPercent}&#37; OFF
+                            </span>
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-300 italic">
+                            You save &#8377;{formatNumberWithCommas(saved)} - Per {quantityUnit}
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-sm mb-2 dark:text-gray-300">
+                        Price: <span className="font-bold text--[#843E71] dark:text-white">&#8377;{formatNumberWithCommas(priceNumber)}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">Per {quantityUnit}</span>
+                    </p>
+                )}
 
                 <div className="grid grid-cols-2 mb-2">
                     {stock === 0 && (
@@ -206,7 +233,7 @@ export default function ProductVarietyCard({ id, image, name, rating, likes, typ
                     <button
                         onClick={() => handleAddProduct(id, price)}
                         disabled={quantity === 0 || quantity > stock}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#843E71] hover:bg-[#843E71] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#843E71] hover:bg-[#843E7190] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         <ShoppingCartIcon sx={{ fontSize: "1.2rem" }} />
                         <span>Add to Cart</span>
@@ -221,6 +248,7 @@ ProductVarietyCard.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     image: PropTypes.string,
+    discount: PropTypes.number.isRequired,
     minQuantity: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
