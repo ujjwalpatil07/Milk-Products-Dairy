@@ -10,17 +10,13 @@ export const AuthProvider = ({ children }) => {
     const [authUser, setAuthUser] = useState(null);
     const [authAdmin, setAuthAdmin] = useState(null);
 
-    const [deliveryAddress, setDeliveryAddress] = useState(null);
+    const storedAddress = JSON.parse(localStorage.getItem("deliveryAddress"));
+    const [deliveryAddress, setDeliveryAddress] = useState(storedAddress || null);
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const localUser = JSON.parse(localStorage.getItem("User"));
-                const storedAddress = JSON.parse(localStorage.getItem("deliveryAddress"));
-
-                if (storedAddress) {
-                    setDeliveryAddress(storedAddress);
-                }
 
                 if (localUser?._id && authUser?._id !== localUser?._id) {
                     const res = await axios.post(`http://localhost:9000/u/get-user`, { _id: localUser?._id });
@@ -28,22 +24,6 @@ export const AuthProvider = ({ children }) => {
 
                     if (user) {
                         setAuthUser(user);
-
-                        if (!storedAddress) {
-                            const generatedAddress = {
-                                owner: user._id,
-                                addressType: "Home",
-                                name: `${user.firstName} ${user.lastName}`,
-                                phone: user.mobileNo,
-                                streetAddress: user.address?.streetAddress || "",
-                                city: user.address?.city || "",
-                                state: "Maharashtra",
-                                pincode: user.address?.pincode || ""
-                            };
-
-                            localStorage.setItem("deliveryAddress", JSON.stringify(generatedAddress));
-                            setDeliveryAddress(generatedAddress);
-                        }
                     }
                 }
             } catch (error) {

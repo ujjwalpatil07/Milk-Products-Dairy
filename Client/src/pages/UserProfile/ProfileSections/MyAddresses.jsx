@@ -147,7 +147,7 @@ export default function MyAddresses() {
       </button>
 
       {
-        addresses.length === 0 ? (
+        addresses.length === 0 ? (//
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <MapPin className="text-gray-400 dark:text-gray-300 h-12 w-12" />

@@ -47,6 +47,7 @@ export default function Routers() {
 
             <Route path="/cart" element={<Layout><CartPage /></Layout>} />
             <Route path="/order-checkout" element={<Layout><OrderCheckoutPage /></Layout>} />
+            <Route path="/my-orders" element={<Layout><OrderPage /></Layout>} />
 
             <Route path="/contact-us" element={<Layout><ContactPage /></Layout>} />
 

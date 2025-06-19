@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { getSavedAddresses } from "../../services/userProfileService";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { Close } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -19,7 +20,6 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
 
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
-
 
   const handleSelectAddress = (address) => {
     handleDialogStatus(false);
@@ -118,6 +118,12 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
         </div>
 
         {addressContent}
+
+        <div className="w-full flex justify-center">
+          <Link to={"/user-profile"} className="w-fit px-3 py-1 bg-blue-500 text-white rounded-lg">Add New Address</Link>
+        </div>
+
+        <br />
       </div>
     </Dialog>
   );
