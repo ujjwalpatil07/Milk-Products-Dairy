@@ -39,7 +39,7 @@ import mongoose, { Schema } from "mongoose";
 
 const ProductSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, unique : true },
     category: {
       type: String,
       enum: [
@@ -78,10 +78,11 @@ const ProductSchema = new Schema(
     quantityUnit: {
       type: String,
       required: true,
-      enum: ["Liter", "Kg", "Gram", "Pack"],
+      enum: ["Litre", "Ml", "Kg", "Gram", "Pack"],
     },
 
     stock: { type: Number, default: 0, min: 0 },
+    thresholdVal : {type: Number},
 
     price: { type: Number, required: true, min: 0 },
 
@@ -93,6 +94,7 @@ const ProductSchema = new Schema(
     },
 
     shelfLife: { type: String },
+    expiryDate : {type : Date },
 
     reviews: [
       {

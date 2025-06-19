@@ -19,6 +19,7 @@ import CartPage from "../pages/CartPage"
 import ContactPage from "../pages/ContactPage"
 import OrderCheckoutPage from "../pages/OrderCheckoutPage"
 import Dashboard from "../pages/Admin/Dashboard";
+import Inventory from "../pages/Admin/Inventory";
 
 export default function Routers() {
     return (
@@ -35,6 +36,8 @@ export default function Routers() {
             <Route path="/user-profile" element={<Layout><Profile /></Layout>} />
 
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
+            <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
+
 
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
             <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />
