@@ -87,6 +87,8 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
             </div>
           </div>
         ))}
+
+        <br />
       </div>
     );
   }
