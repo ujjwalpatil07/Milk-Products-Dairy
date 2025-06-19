@@ -1,11 +1,15 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { useState } from 'react';
-import AddProductModal from './AddProductModal';
 import { getProducts } from '../../../services/productServices';
 import { useEffect } from 'react';
+import UpdateProductModel from './UpdateProductModal';
+import AddProductModal from './AddProductModal';
 
 export default function ProductsList() {
   const [addModel, setAddModel] = useState(false)
+  const [updateModel, setUpdateModel] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState({});
+
   const [fetchedProducts, setFetchedProducts] = useState([])
 
   const fetchProducts = async () => {
@@ -24,7 +28,18 @@ export default function ProductsList() {
 
   useEffect(() => {
     if (!addModel) fetchProducts();
-  }, [addModel]);
+  }, [addModel, updateModel]);
+
+  // const handleUpdateProduct = (product) => {
+  //   try {
+  //     setUpdateModel(true)
+  //     console.log(product)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }finally{
+  //     setUpdateModel(false)
+  //   }
+  // }
 
 
   return (
@@ -77,7 +92,12 @@ export default function ProductsList() {
               <td className="py-2 px-3">{product.thresholdVal}{" "} {product.quantityUnit}</td>
               <td className="py-2 px-3">{product.category}</td>
               <td className="py-2 px-3">
-                <button className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white  px-3 py-1 rounded-md hover:bg-green-300/80">
+                <button 
+                onClick={() => {
+                  setSelectedProduct(product)
+                  setUpdateModel(true)
+                }} 
+                className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white  px-3 py-1 rounded-md hover:bg-green-300/80">
                   Update
                 </button>
               </td>
@@ -96,6 +116,10 @@ export default function ProductsList() {
 
       {addModel && (
         <AddProductModal setAddModel={setAddModel} />
+      )}
+
+      {updateModel && (
+        <UpdateProductModel setUpdateModel={setUpdateModel}  selectedProduct={selectedProduct}/>
       )}
     </div>
   );

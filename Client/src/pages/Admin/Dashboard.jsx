@@ -5,8 +5,41 @@ import { ProductsStock } from "../../components/AdminComponents/DashboardCompone
 import Statistics from "../../components/AdminComponents/DashboardComponents/Statastics";
 import LowQuantityStock from "../../components/AdminComponents/DashboardComponents/LowQuantityStock";
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
+import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalCategories, totalStock } from "../../services/inventoryServices";
+import { getProducts } from "../../services/productServices";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function Dashboard() {
+
+    const [fetchedProducts, setFetchedProducts] = useState([])
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+
+    const fetchProducts = async () => {
+        try {
+            const dbProducts = await getProducts();
+
+            setFetchedProducts(dbProducts?.products);
+        } catch (err) {
+            console.error("Error fetching products:", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+
+    const totalProducts = fetchedProducts?.length
+
+    const stockCount = totalStock(fetchedProducts)
+
+    const lowStockProducts = lowStockCount(fetchedProducts)
+
+    const outOfStockCount = outOfStockProducts(fetchedProducts)
+
+    const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
 
 
     return (
@@ -19,7 +52,14 @@ export default function Dashboard() {
                 {/* Left Column (Inventory + Purchase) */}
                 <section className="flex flex-col gap-4 w-full md:max-w-3xl">
                     <div className="w-full">
-                        <InventorySummary />
+                        <InventorySummary
+                            totalProducts={totalProducts}
+                            totalStock={stockCount}
+                            lowStockCount={lowStockProducts}
+                            outOfStockProducts={outOfStockCount}
+                            expiringSoonCount={expiringSoonCount}
+                            expiredCount={expiredCount}
+                        />
                     </div>
 
                     <div className="w-full">
@@ -31,18 +71,18 @@ export default function Dashboard() {
                     </div>
 
                     <div className="w-full">
-                        <TopSellingStock/>
+                        <TopSellingStock />
                     </div>
                 </section>
 
                 {/* Right Column (Products Stock + Placeholder) */}
                 <section className="flex flex-col gap-4 w-full md:w-2/5 md:max-w-xl">
                     <div className="w-full">
-                        <ProductsStock />
+                        <ProductsStock fetchedProducts={fetchedProducts} darkMode={isDarkMode} />
                     </div>
 
                     <div className="w-full">
-                        <LowQuantityStock/>
+                        <LowQuantityStock />
                     </div>
                 </section>
             </section>

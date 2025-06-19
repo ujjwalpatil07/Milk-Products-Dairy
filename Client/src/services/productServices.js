@@ -16,6 +16,17 @@ export const addNewProduct = async (productData) => {
   return res.data;
 };
 
+export const updateProduct = async (updatedProductData) => {
+  const res = await api.put(
+    "http://localhost:9000/inventory/update-product",
+    updatedProductData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  return res.data;
+};
+
 export const productLike = async (productId, userId) => {
   const res = await api.put(`/products/like/${productId}`, { userId });
   return res.data;
