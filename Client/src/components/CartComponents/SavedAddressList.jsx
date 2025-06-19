@@ -20,6 +20,13 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
+  const handleSelectAddress = (address) => {
+    handleDialogStatus(false);
+    localStorage.setItem("deliveryAddress", JSON.stringify(address));
+    setDeliveryAddress(address);
+  };
+
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -34,12 +41,6 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
 
     if (authUser) fetchAddresses();
   }, [authUser]);
-
-  const handleSelectAddress = (address) => {
-    handleDialogStatus(false);
-    localStorage.setItem("deliveryAddress", JSON.stringify(address));
-    setDeliveryAddress(address);
-  };
 
   let addressContent;
   if (loading) {
