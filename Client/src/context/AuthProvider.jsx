@@ -4,7 +4,6 @@ import axios from "axios";
 export const UserAuthContext = createContext();
 export const AdminAuthContext = createContext();
 
-
 export const AuthProvider = ({ children }) => {
 
     const [authUser, setAuthUser] = useState(null);

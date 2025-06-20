@@ -92,7 +92,7 @@ export default function ProductPage() {
                                 className="w-full lg:px-6"
                             >
                                 {(sortedFilteredProducts?.length ?? 0) === 0 ? (
-                                    <div className="py-20 text-center">No products found matching your search/filter.</div>
+                                    <div className="py-20 text-center border-b border-dashed border-gray-500/50">No products found matching your search/filter.</div>
                                 ) : (
                                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5 border-b border-dashed border-gray-500/50">
                                         {sortedFilteredProducts.map((product, index) => (
@@ -120,7 +120,7 @@ export default function ProductPage() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.5, delay: 0.2 }}
-                                    className="pt-10 lg:px-6"
+                                    className="pt-5 lg:px-6"
                                 >
                                     <h2 className="text-lg font-semibold py-2">Recommended</h2>
 

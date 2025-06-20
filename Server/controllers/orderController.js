@@ -65,8 +65,7 @@ export const addNewOrder = async (req, res) => {
     }
 
     const discountPercent = product.discount || 0;
-    const discountedPrice =
-      product.price - (product.price * discountPercent) / 100;
+    const discountedPrice = product.price - (product.price * discountPercent) / 100;
     serverTotal += discountedPrice * productQuantity;
 
     validatedProducts.push({

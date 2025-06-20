@@ -3,6 +3,7 @@ import User from "../../models/UserSchema.js";
 import bcryptjs from "bcryptjs";
 
 export const signUpUser = async (req, res) => {
+
   const { email, password } = req.body;
 
   if (!email || !password) {

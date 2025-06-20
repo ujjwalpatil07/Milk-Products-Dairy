@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { HiPlus } from "react-icons/hi";
-import axios from "axios";
 import { toast } from "react-toastify";
 import {
   User, Phone, Building2, Mail,
   X, Check, Home, MapPin, Locate, Plus, Trash2, Edit2
 } from "lucide-react";
-import { UserAuthContext } from "../../../context/AuthProvider";
+import { UserAuthContext } from "../../context/AuthProvider";
+import { getSavedAddresses, addNewAddress, deleteAddress, updateAddress } from "../../services/userAddressService";
+
+
 
 export default function MyAddresses() {
 
@@ -31,21 +33,19 @@ export default function MyAddresses() {
   const getAddresses = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/user-profile/get-addresses", {
-        userId: authUser?._id,
-      });
-      if (response?.data?.success) {
-        setAddresses(response.data.userAddresses);
+      const data = await getSavedAddresses(authUser?._id);
+      if (data?.success) {
+        setAddresses(data.userAddresses);
       } else {
         toast.error("Failed to fetch addresses");
       }
-    } catch (error) {
+    } catch {
       toast.error("Error fetching addresses");
-      console.error(error);
     } finally {
       setLoading(false);
     }
   }, [authUser]);
+
 
   useEffect(() => {
     if (authUser) getAddresses();
@@ -55,11 +55,8 @@ export default function MyAddresses() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/user-profile/add-address", {
-        userId: authUser?._id,
-        address: newAddress,
-      });
-      if (response?.data?.success) {
+      const data = await addNewAddress(authUser?._id, newAddress);
+      if (data?.success) {
         getAddresses();
         setNewAddress({
           addressType: "Home",
@@ -72,71 +69,63 @@ export default function MyAddresses() {
         });
         toast.success("New address added successfully");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to add address");
-      console.error(error);
     } finally {
       setShowModal(false);
       setLoading(false);
     }
   };
 
+
   const removeAddress = async (address) => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:9000/user-profile/remove-address", {
-        addressId: address._id,
-        userId: address.owner
-      });
-
-      if (response?.data?.success) {
+      const data = await deleteAddress(address._id, address.owner);
+      if (data?.success) {
         getAddresses();
         toast.success("Address removed successfully");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to remove address");
-      console.error(error);
     } finally {
       setRemoveModal(false);
       setLoading(false);
     }
   };
 
+
   const editAddress = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.put("http://localhost:9000/user-profile/edit-address", {
-        addressId: selectedAddress._id,
-        updatedData: selectedAddress,
-      });
-
-      if (res?.data?.success) {
+      const data = await updateAddress(selectedAddress._id, selectedAddress);
+      if (data?.success) {
         toast.success("Address updated successfully");
         setEditModal(false);
         getAddresses();
       } else {
         toast.error("Failed to update address");
       }
-    } catch (error) {
+    } catch {
       toast.error("Error updating address");
-      console.error("Failed to update address", error);
     } finally {
       setLoading(false);
     }
   };
 
+
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-        <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
-        <p className="mt-4 text-sm animate-pulse">Loading...</p>
+      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
+        <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <p className="text-sm">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-full mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-gray-100 shadow-md rounded p-3">
+    <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-gray-100 shadow-md rounded p-3">
       <h3 className="text-xl font-semibold mb-4">Manage Addresses</h3>
 
       <button
@@ -147,7 +136,7 @@ export default function MyAddresses() {
       </button>
 
       {
-        addresses.length === 0 ? (//
+        addresses.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
               <MapPin className="text-gray-400 dark:text-gray-300 h-12 w-12" />

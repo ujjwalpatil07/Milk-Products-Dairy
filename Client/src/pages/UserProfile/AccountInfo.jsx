@@ -1,26 +1,20 @@
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
-  FaUser,
-  FaPhone,
-  FaVenusMars,
-  FaMapMarkerAlt,
-  FaEdit,
-  FaRoad,
-  FaCity,
-  FaMapPin,
+  FaUser, FaPhone, FaVenusMars, FaMapMarkerAlt, FaEdit,
+  FaRoad, FaCity, FaMapPin,
 } from "react-icons/fa";
 import { Close } from "@mui/icons-material";
-import { UserAuthContext } from "../../../context/AuthProvider";
+import { UserAuthContext } from "../../context/AuthProvider";
+import { getUserProfile, updateUserProfile } from "../../services/userProfileService";
 
 export default function AccountInfo() {
-
   const { authUser } = useContext(UserAuthContext);
 
   const [edit, setEdit] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
 
   const [editData, setEditData] = useState({
     _id: authUser?._id,
@@ -37,29 +31,27 @@ export default function AccountInfo() {
     username: "",
   });
 
-  const [showAddressModal, setShowAddressModal] = useState(false);
   const [dbData, setDbData] = useState({});
 
-  const handleUserProfileData = async () => {
+  const handleUserProfileData = useCallback(async () => {
     try {
       setDataLoading(true);
-      const response = await axios.post("http://localhost:9000/user-profile/profile", { profile_id: authUser?._id });
-
-      if (response?.data?.success) {
-        setDbData(response.data.userData);
-      } else {
-        console.log("Failed to fetch user data");
+      const data = await getUserProfile(authUser?._id);
+      if (data?.success) {
+        setDbData(data.userData);
       }
     } catch (error) {
       toast.error(error?.message || "Error fetching user data");
     } finally {
       setDataLoading(false);
     }
-  };
+  }, [authUser?._id]);
 
   useEffect(() => {
-    if (authUser) handleUserProfileData();
-  }, [authUser]);
+    if (authUser?._id) {
+      handleUserProfileData();
+    }
+  }, [authUser?._id, handleUserProfileData]);
 
   useEffect(() => {
     if (dbData) {
@@ -87,13 +79,10 @@ export default function AccountInfo() {
         toast.error("Enter a valid 10-digit phone number");
         return;
       }
-      setIsLoading(true);
-      const response = await axios.put("http://localhost:9000/user-profile/profile-edit", {
-        editData,
-        userId: authUser?._id,
-      });
 
-      if (response?.data?.success) {
+      setIsLoading(true);
+      const res = await updateUserProfile(editData, authUser?._id);
+      if (res?.success) {
         await handleUserProfileData();
         setEdit(false);
         toast.success("Profile edited successfully");
@@ -109,9 +98,9 @@ export default function AccountInfo() {
 
   if (dataLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-        <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
-        <p className="mt-4 text-sm animate-pulse">Loading...</p>
+      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
+        <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <p className="text-sm">Loading...</p>
       </div>
     );
   }
@@ -123,7 +112,7 @@ export default function AccountInfo() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md p-6 transition-all duration-300">
+    <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md p-6 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold flex items-center gap-2">
           <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
