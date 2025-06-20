@@ -14,7 +14,6 @@ import { Link, useLocation } from "react-router-dom";
 import { UserAuthContext } from "../context/AuthProvider";
 import { updateUserProfilePhoto } from "../services/userProfileService";
 
-
 export default function UserProfileSidebar() {
 
     const location = useLocation();

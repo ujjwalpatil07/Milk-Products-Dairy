@@ -45,3 +45,13 @@ export const updateAddress = async (addressId, updatedData) => {
   });
   return res.data;
 };
+
+export const getUserOrders = async (userId) => {
+  const res = await api.post("/user/get-orders", {userId})
+  return res?.data;
+}
+
+export const getWishlistedProducts = async (userId) => {
+  const res = await api.post("/user/get-wishlisted", {userId});
+  return res?.data
+}

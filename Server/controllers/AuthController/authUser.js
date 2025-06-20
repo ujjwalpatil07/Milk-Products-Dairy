@@ -3,19 +3,19 @@ import User from "../../models/UserSchema.js";
 import bcryptjs from "bcryptjs";
 
 export const signUpUser = async (req, res) => {
+  const { email, password, confirmPassword } = req.body;
 
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
+  if (!email || !password || !confirmPassword) {
+    return res.status(400).json({ success:false, message: "All fields are required" });
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return res.status(400).json({ message: "User already exists" });
+    return res.status(400).json({ success:false, message: "User already exists" });
   }
 
   res.status(201).json({
+    success : true,
     message: "User info is Correct",
   });
 };

@@ -6,7 +6,7 @@ import {
   X, Check, Home, MapPin, Locate, Plus, Trash2, Edit2
 } from "lucide-react";
 import { UserAuthContext } from "../../context/AuthProvider";
-import { getSavedAddresses, addNewAddress, deleteAddress, updateAddress } from "../../services/userAddressService";
+import { getSavedAddresses, addNewAddress, deleteAddress, updateAddress } from "../../services/userProfileService";
 
 
 

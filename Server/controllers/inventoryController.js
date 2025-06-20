@@ -90,3 +90,20 @@ export const updateProduct = async (req, res) => {
     product: updatedProduct,
   });
 };
+
+export const removeProduct = async (req, res) => {
+  let { _id } = req.body;
+
+  if (!_id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Product id missing" });
+  }
+
+  await Product.findByIdAndDelete(_id);
+  console.log("Product removed successfully ")
+
+  res
+    .status(200)
+    .json({ success: true, message: "Product removed successfully" });
+};

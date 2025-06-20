@@ -1,13 +1,12 @@
-
 // import React, { useState } from "react";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { updateProduct } from "../../../services/productServices";
+import { updateProduct } from "../../../../services/productServices";
 import { Image, Tag, DollarSign, Archive, Package, AlertCircle, Scale3D, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import ScienceIcon from '@mui/icons-material/Science';
 import DescriptionIcon from '@mui/icons-material/Description';
-import NutritionInput from "./NutritionalInfo";
+import NutritionInput from "../NutritionalInfo";
 
 const categories = [
   "Milk",
@@ -381,7 +380,6 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   );
 }
 
-// 🧩 Reusable input with label and icon
 function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding, value }) {
   return (
     <div>
@@ -402,5 +400,3 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding, va
     </div>
   );
 }
-
-

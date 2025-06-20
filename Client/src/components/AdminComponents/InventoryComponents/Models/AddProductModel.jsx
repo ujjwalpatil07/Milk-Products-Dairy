@@ -1,12 +1,12 @@
 // import React, { useState } from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { addNewProduct } from "../../../services/productServices";
+import { addNewProduct } from "../../../../services/productServices";
 import { Image, Tag, DollarSign, Archive, Package, AlertCircle, Scale3D, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import ScienceIcon from '@mui/icons-material/Science';
 import DescriptionIcon from '@mui/icons-material/Description';
-import NutritionInput from "./NutritionalInfo";
+import NutritionInput from "../NutritionalInfo";
 
 const categories = [
   "Milk",
@@ -101,7 +101,6 @@ export default function AddProductModal({ setAddModel }) {
 
       if (res?.success) {
         toast.success("Product Added successfully");
-        console.log(res?.product)
       } else {
         toast.error(res.message);
       }
@@ -115,7 +114,6 @@ export default function AddProductModal({ setAddModel }) {
     }
   }
 
-  console.log(productDetails)
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
@@ -333,7 +331,6 @@ export default function AddProductModal({ setAddModel }) {
   );
 }
 
-// 🧩 Reusable input with label and icon
 function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) {
   return (
     <div>
@@ -353,5 +350,3 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) 
     </div>
   );
 }
-
-
