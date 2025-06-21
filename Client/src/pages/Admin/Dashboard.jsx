@@ -5,7 +5,7 @@ import { ProductsStock } from "../../components/AdminComponents/DashboardCompone
 import Statistics from "../../components/AdminComponents/DashboardComponents/Statastics";
 import LowQuantityStock from "../../components/AdminComponents/DashboardComponents/LowQuantityStock";
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
-import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalCategories, totalStock } from "../../services/inventoryServices";
+import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../services/inventoryServices";
 import { getProducts } from "../../services/productServices";
 import { useState } from "react";
 import { useEffect } from "react";

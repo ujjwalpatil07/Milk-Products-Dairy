@@ -1,7 +1,7 @@
 import React from "react";
 import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban  } from "lucide-react";
 
-export default function OrdersSummary() {
+export default function OrdersSummary({ orders }) {
   const inventorySummaryData = [
     {
       name: "Total Orders",

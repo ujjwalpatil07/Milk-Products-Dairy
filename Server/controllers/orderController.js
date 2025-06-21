@@ -146,3 +146,25 @@ export const getAllUserOrders = async (req, res) => {
     orders: user.orders,
   });
 }
+
+export const getAllOrders = async (req, res) => {
+  const orders = await Order.find({})
+    .populate({
+      path: "address",
+      model: "Address",
+      populate: {
+        path: "owner",
+        model: "User",
+      },
+    })
+    .populate({
+      path: "productsData.productId",
+      model: "Product",
+    });
+
+  res.status(200).json({
+    success: true,
+    message: "Orders fetched successfully",
+    orders,
+  });
+};

@@ -7,13 +7,17 @@ import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalCategori
 
 export default function Inventory() {
   const [fetchedProducts, setFetchedProducts] = useState([])
+  const [loading, setLoading] = useState(false)
+
   const fetchProducts = async () => {
     try {
+      setLoading(true)
       const dbProducts = await getProducts();
-
       setFetchedProducts(dbProducts?.products);
     } catch (err) {
       console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -21,7 +25,6 @@ export default function Inventory() {
     fetchProducts();
   }, []);
 
-  // console.log(fetchedProducts)
 
   const categoryCount = totalCategories(fetchedProducts)
 
@@ -33,21 +36,21 @@ export default function Inventory() {
 
   const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
 
-  
+
   return (
     <>
       <div className="p-3">
-        <OverallInventory 
-        totalCategories={categoryCount} 
-        totalStock={stockCount} 
-        lowStockCount={lowStockProducts}
-        outOfStockProducts={outOfStockCount}
-        expiringSoonCount={expiringSoonCount}
-        expiredCount={expiredCount}
+        <OverallInventory
+          totalCategories={categoryCount}
+          totalStock={stockCount}
+          lowStockCount={lowStockProducts}
+          outOfStockProducts={outOfStockCount}
+          expiringSoonCount={expiringSoonCount}
+          expiredCount={expiredCount}
         />
       </div>
       <div className="p-3">
-        <ProductsList fetchProducts={fetchProducts} fetchedProducts={fetchedProducts} />
+        <ProductsList fetchProducts={fetchProducts} fetchedProducts={fetchedProducts} loading={loading} />
       </div>
     </>
   );
