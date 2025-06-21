@@ -5,6 +5,7 @@ import {
   User, Phone, Building2, Mail,
   X, Check, Home, MapPin, Locate, Plus, Trash2, Edit2
 } from "lucide-react";
+
 import { UserAuthContext } from "../../context/AuthProvider";
 import { getSavedAddresses, addNewAddress, deleteAddress, updateAddress } from "../../services/userProfileService";
 
@@ -158,7 +159,7 @@ export default function MyAddresses() {
           {addresses.map((item) => (
             <div
               key={item._id}
-              className="rounded-lg bg-gray-50 dark:bg-gray-500/20 p-5 shadow-sm hover:shadow-md dark:shadow-none border border-gray-200 dark:border-gray-600 transition-all duration-200 dark:hover:bg-gray-500/30"
+              className="rounded-lg bg-gray-50 dark:bg-gray-500/20 p-4 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 dark:hover:bg-gray-500/30"
             >
               <div className="w-full">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold tracking-wide bg-gray-800 text-white dark:text-white`}>
@@ -172,28 +173,29 @@ export default function MyAddresses() {
                 </p>
               </div>
 
-              <hr className="border-gray-300 dark:border-gray-500 w-full mt-5" />
+              <hr className="border-dashed border-gray-300 dark:border-gray-500 w-full my-3" />
 
-              <div className="flex w-full mt-5 space-x-4">
+              <div className="flex w-full space-x-4">
                 <button
-                  className="flex items-center gap-2 py-2 px-4 border border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 rounded-lg font-medium hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200"
+                  className="flex items-center gap-1.5 py-1 px-3 text-sm bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-300 rounded-md font-medium hover:bg-blue-200 dark:hover:bg-blue-600/40 transition-colors duration-200"
                   onClick={() => {
                     setEditModal(true);
                     setSelectedAddress(item);
                   }}
                   aria-label={`Edit address for ${item.name}`}
                 >
-                  <Edit2 size={16} /> Edit
+                  <Edit2 size={14} /> Edit
                 </button>
+
                 <button
-                  className="flex items-center gap-2 py-2 px-4 border border-red-600 dark:border-red-400 text-red-600 dark:text-red-400 rounded-lg font-medium hover:bg-red-50 dark:hover:bg-gray-600 transition-colors duration-200"
+                  className="flex items-center gap-1.5 py-1 px-3 text-sm bg-red-100 text-red-700 dark:bg-red-600/20 dark:text-red-300 rounded-md font-medium hover:bg-red-200 dark:hover:bg-red-600/40 transition-colors duration-200"
                   onClick={() => {
                     setRemoveModal(true);
                     setSelectedAddress(item);
                   }}
                   aria-label={`Remove address for ${item.name}`}
                 >
-                  <Trash2 size={16} /> Remove
+                  <Trash2 size={14} /> Remove
                 </button>
               </div>
             </div>

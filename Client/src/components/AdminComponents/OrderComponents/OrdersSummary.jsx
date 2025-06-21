@@ -1,9 +1,4 @@
 import React from "react";
-import CategoryIcon from '@mui/icons-material/Category';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban  } from "lucide-react";
 
 export default function OrdersSummary() {

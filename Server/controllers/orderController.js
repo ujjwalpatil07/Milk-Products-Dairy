@@ -127,10 +127,11 @@ export const getAllUserOrders = async (req, res) => {
   const user = await User.findById(userId).populate({
     path: "orders",
     populate: [
-      { path: "address" }, // Populate address inside each order
+      { path: "address" }, 
       {
-        path: "productsData.productId", // Deep populate each product
-        model: "Product", // Assuming your model name is "Product"
+        path: "productsData.productId", 
+        model: "Product",
+        select: "name quantityUnit image",
       },
     ],
   });

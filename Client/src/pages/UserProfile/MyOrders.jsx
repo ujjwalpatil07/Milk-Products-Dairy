@@ -1,22 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-
-import {
-  FaCheckCircle,
-  FaTimesCircle,
-  FaHourglassHalf,
-  FaShippingFast,
-  FaBoxOpen,
-  FaStar
-} from "react-icons/fa";
-
+import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey } from "react-icons/fa";
 import { getUserOrders } from "../../services/orderService";
 import { UserAuthContext } from "../../context/AuthProvider";
 
-
 export default function MyOrders() {
-
-  const { authUser } = useContext(UserAuthContext)
-
+  const { authUser } = useContext(UserAuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +14,7 @@ export default function MyOrders() {
       try {
         if (authUser?._id) {
           const res = await getUserOrders(authUser._id);
-          setOrders(res.orders || []);
+          setOrders((res.orders || []).reverse());
         }
       } catch (err) {
         console.error("Failed to fetch orders:", err);
@@ -39,130 +27,129 @@ export default function MyOrders() {
     fetchOrders();
   }, [authUser?._id]);
 
-  const getStatusStyle = (status) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "Pending":
-        return { icon: <FaHourglassHalf className="text-yellow-500 text-xl" />, textClass: "text-yellow-500" };
+        return <FaHourglassHalf className="text-yellow-500" />;
       case "Processing":
-        return { icon: <FaBoxOpen className="text-blue-500 text-xl" />, textClass: "text-blue-500" };
+        return <FaBoxOpen className="text-blue-500" />;
       case "Shipped":
-        return { icon: <FaShippingFast className="text-purple-500 text-xl" />, textClass: "text-purple-500" };
+        return <FaShippingFast className="text-purple-500" />;
       case "Delivered":
-        return { icon: <FaCheckCircle className="text-green-600 text-xl" />, textClass: "text-green-600" };
+        return <FaCheckCircle className="text-green-600" />;
       case "Cancelled":
-        return { icon: <FaTimesCircle className="text-red-600 text-xl" />, textClass: "text-red-600" };
+        return <FaTimesCircle className="text-red-600" />;
       default:
-        return { icon: null, textClass: "text-gray-500 dark:text-white" };
+        return null;
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
+      <div className="flex items-center justify-center py-20 text-gray-500 max-w-3xl">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
-        <p className="text-sm">Loading...</p>
+        <p className="ml-3">Loading orders...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500 text-center mt-6">{error}</p>;
   }
 
   if (orders.length === 0) {
     return (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16">
-        You have no orders yet.
+        You haven't placed any orders yet.
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-full mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-gray-100 shadow-md rounded p-3">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">My Orders</h2>
-
-      {orders.map((order) => {
-        const { icon, textClass } = getStatusStyle(order.status);
-        const products = order.productsData || [];
-        return (
-          <div key={order._id} className="bg-white dark:bg-gray-500/20 rounded-xl shadow p-3 mb-6">
-            <div className={`flex items-center gap-3 text-sm ${textClass} font-semibold mb-2`}>
-              {icon}
-              <div>
-                {order.status}
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-normal">
-                  On {new Date(order.createdAt).toLocaleDateString("en-GB", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                  })}
-                </p>
+    <div className="w-full max-w-5xl mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
+      <h2 className="text-2xl font-bold mb-3 py-3 text-center">My Orders</h2>
+      <div className="space-y-6">
+        {orders.map((order) => (
+          <div
+            key={order._id}
+            className="bg-gray-100 dark:bg-gray-500/10 md:rounded-lg p-3 md:p-5 shadow-sm"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-3">
+                {getStatusIcon(order.status)}
+                <span className="font-semibold text-lg">{order.status}</span>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-300">
+                {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
               </div>
             </div>
 
-            {products.map((product, index) => (
-              <div
-                key={`${order._id}-${product.productId?._id || index}`}
-                className="bg-gray-100 dark:bg-gray-500/20 rounded-md flex items-center justify-between p-3 mb-3"
-              >
-                <div className="flex gap-3 items-start">
-                  <img
-                    src={
-                      product.productId?.image ||
-                      "https://res.cloudinary.com/dyahibuzy/image/upload/v1750397387/user-profiles/czkyudzlkuvwt6jmlyer.jpg"
-                    }
-                    alt="Product"
-                    className="w-20 h-20 object-cover rounded-md"
-                  />
-                  <div>
-                    <span className="font-semibold">{product.productId?.name}</span>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{product.category}</p>
-                    <p className="text-sm text-gray-500 dark:text-white">Quantity: {product.productQuantity}</p>
-                    <p className="text-sm text-gray-500 dark:text-white">
-                      Price: {product.productPrice} Rs / {product.productId?.quantityUnit}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-xl text-gray-400 font-bold">&rsaquo;</div>
-              </div>
-            ))}
-
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-3 border-t border-dashed pt-3">
-              <h3 className="font-semibold dark:text-[#D595C3] text-gray-400">Delivery Address Info:</h3>
-              <div className="w-full">
-                <div className="flex justify-between">
-                  <p className="font-semibold mt-3 text-gray-800 dark:text-gray-100">
-                    {order.address?.name}{" "}
-                    <span className="font-normal text-gray-600 dark:text-gray-300 ml-3">
-                      {order.address?.phone}
-                    </span>
-                  </p>
-                  <span className="inline-flex items-center px-3 rounded-full text-sm font-semibold tracking-wide bg-gray-800 text-white dark:text-white">
-                    {order.address?.addressType}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {order.address?.streetAddress}, {order.address?.city}, {order.address?.state} -{" "}
-                  {order.address?.pincode}
-                </p>
-              </div>
+            <div className="overflow-x-auto mb-3">
+              <table className="w-full overflow-x-auto text-sm text-left">
+                <thead className="bg-gray-200 dark:bg-gray-600">
+                  <tr>
+                    <th className="p-2 md:px-4 md:py-2 border-e border-gray-500 font-semibold hidden sm:flex">Image</th>
+                    <th className="p-2 md:px-4 md:py-2 border-e border-gray-500 font-semibold">Product</th>
+                    <th className="p-2 md:px-4 md:py-2 border-e border-gray-500 font-semibold">Quantity</th>
+                    <th className="p-2 md:px-4 md:py-2 border-e border-gray-500 font-semibold">Price</th>
+                    <th className="p-2 md:px-4 md:py-2 font-semibold">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.productsData.map((product, idx) => (
+                    <tr
+                      key={idx * 0.5}
+                      className="border-b border-gray-200 dark:border-gray-600"
+                    >
+                      <td className="p-2 hidden sm:flex w-12 h-12">
+                        {product.productId?.image?.[0] ? (
+                          <img
+                            src={product.productId.image[0]}
+                            alt={product.productId?.name || "Product"}
+                            className="rounded object-cover"
+                          />
+                        ) : (
+                          <div className="bg-black/20 w-full h-full rounded flex justify-center items-center"><FaGlassWhiskey className="text-sm text-gray-500" /></div>
+                        )}
+                      </td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">{product.productId?.name}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">{product.productQuantity}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">&#8377;{product.productPrice} / {product.productId?.quantityUnit}</td>
+                      <td className="p-2 md:px-4 md:py-2 font-semibold text-gray-700 dark:text-white break-words">
+                        &#8377;{product.productQuantity * product.productPrice}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <div className="flex items-center mt-3 gap-2 border-t border-dashed pt-3">
-              {[...Array(5)].map((_, i) => (
-                <FaStar
-                  key={i * 0.8}
-                  className="dark:text-gray-300 text-gray-600 hover:text-yellow-400 cursor-pointer"
-                />
-              ))}
-              <span className="ml-2 text-sm text-gray-800 dark:text-white font-medium">
-                Rate & Review to{" "}
-                <span className="text-[#d14bad] font-bold">earn Madhur's Credit</span>
+            <div className="mt-3 text-sm">
+              <h4 className="font-semibold mb-1 text-gray-700 dark:text-white">Delivery Address:</h4>
+              <p>{order.address?.name}, {order.address?.phone}</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                {order.address?.streetAddress}, {order.address?.city}, {order.address?.state} - {order.address?.pincode}
+              </p>
+              <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded">
+                {order.address?.addressType}
               </span>
             </div>
+
+            <div className="flex justify-between items-center mt-4 border-t pt-3">
+              <p className="font-semibold text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                <FaMoneyBillWave className="text-green-500" /> Payment Mode: {order.paymentMode}
+              </p>
+              <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                &#8377;{order.totalAmount}
+              </p>
+            </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }

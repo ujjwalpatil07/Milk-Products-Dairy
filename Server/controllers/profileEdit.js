@@ -163,3 +163,24 @@ export const editProfilePhoto = async (req, res) => {
     updatedPhoto: updatedUser.photo,
   });
 };
+
+export const getUserWishlistedProducts = async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required." });
+  }
+
+  const user = await User.findById(userId).populate({
+    path: "wishlistedProducts",
+    select: "name category image quantityUnit price discount",
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  const products = await Products
+
+  return res.status(200).json({ success: true, wishlistedProducts: user.wishlistedProducts });
+};

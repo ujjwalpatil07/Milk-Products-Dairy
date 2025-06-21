@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types"
 
 export default function NutritionInput({ onChange, value }) {
   const [nutrition, setNutrition] = useState([{ key: "", value: "" }]);
@@ -48,7 +49,7 @@ export default function NutritionInput({ onChange, value }) {
       <label className="text-gray-700 dark:text-white font-medium">Nutrition Info</label>
 
       {nutrition.map((item, index) => (
-        <div key={index} className="flex gap-2 items-center">
+        <div key={index * 0.5} className="flex gap-2 items-center">
           <div className="w-1/2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Key
@@ -95,3 +96,8 @@ export default function NutritionInput({ onChange, value }) {
     </div>
   );
 }
+
+NutritionInput.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.object, 
+};

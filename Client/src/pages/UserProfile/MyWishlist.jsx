@@ -1,47 +1,122 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { UserAuthContext } from "../../context/AuthProvider";
+import { getWishlistedProducts } from "../../services/userProfileService";
+import { Link } from "react-router-dom";
+import { FaGlassWhiskey } from "react-icons/fa";
+import { getDiscountedPrice } from "../../utils/helper";
 
 export default function MyWishlist() {
-  const [wishlist, setWishlist] = useState([
-    {
-      name: "Fresh Cow Milk - 1L",
-      price: 55,
-      image: "/images/products/cow-milk.png"
-    },
-    {
-      name: "Paneer - 200g",
-      price: 90,
-      image: "/images/products/paneer.png"
-    },
-    {
-      name: "Greek Yogurt - 500g",
-      price: 120,
-      image: "/images/products/yogurt.png"
-    }
-  ]);
-  
-  return (
-    <div className="w-full max-w-5xl mx-auto bg-white shadow-md rounded p-6">
-      <h3 className="text-xl font-semibold mb-6">My Wishlist</h3>
+  const { authUser } = useContext(UserAuthContext);
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      {wishlist.length === 0 ? (
-        <p className="text-gray-500">Your wishlist is empty.</p>
-      ) : (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {wishlist.map((item, idx) => (
-            <div key={idx} className="border rounded-lg p-4 shadow-sm flex flex-col justify-between">
-              <img src={item.image} alt={item.name} className="h-40 object-contain mx-auto mb-4" />
-              <h4 className="font-semibold text-lg">{item.name}</h4>
-              <p className="text-gray-600 mt-1 mb-2">₹{item.price}</p>
-              <div className="flex justify-between items-center mt-auto">
-                <button className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded text-sm">Add to Cart</button>
-                <button className="text-red-500 hover:text-red-700 text-sm">Remove</button>
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        if (authUser?._id) {
+          const res = await getWishlistedProducts(authUser._id);
+          setWishlist(res?.wishlistedProducts || []);
+        }
+      } catch (err) {
+        console.error("Failed to load wishlist:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWishlist();
+  }, [authUser]);
+
+  const handleRemove = (id) => {
+    // TODO: Add API call to remove product from wishlist
+    setWishlist((prev) => prev.filter((item) => item._id !== id));
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-20 text-gray-600 md:w-90 lg:w-xl">
+        <div className="animate-spin w-6 h-6 border-4 border-dashed rounded-full mx-auto border-[#843E71] mb-3" />
+        Loading your wishlist...
+      </div>
+    );
+  }
+
+  if (wishlist.length === 0) {
+    return (
+      <div className="text-center py-16 px-3 text-gray-600 dark:text-gray-300 lg:w-xl bg-white dark:bg-gray-500/20 rounded-lg">
+        You haven't added anything to your wishlist yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-4xl mx-auto p-4 bg-white dark:bg-gray-500/20 rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">
+        My Wishlist
+      </h2>
+
+      <ul className="space-y-4">
+        {wishlist.map((product) => {
+          const { discountedPrice } = getDiscountedPrice(
+            product?.price,
+            product?.discount
+          );
+
+          return (
+            <li
+              key={product?._id}
+              className="flex items-start gap-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:shadow transition"
+            >
+              <div className="w-25 h-25 flex-shrink-0 bg-white rounded overflow-hidden flex justify-center items-center">
+                {product?.image?.[0] ? (
+                  <img
+                    src={product.image[0]}
+                    alt={product?.name || "Product"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <FaGlassWhiskey className="text-xl text-gray-400" />
+                )}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+
+              {/* Product Info with remove button at bottom */}
+              <div className="flex flex-col justify-between flex-1 min-w-0">
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-white truncate">
+                    {product?.name || "Unnamed Product"}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-300">
+                    {product?.category || "Category"} &bull; {product?.quantityUnit || ""}
+                  </p>
+                  <div className="mt-1 flex items-center gap-2 flex-wrap">
+                    <span className="text-[#843E71] font-bold text-sm">
+                      &#8377;{discountedPrice}
+                    </span>
+                    {product?.discount > 0 && (
+                      <>
+                        <span className="text-xs line-through text-gray-500">
+                          &#8377;{product?.price}
+                        </span>
+                        <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                          {product.discount}% OFF
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleRemove(product._id)}
+                    className="mt-3 text-sm font-medium text-red-600 hover:text-red-800 self-start"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+
     </div>
   );
-;
 }

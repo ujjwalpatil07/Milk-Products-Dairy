@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory'; 
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
@@ -60,3 +61,11 @@ export default function OverallInventory({ totalCategories, totalStock, lowStock
     </div>
   );
 }
+
+OverallInventory.propTypes = {
+  totalCategories: PropTypes.number.isRequired,
+  totalStock: PropTypes.number.isRequired,
+  lowStockCount: PropTypes.number.isRequired,
+  outOfStockProducts: PropTypes.number.isRequired,
+  expiringSoonCount: PropTypes.number.isRequired,
+};

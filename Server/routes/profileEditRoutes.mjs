@@ -8,6 +8,7 @@ import {
   deleteAddress,
   editAddress,
   editProfilePhoto,
+  getUserWishlistedProducts,
 } from "../controllers/profileEdit.js";
 import { upload } from "../config/cloudinary.js";
 const router = express.Router();
@@ -25,5 +26,7 @@ router.post("/remove-address", wrapAsync(deleteAddress));
 router.put("/edit-address", wrapAsync(editAddress));
 
 router.post("/edit-profilePhoto", upload.single("photo"), wrapAsync(editProfilePhoto));
+
+router.post("/get-wishlisted", wrapAsync(getUserWishlistedProducts));
 
 export default router;

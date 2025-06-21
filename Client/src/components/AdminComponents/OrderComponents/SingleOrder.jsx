@@ -1,4 +1,6 @@
 import React from "react";
+import PropTypes from "prop-types";
+
 
 export default function SingleOrder({ order }) {
   return (
@@ -41,7 +43,7 @@ export default function SingleOrder({ order }) {
           </thead>
           <tbody>
             {order.items.map((item, idx) => (
-              <tr key={idx} className="border-t dark:border-gray-600">
+              <tr key={idx * 0.95} className="border-t dark:border-gray-600">
                 <td className="p-2">{item.productId}</td>
                 <td className="p-2">{item.name}</td>
                 <td className="p-2">{item.quantity}</td>
@@ -66,3 +68,23 @@ export default function SingleOrder({ order }) {
     </div>
   );
 }
+
+SingleOrder.propTypes = {
+  order: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    customerName: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+    userPhoto: PropTypes.string,
+    date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+    address: PropTypes.string.isRequired,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        productId: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        quantity: PropTypes.number.isRequired,
+        price: PropTypes.number.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+};
+
