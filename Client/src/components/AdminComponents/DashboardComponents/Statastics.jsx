@@ -11,23 +11,41 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-// Register components
+// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-// Sample data and config
+// Responsive options
 const options = {
   responsive: true,
+  maintainAspectRatio: false, // ❗ Important for custom height responsiveness
   plugins: {
     legend: {
       position: 'top',
+      labels: {
+        color: '#374151', // Adjust for dark mode manually if needed
+      },
     },
     title: {
       display: true,
-      text: 'Monthly Sales Overview',
+      text: 'Weekly Sales Overview',
+      color: '#374151',
+    },
+  },
+  scales: {
+    x: {
+      ticks: {
+        color: '#6B7280', // Tailwind gray-500
+      },
+    },
+    y: {
+      ticks: {
+        color: '#6B7280',
+      },
     },
   },
 };
 
+// Dummy labels & data
 const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const data = {
@@ -53,11 +71,12 @@ const data = {
 
 const Statistics = () => {
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4 ">
-      <Bar options={options} data={data} />
+    <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
+      <div className="w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]">
+        <Bar options={options} data={data} />
+      </div>
     </div>
   );
 };
 
 export default Statistics;
-

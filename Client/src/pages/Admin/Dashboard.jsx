@@ -48,7 +48,7 @@ export default function Dashboard() {
                 <SalesOverview />
             </section>
 
-            <section className="flex flex-col md:flex-row gap-4 p-3">
+            <section className="flex flex-col lg:flex-row gap-4 p-3">
                 {/* Left Column (Inventory + Purchase) */}
                 <section className="flex flex-col gap-4 w-full md:max-w-3xl">
                     <div className="w-full">
