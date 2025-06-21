@@ -38,7 +38,9 @@ export default function MyOrders() {
       case "Delivered":
         return <FaCheckCircle className="text-green-600" />;
       case "Cancelled":
-        return <FaTimesCircle className="text-red-600" />;
+        return <FaTimesCircle className="text-red-500" />;
+      case "Confirmed":
+        return <FaCheckCircle className="text-blue-500" />;
       default:
         return null;
     }

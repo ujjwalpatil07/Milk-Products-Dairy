@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import OrdersSummary from "../../components/AdminComponents/OrderComponents/OrdersSummary";
 import OrderDetails from "../../components/AdminComponents/OrderComponents/OrderDetails";
 import { getAllOrders } from "../../services/orderService";
+import { toast } from "react-toastify";
 
 export default function Orders() {
 
@@ -15,8 +16,8 @@ export default function Orders() {
         const res = await getAllOrders();
         setOrders(res.orders);
 
-      } catch (err) {
-        console.error("Failed to fetch orders:", err);
+      } catch {
+        toast.error("Failed to fetch orders, please try again!");
       } finally {
         setLoading(false);
       }
