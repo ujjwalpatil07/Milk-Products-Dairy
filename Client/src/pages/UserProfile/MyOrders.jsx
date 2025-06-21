@@ -46,9 +46,9 @@ export default function MyOrders() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-gray-500 max-w-3xl">
+      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
-        <p className="ml-3">Loading orders...</p>
+        <p className="text-sm">Loading...</p>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function MyOrders() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
+    <div className="w-full h-fit md:w-xl lg:w-2xl bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
       <h2 className="text-2xl font-bold mb-3 py-3 text-center">My Orders</h2>
       <div className="space-y-6">
         {orders.map((order) => (

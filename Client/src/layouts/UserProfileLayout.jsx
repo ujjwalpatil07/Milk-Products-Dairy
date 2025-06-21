@@ -52,9 +52,8 @@ export default function UserProfileLayout({ children }) {
             <main className="flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto">
                 <UserProfileSidebar />
 
-                <div className="">
-                    {children}
-                </div>
+                {children}
+
             </main>
             <Footer />
         </div>

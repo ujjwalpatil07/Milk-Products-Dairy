@@ -126,7 +126,7 @@ export default function MyAddresses() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-500/20 text-gray-800 dark:text-gray-100 shadow-md rounded p-3">
+    <div className="w-full h-fit md:w-xl lg:w-2xl bg-white dark:bg-gray-500/20 text-gray-800 dark:text-gray-100 shadow-md rounded-lg p-3">
       <h3 className="text-xl font-semibold mb-4">Manage Addresses</h3>
 
       <button
