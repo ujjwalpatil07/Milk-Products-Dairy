@@ -28,7 +28,7 @@ export const getExpiryStatusCounts = (fetchedProducts) => {
 
   fetchedProducts.forEach((product) => {
     const createdDate = new Date(product.createdAt);
-    const hoursDiff = (now - createdDate) / (1000 * 60 * 60); // in hours
+    const hoursDiff = (now - createdDate) / (1000 * 60 * 60); 
 
     if (hoursDiff >= 72) {
       expiredCount++;

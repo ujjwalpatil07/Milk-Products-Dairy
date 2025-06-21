@@ -15,7 +15,6 @@ export const ProductsStock = ({ fetchedProducts }) => {
   useEffect(() => {
     if (!Array.isArray(fetchedProducts)) return;
 
-    // Sort products by stock (descending) and take top 4
     const topProducts = [...fetchedProducts]
       .sort((a, b) => b.stock - a.stock)
       .slice(0, 4);
@@ -33,7 +32,8 @@ export const ProductsStock = ({ fetchedProducts }) => {
           borderWidth: 0,
           spacing : 5,
           weight : 20,
-          hoverOffset: 8
+          hoverOffset: 8,
+          borderRadius: 10,
         },
       ],
     });
@@ -46,14 +46,14 @@ export const ProductsStock = ({ fetchedProducts }) => {
       legend: {
         position: 'bottom',
         labels: {
-          color: '#374151', // Tailwind's gray-700 (optional for dark mode)
+          color: '#374151', 
         },
       },
     },
   };
 
   return (
-    <div className="w-full h-[400px] bg-white dark:bg-gray-500/20 rounded-sm p-4">
+    <div className="w-full h-fit bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Products Stock</h2>
       <hr className="my-2 border-gray-200 dark:border-gray-600" />
       {chartData ? (

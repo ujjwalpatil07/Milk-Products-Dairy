@@ -11,18 +11,16 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-// Responsive options
 const options = {
   responsive: true,
-  maintainAspectRatio: false, // ❗ Important for custom height responsiveness
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       position: 'top',
       labels: {
-        color: '#374151', // Adjust for dark mode manually if needed
+        color: '#374151', 
       },
     },
     title: {
@@ -34,7 +32,7 @@ const options = {
   scales: {
     x: {
       ticks: {
-        color: '#6B7280', // Tailwind gray-500
+        color: '#6B7280', 
       },
     },
     y: {
@@ -45,7 +43,6 @@ const options = {
   },
 };
 
-// Dummy labels & data
 const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const data = {
@@ -55,16 +52,19 @@ const data = {
       label: 'Purchase',
       data: [1200, 1900, 2700, 2500, 2800, 1200, 900],
       backgroundColor: 'rgba(54, 162, 235, 0.6)',
+      borderRadius: 8,
     },
     {
       label: 'Return',
       data: [800, 1000, 1200, 900, 1100, 550, 880],
       backgroundColor: 'rgba(255, 99, 132, 0.6)',
+      borderRadius: 8,
     },
     {
       label: 'Cancel',
       data: [600, 100, 20, 60, 45, 105, 78],
       backgroundColor: 'rgba(70, 80, 188, 0.6)',
+      borderRadius: 8,
     }
   ],
 };

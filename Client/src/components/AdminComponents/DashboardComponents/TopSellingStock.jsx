@@ -11,28 +11,33 @@ const topSellingData = [
 
 export default function TopSellingStock() {
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-xl p-6 shadow-md w-full overflow-x-auto">
+    <div className="bg-white dark:bg-gray-500/20 rounded p-3 shadow-md">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Top Selling Stock</h2>
-      <table className="min-w-full table-auto text-left">
-        <thead>
-          <tr className="text-gray-600 dark:text-gray-300 text-sm border-b">
-            <th className="pb-3">Name</th>
-            <th className="pb-3">Sold Quantity</th>
-            <th className="pb-3">Remaining Quantity</th>
-            <th className="pb-3">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {topSellingData.map((product, index) => (
-            <tr key={index} className="text-gray-800 dark:text-gray-100 text-sm border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-              <td className="py-3">{product.name}</td>
-              <td className="py-3">{product.sold}</td>
-              <td className="py-3">{product.remaining}</td>
-              <td className="py-3">₹ {product.price}</td>
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-full table-auto text-left border-collapse">
+          <thead>
+            <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
+              <th className="py-3 px-4">Product Name</th>
+              <th className="py-3 px-4">Sold</th>
+              <th className="py-3 px-4">Remaining</th>
+              <th className="py-3 px-4">Price</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {topSellingData.map((product, index) => (
+              <tr
+                key={index * 0.5}
+                className="text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <td className="py-3 px-4 font-medium">{product.name}</td>
+                <td className="py-3 px-4">{product.sold}</td>
+                <td className="py-3 px-4">{product.remaining}</td>
+                <td className="py-3 px-4">₹ {product.price}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

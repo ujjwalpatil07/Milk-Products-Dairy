@@ -12,13 +12,10 @@ import { useState, useEffect } from "react";
 export default function Dashboard() {
 
     const [fetchedProducts, setFetchedProducts] = useState([])
-    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
 
     const fetchProducts = async () => {
         try {
             const dbProducts = await getProducts();
-
             setFetchedProducts(dbProducts?.products);
         } catch (err) {
             console.error("Error fetching products:", err);
@@ -47,19 +44,16 @@ export default function Dashboard() {
                 <SalesOverview />
             </section>
 
-            <section className="flex flex-col lg:flex-row gap-4 p-3">
-                {/* Left Column (Inventory + Purchase) */}
-                <section className="flex flex-col gap-4 w-full md:max-w-3xl">
-                    <div className="w-full">
-                        <InventorySummary
-                            totalProducts={totalProducts}
-                            totalStock={stockCount}
-                            lowStockCount={lowStockProducts}
-                            outOfStockProducts={outOfStockCount}
-                            expiringSoonCount={expiringSoonCount}
-                            expiredCount={expiredCount}
-                        />
-                    </div>
+            <section className="w-full flex flex-col md:flex-row gap-4 p-3">
+                <section className="flex-1 flex flex-col gap-4">
+                    <InventorySummary
+                        totalProducts={totalProducts}
+                        totalStock={stockCount}
+                        lowStockCount={lowStockProducts}
+                        outOfStockProducts={outOfStockCount}
+                        expiringSoonCount={expiringSoonCount}
+                        expiredCount={expiredCount}
+                    />
 
                     <div className="w-full">
                         <PurchaseOverview />
@@ -74,14 +68,13 @@ export default function Dashboard() {
                     </div>
                 </section>
 
-                {/* Right Column (Products Stock + Placeholder) */}
-                <section className="flex flex-col gap-4 w-full md:w-2/5 md:max-w-xl">
+                <section className="flex flex-col gap-4 md:w-80">
                     <div className="w-full">
-                        <ProductsStock fetchedProducts={fetchedProducts} darkMode={isDarkMode} />
+                        <ProductsStock fetchedProducts={fetchedProducts} />
                     </div>
 
                     <div className="w-full">
-                        <LowQuantityStock />
+                        <LowQuantityStock fetchedProducts={fetchedProducts} />
                     </div>
                 </section>
             </section>
