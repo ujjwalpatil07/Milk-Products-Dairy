@@ -39,19 +39,38 @@ export default function PurchaseOverview() {
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold mb-4"> Purchase Overview </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* For small screens: horizontal scroll */}
+      <div className="md:hidden flex gap-4 overflow-x-auto scrollbar-hide pb-2">
         {purchaseOverviewData.map((item, index) => (
-          <div key={index * 0.5} className={`flex items-center gap-3 p-3 rounded-lg ${item.bg}`}>
-            <div className="text-2xl">
-              {item.icon}
-            </div>
-            <div className="flex flex-col items-start ">
-              <div className="text-sm text-gray-500 dark:text-gray-300 text-center">{item.name}</div>
-              <div className="text-lg font-bold ">{formatNumberWithCommas(item.value)}</div>
+          <div
+            key={index}
+            className={`flex-shrink-0 w-64 min-w-full sm:min-w-[300px] flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+          >
+            <div className="text-2xl">{item.icon}</div>
+            <div>
+              <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
+              <div className="text-lg font-bold">&#8377; {formatNumberWithCommas(item.value)}</div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* For medium+ screens: grid layout */}
+      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 max-lg:grid-cols-3 lg:grid-cols-4 gap-3">
+        {purchaseOverviewData.map((item, index) => (
+          <div
+            key={index}
+            className={`flex items-center gap-4 p-3 rounded-lg ${item.bg}`}
+          >
+            <div className="text-2xl">{item.icon}</div>
+            <div>
+              <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
+              <div className="text-lg font-bold">&#8377; {formatNumberWithCommas(item.value)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }
