@@ -9,6 +9,8 @@ import {
   editAddress,
   editProfilePhoto,
   getUserWishlistedProducts,
+  removeFromWishlistedProducts,
+  addToWishlistedProducts,
 } from "../controllers/profileEdit.js";
 import { upload } from "../config/cloudinary.js";
 const router = express.Router();
@@ -27,6 +29,10 @@ router.put("/edit-address", wrapAsync(editAddress));
 
 router.post("/edit-profilePhoto", upload.single("photo"), wrapAsync(editProfilePhoto));
 
+router.put("/add-to-wishlist", wrapAsync(addToWishlistedProducts));
+
 router.post("/get-wishlisted", wrapAsync(getUserWishlistedProducts));
+
+router.post("/remove-from-wishlist", wrapAsync(removeFromWishlistedProducts));
 
 export default router;

@@ -11,6 +11,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { Tooltip } from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+
 
 import { slugify } from "../../utils/slugify";
 import { UserAuthContext } from "../../context/AuthProvider";
@@ -18,11 +20,12 @@ import { CartContext } from "../../context/CartProvider";
 import { productLike } from "../../services/productServices";
 import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
+import { addToWishlist } from "../../services/userProfileService";
 
 
-export default function ProductVarietyCard({ id, image, name, discount, rating, likes, type, price, minQuantity, stock, quantityUnit }) {
+export default function ProductVarietyCard({ id, image, name, discount, rating, likes, price, minQuantity, stock, quantityUnit }) {
 
-    const { authUser } = useContext(UserAuthContext);
+    const { authUser, setAuthUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
     const minQty = Number(minQuantity) || 1;
     const existing = cartItems?.find(item => item?.productId === id);
@@ -30,10 +33,12 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
     const [quantity, setQuantity] = useState(0);
     const [localLikes, setLocalLikes] = useState(likes);
     const [likeLoading, setLikeLoading] = useState(false);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
 
     const priceNumber = Number(price);
     const discountPercent = Number(discount) || 0;
     const { discountedPrice, saved } = getDiscountedPrice(priceNumber, discountPercent);
+    const isWishlisted = authUser?.wishlistedProducts?.includes(id);
 
 
     useEffect(() => {
@@ -78,6 +83,57 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
             setLikeLoading(false);
         }
     };
+
+    const handleAddProductInWishlist = async (productId) => {
+        if (!authUser?._id) {
+            toast.info("Please log in to add items to your wishlist.");
+            return;
+        }
+
+        if (isWishlisted) {
+            toast.info("This product is already in your wishlist.");
+            return;
+        }
+
+        if (wishlistLoading) {
+            toast.info("Please wait, adding to wishlist...");
+            return;
+        }
+
+        try {
+            setWishlistLoading(true);
+            const data = await addToWishlist(authUser._id, productId);
+
+            if (data?.success) {
+                toast.success("Product added to wishlist!");
+                setAuthUser((prev) => ({
+                    ...prev,
+                    wishlistedProducts: Array.isArray(prev?.wishlistedProducts)
+                        ? [...prev.wishlistedProducts, productId]
+                        : [productId],
+                }));
+            } else {
+                toast.error(data?.error || "Something went wrong.");
+            }
+        } catch {
+            toast.error("Failed to add to wishlist.");
+        } finally {
+            setWishlistLoading(false);
+        }
+    };
+
+    let wishlistIconContent;
+
+    if (wishlistLoading) {
+        wishlistIconContent = (
+            <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
+        );
+    } else if (isWishlisted) {
+        wishlistIconContent = <FavoriteIcon sx={{ fontSize: "1.2rem" }} />;
+    } else {
+        wishlistIconContent = <FavoriteBorderIcon sx={{ fontSize: "1.2rem" }} />;
+    }
+
 
     return (
         <motion.div
@@ -138,9 +194,6 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                     </div>
                 </div>
 
-                <p className="text-sm mb-2 dark:text-gray-300">
-                    Type: <span className="font-medium">{type}</span>
-                </p>
                 {discountPercent > 0 ? (
                     <div className="mb-2">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -164,6 +217,21 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                         <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">Per {quantityUnit}</span>
                     </p>
                 )}
+
+                <div className="flex items-center justify-between">
+                    <button
+                        onClick={() => handleAddProductInWishlist(id)}
+                        disabled={isWishlisted || wishlistLoading}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-sm text-sm transition-all duration-300 ${isWishlisted
+                                ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
+                                : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        {wishlistIconContent}
+                        <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
+                    </button>
+                </div>
+
 
                 <div className="grid grid-cols-2 mb-2">
                     {stock === 0 && (
@@ -251,7 +319,6 @@ ProductVarietyCard.propTypes = {
     discount: PropTypes.number.isRequired,
     minQuantity: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
-    type: PropTypes.string.isRequired,
     stock: PropTypes.number,
     price: PropTypes.number.isRequired,
     likes: PropTypes.arrayOf(PropTypes.string).isRequired,

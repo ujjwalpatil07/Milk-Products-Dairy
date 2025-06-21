@@ -11,16 +11,18 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { UserAuthContext } from "../../context/AuthProvider";
 import { CartContext } from "../../context/CartProvider";
 import { productLike } from "../../services/productServices";
 import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
+import { addToWishlist } from "../../services/userProfileService";
 
 export default function ProductDetails({ id, name, description, image = [], discount, minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
 
     const navigate = useNavigate();
-    const { authUser } = useContext(UserAuthContext);
+    const { authUser, setAuthUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
 
     const minQty = Number(minQuantity) || 1;
@@ -29,11 +31,14 @@ export default function ProductDetails({ id, name, description, image = [], disc
     const [quantity, setQuantity] = useState(0);
     const [selectedImage, setSelectedImage] = useState(image[0] || "");
     const [localLikes, setLocalLikes] = useState(likes || []);
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
 
     useEffect(() => {
         setLocalLikes(likes || []);
-    }, [id, likes]);
+        setIsWishlisted(authUser?.wishlistedProducts?.includes(id));
+    }, [id, likes, authUser]);
 
     useEffect(() => {
         setSelectedImage(image[0]);
@@ -89,6 +94,46 @@ export default function ProductDetails({ id, name, description, image = [], disc
         }
         navigate('/cart');
     }
+
+    const handleAddProductInWishlist = async (productId) => {
+        if (!authUser?._id) {
+            toast.info("Please log in to add items to your wishlist.");
+            return;
+        }
+
+        if (isWishlisted) {
+            toast.info("This product is already in your wishlist.");
+            return;
+        }
+
+        if (wishlistLoading) {
+            toast.info("Please wait, adding to wishlist...");
+            return;
+        }
+
+        try {
+            setWishlistLoading(true);
+
+            const data = await addToWishlist(authUser._id, productId);
+
+            if (data?.success) {
+                toast.success("Product added to wishlist!");
+                setIsWishlisted(true);
+                setAuthUser((prev) => ({
+                    ...prev,
+                    wishlistedProducts: Array.isArray(prev?.wishlistedProducts)
+                        ? [...prev.wishlistedProducts, productId]
+                        : [productId], 
+                }));
+            } else {
+                toast.error(data?.error || "Something went wrong.");
+            }
+        } catch {
+            toast.error("Failed to add to wishlist.");
+        } finally {
+            setWishlistLoading(false);
+        }
+    };
 
     return (
         <>
@@ -217,6 +262,37 @@ export default function ProductDetails({ id, name, description, image = [], disc
                     </span>
                 )}
 
+                {
+                    !wishlistLoading ? (
+                        <button
+                            onClick={() => handleAddProductInWishlist(id)}
+                            disabled={isWishlisted}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-300
+                                     ${isWishlisted
+                                    ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
+                                    : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
+                                }
+                                 disabled:cursor-not-allowed`}
+                        >
+                            {isWishlisted ? (
+                                <FavoriteIcon sx={{ fontSize: "1.3rem" }} />
+                            ) : (
+                                <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                            )}
+                            <span className="text-sm">{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
+                        </button>
+                    ) : (
+                        <button
+                            className={`flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-300
+        bg-white text-gray-700 dark:bg-gray-500/20 dark:text-gray-100`}
+                            disabled
+                        >
+                            <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-sm">Adding...</span>
+                        </button>
+                    )
+                }
+
                 <div className="flex items-center justify-between pt-3">
                     <div className="mb-3">
                         {discountPercent > 0 ? (
@@ -242,7 +318,6 @@ export default function ProductDetails({ id, name, description, image = [], disc
                             </h1>
                         )}
                     </div>
-
 
                     <div className="flex items-center gap-2">
                         <Tooltip

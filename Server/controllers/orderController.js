@@ -145,7 +145,7 @@ export const getAllUserOrders = async (req, res) => {
     message: "User orders retrieved",
     orders: user.orders,
   });
-}
+};
 
 export const getAllOrders = async (req, res) => {
   const orders = await Order.find({})

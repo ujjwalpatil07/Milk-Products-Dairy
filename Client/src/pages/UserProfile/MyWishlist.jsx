@@ -1,14 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserAuthContext } from "../../context/AuthProvider";
-import { getWishlistedProducts } from "../../services/userProfileService";
+import { getWishlistedProducts, removeProductFromWishList } from "../../services/userProfileService";
 import { Link } from "react-router-dom";
 import { FaGlassWhiskey } from "react-icons/fa";
 import { getDiscountedPrice } from "../../utils/helper";
+import { toast } from "react-toastify";
+import { slugify } from "../../utils/slugify";
 
 export default function MyWishlist() {
-  const { authUser } = useContext(UserAuthContext);
+  const { authUser, setAuthUser } = useContext(UserAuthContext);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -26,9 +29,31 @@ export default function MyWishlist() {
     fetchWishlist();
   }, [authUser]);
 
-  const handleRemove = (id) => {
-    // TODO: Add API call to remove product from wishlist
-    setWishlist((prev) => prev.filter((item) => item._id !== id));
+  const handleRemove = async (productId) => {
+
+    if (deleteLoading) {
+      toast.info("Please wait, removing item...");
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      const data = await removeProductFromWishList(authUser._id, productId);
+      if (data?.success) {
+        setWishlist((prev) => prev.filter((item) => item._id !== productId));
+        toast.success("Removed from wishlist");
+        setAuthUser((prev) => ({
+          ...prev,
+          wishlistedProducts: (prev?.wishlistedProducts || []).filter(
+            (id) => id !== productId
+          ),
+        }));
+      }
+    } catch {
+      toast.error("Failed to remove from wishlist");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   if (loading) {
@@ -64,53 +89,81 @@ export default function MyWishlist() {
           return (
             <li
               key={product?._id}
-              className="flex items-start gap-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:shadow transition"
+              className="w-full sm:w-100 lg:w-120 rounded-lg bg-gray-100 dark:bg-gray-500/10 hover:shadow transition"
             >
-              <div className="w-25 h-25 flex-shrink-0 bg-white rounded overflow-hidden flex justify-center items-center">
-                {product?.image?.[0] ? (
-                  <img
-                    src={product.image[0]}
-                    alt={product?.name || "Product"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <FaGlassWhiskey className="text-xl text-gray-400" />
-                )}
-              </div>
+              <div className="flex items-start">
+                <div className="w-25 h-25 flex-shrink-0 bg-white rounded-tl sm:rounded-s overflow-hidden flex justify-center items-center">
+                  {product?.image?.[0] ? (
+                    <img
+                      src={product.image[0]}
+                      alt={product?.name || "Product"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaGlassWhiskey className="text-xl text-gray-400" />
+                  )}
+                </div>
 
-              {/* Product Info with remove button at bottom */}
-              <div className="flex flex-col justify-between flex-1 min-w-0">
-                <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-white truncate">
-                    {product?.name || "Unnamed Product"}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-300">
-                    {product?.category || "Category"} &bull; {product?.quantityUnit || ""}
-                  </p>
-                  <div className="mt-1 flex items-center gap-2 flex-wrap">
-                    <span className="text-[#843E71] font-bold text-sm">
-                      &#8377;{discountedPrice}
-                    </span>
-                    {product?.discount > 0 && (
-                      <>
-                        <span className="text-xs line-through text-gray-500">
-                          &#8377;{product?.price}
+                <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
+                  <div>
+                    <Link to={`/product-details/${slugify(product?.category)}`} className="font-semibold text-gray-800 dark:text-white truncate">
+                      {product?.name || "Unnamed Product"}
+                    </Link>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
+                      {product?.category || "Category"} &bull; {product?.quantityUnit || ""}
+                    </p>
+                    <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
+                      <div>
+                        <span className="text-[#843E71] font-bold text-sm">
+                          &#8377;{discountedPrice}
                         </span>
-                        <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                          {product.discount}% OFF
-                        </span>
-                      </>
-                    )}
+                        {product?.discount > 0 && (
+                          <>
+                            <span className="text-xs line-through text-gray-500 ml-1">
+                              &#8377;{product?.price}
+                            </span>
+                            <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded ml-1">
+                              {product.discount}&#37; OFF
+                            </span>
+                          </>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleRemove(product._id)}
+                        disabled={deleteLoading}
+                        className={`hidden sm:flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full transition 
+    ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:bg-red-500/30"}`}
+                      >
+                        {deleteLoading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
+                            Removing...
+                          </>
+                        ) : (
+                          "Remove"
+                        )}
+                      </button>
+                    </div>
                   </div>
-
-                  <button
-                    onClick={() => handleRemove(product._id)}
-                    className="mt-3 text-sm font-medium text-red-600 hover:text-red-800 self-start"
-                  >
-                    Remove
-                  </button>
                 </div>
               </div>
+
+              <button
+                onClick={() => handleRemove(product._id)}
+                disabled={deleteLoading}
+                className={`w-full py-1 rounded-b text-sm font-medium transition sm:hidden 
+    ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:text-red-800"}`}
+              >
+                {deleteLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
+                    Removing...
+                  </div>
+                ) : (
+                  "Remove"
+                )}
+              </button>
             </li>
           );
         })}

@@ -7,8 +7,7 @@ import LowQuantityStock from "../../components/AdminComponents/DashboardComponen
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
 import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../services/inventoryServices";
 import { getProducts } from "../../services/productServices";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
 

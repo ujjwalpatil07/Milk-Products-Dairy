@@ -10,7 +10,7 @@ import { CartContext } from "../context/CartProvider";
 import { getCartProductDetails, calculateCartTotals } from "../utils/cartUtils";
 import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
-import CartProductCard from "../components/CartComponents/CartProductCard";
+import ProductCard from "../components/CartComponents/ProductCard";
 import SavedAddressList from "../components/CartComponents/SavedAddressList";
 import { getProducts } from "../services/productServices";
 import { toast } from "react-toastify";
@@ -171,7 +171,7 @@ export default function CartPage() {
             >
                 <motion.div layout className="space-y-3 w-full md:flex-1">
                     {cartDetails.map((item, idx) => (
-                        <CartProductCard key={idx * 0.55} item={item} />
+                        <ProductCard key={idx * 0.55} item={item} />
                     ))}
                 </motion.div>
 

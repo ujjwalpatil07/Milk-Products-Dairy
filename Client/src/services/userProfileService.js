@@ -46,7 +46,18 @@ export const updateAddress = async (addressId, updatedData) => {
   return res.data;
 };
 
+export const addToWishlist = async (userId, productId) => {
+  const res = await api.put("/user-profile/add-to-wishlist", { userId, productId });
+  return res.data;
+};
+
 export const getWishlistedProducts = async (userId) => {
   const res = await api.post("/user-profile/get-wishlisted", {userId});
   return res?.data
 }
+
+export const removeProductFromWishList = async (userId, productId) => {
+  const res = await api.post("/user-profile/remove-from-wishlist", { userId, productId});
+  return res?.data;
+}
+

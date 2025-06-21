@@ -164,6 +164,37 @@ export const editProfilePhoto = async (req, res) => {
   });
 };
 
+export const addToWishlistedProducts = async (req, res) => {
+  const { userId, productId } = req.body;
+
+  if (!userId || !productId) {
+    return res
+      .status(400)
+      .json({ error: "User ID and Product ID are required." });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  const alreadyWishlisted = user.wishlistedProducts.includes(productId);
+  if (alreadyWishlisted) {
+    return res
+      .status(200)
+      .json({ success: false, error: "Product is already in wishlist." });
+  }
+
+  user.wishlistedProducts.push(productId);
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Product added to wishlist.",
+  });
+};
+
 export const getUserWishlistedProducts = async (req, res) => {
   const { userId } = req.body;
 
@@ -180,7 +211,34 @@ export const getUserWishlistedProducts = async (req, res) => {
     return res.status(404).json({ error: "User not found." });
   }
 
-  const products = await Products
+  return res
+    .status(200)
+    .json({ success: true, wishlistedProducts: user.wishlistedProducts });
+};
 
-  return res.status(200).json({ success: true, wishlistedProducts: user.wishlistedProducts });
+export const removeFromWishlistedProducts = async (req, res) => {
+  const { userId, productId } = req.body;
+
+  if (!userId || !productId) {
+    return res
+      .status(400)
+      .json({ error: "User ID and Product ID are required." });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  user.wishlistedProducts = user.wishlistedProducts.filter(
+    (id) => id.toString() !== productId
+  );
+
+  await user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Product removed from wishlist.",
+  });
 };

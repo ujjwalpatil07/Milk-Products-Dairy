@@ -11,7 +11,7 @@ import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
 
 
-export default function CartProductCard({ item }) {
+export default function ProductCard({ item }) {
 
     const { id, name, image, price, selectedQuantity, quantityUnit, type, stock, discount } = item;
     const { removeFromCart, updateCartItem } = useContext(CartContext);
@@ -99,12 +99,11 @@ export default function CartProductCard({ item }) {
                         </>
                     )}
                 </div>
+                
                 <p className="text-sm text-green-600 font-medium">
                     Total: &#8377; {formatNumberWithCommas(itemTotal)}
                     {totalSaved > 0 && <> | You saved &#8377; {totalSaved.toFixed(2)}</>}
                 </p>
-
-
 
                 <p className="text-sm text-gray-600">
                     Selected Quantity: <span className="font-medium">{selectedQuantity} {quantityUnit}</span> ({type || "Not specified"})
@@ -129,7 +128,7 @@ export default function CartProductCard({ item }) {
     );
 }
 
-CartProductCard.propTypes = {
+ProductCard.propTypes = {
     item: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,

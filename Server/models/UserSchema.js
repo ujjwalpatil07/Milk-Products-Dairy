@@ -65,10 +65,12 @@ const UserSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Other"],
     },
 
-    wishlistedProducts: {
-      type: mongoose.Types.ObjectId,
-      ref: "Product",
-    },
+    wishlistedProducts: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
 
     orders: [
       {
