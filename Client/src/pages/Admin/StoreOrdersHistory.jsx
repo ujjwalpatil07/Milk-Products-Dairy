@@ -104,7 +104,7 @@ export default function StoreOrdersHistory() {
                         <div className="text-center text-gray-500 dark:text-white py-6">
                             No matching orders found.
                         </div>) : (filteredOrders.map((order) => (
-                            <div key={order._id} className="mb-8 bg-white dark:bg-gray-500/10 rounded-lg shadow p-4 space-y-4">
+                            <div key={order._id} className="mb-8 bg-white dark:bg-gray-500/10 rounded-lg shadow-lg p-4 space-y-4">
 
                                 <div className="text-sm space-y-2">
 

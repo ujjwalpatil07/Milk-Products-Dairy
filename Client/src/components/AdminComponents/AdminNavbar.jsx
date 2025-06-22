@@ -1,15 +1,22 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { SidebarContext } from "../../context/SidebarProvider";
 import { AdminAuthContext } from "../../context/AuthProvider";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import { Avatar } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function AdminNavbar() {
+
+    const location = useLocation();
+    
     const { authAdmin } = useContext(AdminAuthContext);
     const { setIsSidebarOpen, navbarInput, setNavbarInput } = useContext(SidebarContext);
+
+    useEffect(() => {
+        setNavbarInput("");
+    }, [location.pathname]);
 
     return (
         <nav className="sticky top-0 left-0 flex items-center justify-between px-4 py-5 bg-white/60 dark:bg-gray-500/20 border-b border-gray-300 dark:border-gray-700 backdrop-blur-md">

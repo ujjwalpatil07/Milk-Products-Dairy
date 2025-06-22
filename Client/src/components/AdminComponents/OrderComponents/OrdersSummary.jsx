@@ -36,7 +36,7 @@ export default function OrdersSummary() {
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
+    <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4">
                 <h2 className="text-lg font-semibold mb-4">Orders Overview</h2>
     
                 <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">

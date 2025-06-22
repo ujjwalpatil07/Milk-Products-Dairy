@@ -51,76 +51,78 @@ export default function Stores() {
     }
 
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">All Stores</h2>
+        <div className="p-3">
+            <div className="bg-white dark:bg-gray-500/20 rounded-lg p-3">
+                <h2 className="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">All Stores</h2>
 
-            <div className="space-y-6">
-                {filteredStores.map((store) => (
-                    <div
-                        key={store._id}
-                        className="md:flex items-start bg-white dark:bg-gray-500/20 rounded-lg shadow-sm overflow-hidden"
-                    >
-                        {
-                            (store?.photo) ? (<img
-                                src={store.photo}
-                                alt={store.shopName}
-                                loading="lazy"
-                                className="h-40 w-full md:h-70 md:w-60 object-cover"
-                            />) : (
-                                <div className="h-40 w-full md:h-70 md:w-60 bg-gray-500/10 flex items-center justify-center">
-                                    <EmojiFoodBeverageIcon className="text-gray-400 dark:text-gray-300 text-5xl" />
+                <div className="space-y-6">
+                    {filteredStores.map((store) => (
+                        <div
+                            key={store._id}
+                            className="md:flex items-start bg-white dark:bg-gray-500/10 rounded-lg shadow-lg overflow-hidden"
+                        >
+                            {
+                                (store?.photo) ? (<img
+                                    src={store.photo}
+                                    alt={store.shopName}
+                                    loading="lazy"
+                                    className="h-40 w-full md:h-70 md:w-60 object-cover"
+                                />) : (
+                                    <div className="h-40 w-full md:h-70 md:w-60 bg-gray-500/10 flex items-center justify-center">
+                                        <EmojiFoodBeverageIcon className="text-gray-400 dark:text-gray-300 text-5xl" />
+                                    </div>
+                                )
+                            }
+
+
+                            <div className="flex-1 flex flex-col justify-between md:h-70 space-y-1 text-gray-800 dark:text-white p-3 md:p-4">
+                                <h3 className="text-lg sm:text-xl font-semibold">{store.shopName || "Unnamed Store"}</h3>
+                                <p className="text-sm text-gray-400 dark:text-gray-300 md:line-clamp-2">
+                                    <span className="font-medium">Address:</span>{" "}
+                                    {store.address?.streetAddress}, {store.address?.city} - {store.address?.pincode}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium text-gray-400 dark:text-gray-300">Owner:</span> {store.firstName} {store.lastName}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium text-gray-400 dark:text-gray-300">Email:</span> {store.email}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium text-gray-400 dark:text-gray-300">Mobile:</span> {store.mobileNo}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium text-gray-400 dark:text-gray-300">Gender:</span> {store.gender}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="font-medium text-gray-400 dark:text-gray-300">Total Orders:</span> {store.orders?.length || 0}
+                                </p>
+
+                                <div className="flex items-end justify-between gap-3">
+                                    <Link
+                                        to={`/admin/store/${store?._id}/orders-history`}
+                                        className="flex items-center gap-1 text-sm bg-[#843E71] text-white px-3 py-1.5 rounded-md shadow hover:bg-[#6c2f5c] transition"
+                                    >
+                                        <VisibilityIcon fontSize="small" />
+                                        View Orders
+                                    </Link>
+
+                                    <a
+                                        href={`https://wa.me/91${store?.mobileNo}?text=${encodeURIComponent(
+                                            `Hello, I'm contacting you via *${companyName}*.\nAddress: ${address}\nApp: ${appLink}\nMessage: `
+                                        )}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md shadow hover:bg-green-600 transition"
+                                        title="Message on WhatsApp"
+                                    >
+                                        <WhatsAppIcon fontSize="small" />
+                                        <span className="hidden sm:flex">Message on WhatsApp</span>
+                                    </a>
                                 </div>
-                            )
-                        }
-
-
-                        <div className="flex-1 flex flex-col justify-between md:h-70 space-y-1 text-gray-800 dark:text-white p-3 md:p-4">
-                            <h3 className="text-lg sm:text-xl font-semibold">{store.shopName || "Unnamed Store"}</h3>
-                            <p className="text-sm text-gray-400 dark:text-gray-300 md:line-clamp-2">
-                                <span className="font-medium">Address:</span>{" "}
-                                {store.address?.streetAddress}, {store.address?.city} - {store.address?.pincode}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium text-gray-400 dark:text-gray-300">Owner:</span> {store.firstName} {store.lastName}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium text-gray-400 dark:text-gray-300">Email:</span> {store.email}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium text-gray-400 dark:text-gray-300">Mobile:</span> {store.mobileNo}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium text-gray-400 dark:text-gray-300">Gender:</span> {store.gender}
-                            </p>
-                            <p className="text-sm">
-                                <span className="font-medium text-gray-400 dark:text-gray-300">Total Orders:</span> {store.orders?.length || 0}
-                            </p>
-
-                            <div className="flex items-end justify-between gap-3">
-                                <Link
-                                    to={`/admin/store/${store?._id}/orders-history`}
-                                    className="flex items-center gap-1 text-sm bg-[#843E71] text-white px-3 py-1.5 rounded-md shadow hover:bg-[#6c2f5c] transition"
-                                >
-                                    <VisibilityIcon fontSize="small" />
-                                    View Orders
-                                </Link>
-
-                                <a
-                                    href={`https://wa.me/91${store?.mobileNo}?text=${encodeURIComponent(
-                                        `Hello, I'm contacting you via *${companyName}*.\nAddress: ${address}\nApp: ${appLink}\nMessage: `
-                                    )}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md shadow hover:bg-green-600 transition"
-                                    title="Message on WhatsApp"
-                                >
-                                    <WhatsAppIcon fontSize="small" />
-                                    <span className="hidden sm:flex">Message on WhatsApp</span>
-                                </a>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     )

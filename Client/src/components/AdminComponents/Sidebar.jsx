@@ -68,7 +68,7 @@ export default function Sidebar() {
                             </div>
 
                             {
-                                (item?.orderCount) && <div className="text-sm bg-red-500 px-2 rounded-full text-white">
+                                (item?.orderCount > 0) && <div className="text-sm bg-red-500 px-2 rounded-full text-white">
                                     {item?.orderCount}
                                 </div>
                             }

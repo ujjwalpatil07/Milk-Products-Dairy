@@ -112,7 +112,7 @@ export default function OrderDetails({ orders, loading }) {
       return (
         <div
           key={order._id}
-          className="bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-xl p-3 md:p-6 shadow w-full max-w-6xl mx-auto space-y-3"
+          className="bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg w-full max-w-6xl mx-auto space-y-3"
         >
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -156,7 +156,7 @@ export default function OrderDetails({ orders, loading }) {
               </thead>
               <tbody>
                 {products.map((product, idx) => (
-                  <tr key={idx * 0.9} className="border-b dark:border-gray-600">
+                  <tr key={idx * 0.9} className="border-b border-gray-300 dark:border-gray-700">
                     <td className="p-2">{product?.productId._id}</td>
                     <td className="p-2">{product?.productId?.name}</td>
                     <td className="p-2">{product?.productQuantity}</td>
@@ -205,8 +205,9 @@ export default function OrderDetails({ orders, loading }) {
 
 
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-xl p-6 shadow-md w-full overflow-x-auto flex flex-col gap-y-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-2">
+    <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 shadow-md w-full overflow-x-auto flex flex-col gap-y-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
+
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
           <ReceiptLongOutlinedIcon className="text-[#843E71]" />
           Orders Section
@@ -215,14 +216,15 @@ export default function OrderDetails({ orders, loading }) {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm dark:bg-gray-700 dark:text-white"
+            className="rounded-md px-3 py-2 text-sm bg-gray-200 dark:bg-gray-500/10 text-black dark:text-white"
           >
             {filterOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value} className="dark:bg-black/50">{opt.label}</option>
             ))}
           </select>
         </div>
       </div>
+
       {content}
     </div>
   );
