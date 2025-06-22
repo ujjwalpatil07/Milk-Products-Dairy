@@ -43,22 +43,25 @@ export default function OverallInventory({ totalCategories, totalStock, lowStock
   
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
-      <h2 className="text-lg font-semibold mb-4"> Inventary Summary </h2>
-
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {inventorySummaryData.map((item, index) => (
-          <div key={index * 0.5} className={`flex items-center gap-3 p-3 rounded-lg ${item.bg}`}>
-            <div className="text-2xl">
-              {item.icon}
+                <h2 className="text-lg font-semibold mb-4">Inventory Overview</h2>
+    
+                <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
+                    {inventorySummaryData.map((item, index) => (
+                        <div
+                            key={index * 0.9}
+                            className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+                        >
+                            <div className="text-2xl shrink-0">{item.icon}</div>
+                            <div className="flex flex-col">
+                                <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{item.name}</div>
+                                <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
+                                    {(item.value)}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div className="flex flex-col items-start ">
-              <div className="text-sm text-gray-500 dark:text-gray-300 text-start">{item.name}</div>
-              <div className="text-lg font-bold ">{item.value}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 

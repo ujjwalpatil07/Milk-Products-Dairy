@@ -1,20 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { confirmUerOrder, rejectUserOrder } from "../../../services/orderService";
 import { toast } from "react-toastify";
+import PropTypes from "prop-types";
 
 export default function OrderDetails({ orders, loading }) {
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
+  const [sortOption, setSortOption] = useState("latest");
 
   useEffect(() => {
     setLocalOrders(orders);
   }, [orders]);
 
+  const handleSortOrders = useCallback(() => {
+    const sorted = [...orders];
+    if (sortOption === "latest") {
+      sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortOption === "amountHigh") {
+      sorted.sort((a, b) => b.totalAmount - a.totalAmount);
+    } else if (sortOption === "amountLow") {
+      sorted.sort((a, b) => a.totalAmount - b.totalAmount);
+    }
+    setLocalOrders(sorted);
+  }, [orders, sortOption]);
+
+  useEffect(() => {
+    handleSortOrders();
+  }, [sortOption, orders, handleSortOrders]);
+
   const handleAcceptOrders = async (orderId) => {
     setProcessingId(orderId);
     const toastId = toast.loading("Accepting order...");
-
     try {
       const data = await confirmUerOrder(orderId, "Confirmed");
       if (data.success) {
@@ -33,7 +50,6 @@ export default function OrderDetails({ orders, loading }) {
   const handleRejectOrders = async (orderId) => {
     setProcessingId(orderId);
     const toastId = toast.loading("Rejecting order...");
-
     try {
       const data = await rejectUserOrder(orderId);
       if (data.success) {
@@ -49,7 +65,14 @@ export default function OrderDetails({ orders, loading }) {
     }
   };
 
+  const filterOptions = [
+    { value: "latest", label: "Order Date: Newest First" },
+    { value: "amountHigh", label: "Total Amount: High to Low" },
+    { value: "amountLow", label: "Total Amount: Low to High" },
+  ];
+
   let content;
+
   if (loading) {
     content = (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
@@ -72,47 +95,39 @@ export default function OrderDetails({ orders, loading }) {
       return (
         <div
           key={order._id}
-          className="bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-xl p-3 md:p-6 shadow-md w-full max-w-6xl mx-auto space-y-3"
+          className="bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-xl p-3 md:p-6 shadow w-full max-w-6xl mx-auto space-y-3"
         >
-          <div className="flex items-center gap-4">
-            <img
-              src={owner?.photo}
-              alt={owner?.firstName}
-              className="w-12 h-12 rounded-full object-cover border"
-            />
-            <div>
-              <p className="font-semibold">
-                {owner?.firstName} {owner?.lastName}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300">
-                {owner?.mobileNo}
-              </p>
+          <div className="flex flex-col md:flex-row justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={owner?.photo}
+                alt={owner?.firstName}
+                className="w-12 h-12 rounded-full object-cover border"
+              />
+              <div>
+                <p className="font-semibold">
+                  {owner?.firstName} {owner?.lastName}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-300">
+                  {owner?.mobileNo}
+                </p>
+              </div>
             </div>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Order ID: #{order._id}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-300">
+            <div className="text-sm text-gray-500 dark:text-gray-300">
               {new Date(order?.createdAt).toLocaleString()}
-            </p>
+            </div>
           </div>
 
           <div>
             <h3 className="font-semibold">Delivery Details</h3>
-            <p>
-              <strong>Name:</strong> {address?.name}
-            </p>
-            <p>
-              <strong>Phone:</strong> {address?.phone}
-            </p>
-            <p>
-              <strong>Address:</strong> {address?.streetAddress}
-            </p>
+            <p><strong>Name:</strong> {address?.name}</p>
+            <p><strong>Phone:</strong> {address?.phone}</p>
+            <p><strong>Address:</strong> {address?.streetAddress}</p>
           </div>
 
-          <div>
+          <div className="overflow-x-auto">
             <h3 className="font-semibold mb-2">Order Products</h3>
-            <table className="w-full text-sm overflow-hidden">
+            <table className="min-w-[600px] w-full text-sm">
               <thead>
                 <tr className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
                   <th className="p-2 text-left">Product ID</th>
@@ -122,9 +137,9 @@ export default function OrderDetails({ orders, loading }) {
                   <th className="p-2 text-left">Total</th>
                 </tr>
               </thead>
-              <tbody >
+              <tbody>
                 {products.map((product, idx) => (
-                  <tr key={idx * 0.6} className="border-b dark:border-gray-600">
+                  <tr key={idx * 0.9} className="border-b dark:border-gray-600">
                     <td className="p-2">{product?.productId._id}</td>
                     <td className="p-2">{product?.productId?.name}</td>
                     <td className="p-2">{product?.productQuantity}</td>
@@ -138,7 +153,7 @@ export default function OrderDetails({ orders, loading }) {
             </table>
           </div>
 
-          <div className="flex justify-between items-center pt-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-4">
             <div className="text-lg font-semibold">
               Total Amount: &#8377;{order?.totalAmount}
             </div>
@@ -146,22 +161,20 @@ export default function OrderDetails({ orders, loading }) {
               <button
                 onClick={() => handleAcceptOrders(order._id)}
                 disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${
-                  processingId === order._id
-                    ? "bg-green-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
+                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
+                  ? "bg-green-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+                  }`}
               >
                 Accept
               </button>
               <button
                 onClick={() => handleRejectOrders(order._id)}
                 disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${
-                  processingId === order._id
-                    ? "bg-red-400 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
+                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700"
+                  }`}
               >
                 Reject
               </button>
@@ -172,13 +185,34 @@ export default function OrderDetails({ orders, loading }) {
     });
   }
 
+
+
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-xl p-6 shadow-md w-full overflow-x-auto flex flex-col gap-y-4">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 flex items-center gap-2">
-        <ReceiptLongOutlinedIcon className="text-[#843E71]" />
-        Orders Section
-      </h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <ReceiptLongOutlinedIcon className="text-[#843E71]" />
+          Orders Section
+        </h2>
+        <div>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm dark:bg-gray-700 dark:text-white"
+          >
+            {filterOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       {content}
     </div>
   );
+
 }
+
+OrderDetails.propTypes = {
+  orders: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+};
