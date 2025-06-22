@@ -15,6 +15,11 @@ export const getAllOrders = async () => {
   return res.data;
 };
 
+export const getAdminOrders = async (adminId) => {
+  const res = await api.post("/order/get-admin-orders", { adminId })
+  return res.data;
+}
+
 export const confirmUerOrder = async (orderId, status) => {
   const res = await api.put("/order/confirm-order", { orderId, status });
   return res.data;

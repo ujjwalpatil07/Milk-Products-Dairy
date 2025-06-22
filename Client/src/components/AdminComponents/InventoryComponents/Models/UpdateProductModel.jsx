@@ -1,12 +1,11 @@
-// import React, { useState } from "react";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { updateProduct } from "../../../../services/productServices";
-import { Image, Tag, DollarSign, Archive, Package, AlertCircle, Scale3D, FlaskConical } from "lucide-react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import ScienceIcon from '@mui/icons-material/Science';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
+import PropTypes from "prop-types";
 
 const categories = [
   "Milk",
@@ -134,7 +133,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
         toast.success("Product Updated Successfully");
         console.log(res?.product)
       } else {
-        console.log
+        console.log(res)
         toast.error(res.message);
       }
 
@@ -218,7 +217,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                   Select a category
                 </option>
                 {categories.map((cat, index) => (
-                  <option key={index} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                  <option key={index * 0.9} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
                   >
                     {cat}
                   </option>
@@ -229,7 +228,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
           {/* Product Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Description
             </label>
             <div className="flex items-start gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
@@ -321,7 +320,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
                   {quantityUnits.map((unit, index) => (
                     <option
-                      key={index}
+                      key={index * 0.9}
                       value={unit}
                       className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
                     >
@@ -400,3 +399,18 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding, va
     </div>
   );
 }
+
+InputWithLabel.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  icon: PropTypes.node,
+  onChange: PropTypes.func.isRequired,
+  isAdding: PropTypes.bool,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+};
+
+UpdateProductModel.propTypes = {
+  setUpdateModel: PropTypes.func.isRequired,
+  selectedProduct: PropTypes.object.isRequired,
+};

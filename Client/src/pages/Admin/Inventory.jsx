@@ -4,6 +4,7 @@ import ProductsList from "../../components/AdminComponents/InventoryComponents/P
 import { getProducts } from "../../services/productServices";
 import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalCategories, totalStock } from "../../services/inventoryServices";
 
+
 export default function Inventory() {
   const [fetchedProducts, setFetchedProducts] = useState([])
   const [loading, setLoading] = useState(false)
@@ -54,3 +55,4 @@ export default function Inventory() {
     </>
   );
 }
+

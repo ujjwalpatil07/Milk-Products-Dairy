@@ -3,8 +3,6 @@ import UndoIcon from "@mui/icons-material/Undo";
 import CancelIcon from "@mui/icons-material/Cancel";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-import { formatNumberWithCommas } from "../../../utils/format"
-
 export default function PurchaseOverview() {
 
 
@@ -37,7 +35,7 @@ export default function PurchaseOverview() {
 
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
-      <h2 className="text-lg font-semibold mb-4"> Purchase Overview </h2>
+      <h2 className="text-lg font-semibold mb-4"> Orders Overview </h2>
 
       <div className="flex flex-wrap sm:grid sm:grid-cols-2 gap-3 overflow-x-auto scrollbar-hide pb-2">
         {purchaseOverviewData.map((item, index) => (
@@ -48,7 +46,7 @@ export default function PurchaseOverview() {
             <div className="text-2xl">{item.icon}</div>
             <div>
               <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
-              <div className="text-lg font-bold">&#8377; {formatNumberWithCommas(item.value)}</div>
+              <div className="text-lg font-bold">{item.value}</div>
             </div>
           </div>
         ))}

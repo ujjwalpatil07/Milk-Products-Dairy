@@ -50,7 +50,7 @@ export default function InventorySummary({ totalProducts, lowStockCount, outOfSt
             <div className="truncate">
               <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
               <div className="text-lg font-bold whitespace-nowrap">
-                &#37; {formatNumberWithCommas(item.value)}
+                {item.value}
               </div>
             </div>
           </div>

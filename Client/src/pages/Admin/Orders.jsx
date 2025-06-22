@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import OrdersSummary from "../../components/AdminComponents/OrderComponents/OrdersSummary";
 import OrderDetails from "../../components/AdminComponents/OrderComponents/OrderDetails";
+import { getAdminOrders, getAllOrders } from "../../services/orderService";
 import { toast } from "react-toastify";
+import { AdminAuthContext } from "../../context/AuthProvider"
 import axios from "axios";
 
 export default function Orders() {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const {authAdmin} = useContext(AdminAuthContext);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -25,7 +29,7 @@ export default function Orders() {
     };
 
     fetchOrders();
-  }, []);
+  }, [authAdmin?._id]);
 
 
   return <>
