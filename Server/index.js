@@ -8,6 +8,7 @@ import ProfileEditRoute from "./routes/profileEditRoutes.mjs";
 import ProductsRoutes from "./routes/productRoutes.mjs"
 import InventoryRoutes from "./routes/inventoryRoutes.mjs"
 import OrderRoute from "./routes/orderRoutes.js";
+import StoreRoute from "./routes/storeRoutes.js";
 
 import { connectDB } from "./config/db.js";
 
@@ -32,6 +33,8 @@ app.use("/products", ProductsRoutes);
 app.use("/inventory", InventoryRoutes);
 
 app.use("/order", OrderRoute);
+
+app.use("/store", StoreRoute);
 
 
 app.get("*", (req, res) => {

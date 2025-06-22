@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { SidebarContext } from "../../context/SidebarProvider";
 import { AdminAuthContext } from "../../context/AuthProvider";
 
@@ -9,13 +9,7 @@ import { Link } from "react-router-dom";
 
 export default function AdminNavbar() {
     const { authAdmin } = useContext(AdminAuthContext);
-    const { setIsSidebarOpen, setNavbarInput } = useContext(SidebarContext);
-
-    const [inputValue, setInputValue] = useState("");
-
-    const handleSearch = () => {
-        setNavbarInput(inputValue);
-    };
+    const { setIsSidebarOpen, navbarInput, setNavbarInput } = useContext(SidebarContext);
 
     return (
         <nav className="sticky top-0 left-0 flex items-center justify-between px-4 py-5 bg-white/60 dark:bg-gray-500/20 border-b border-gray-300 dark:border-gray-700 backdrop-blur-md">
@@ -26,17 +20,17 @@ export default function AdminNavbar() {
                 <MenuIcon className="text-gray-700 dark:text-white" />
             </button>
 
-            <div className="flex items-center gap-2 flex-1 max-w-xl mx-4">
+            <div className="relative flex-1 max-w-xl mx-4">
                 <input
                     type="text"
                     placeholder="Search..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-[#2c2c2c] text-sm text-black dark:text-white focus:outline-none"
+                    value={navbarInput}
+                    onChange={(e) => setNavbarInput(e.target.value)}
+                    className="w-full ps-3 pe-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-[#2c2c2c] text-sm text-black dark:text-white focus:outline-none"
                 />
                 <button
-                    onClick={handleSearch}
-                    className="h-9 w-9 rounded-md bg-blue-100 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-500 hover:bg-blue-500/20 transition cursor-pointer"
+                    className="absolute top-1/2 right-3 transform -translate-y-1/2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition"
+                    type="button"
                 >
                     <SearchIcon fontSize="small" />
                 </button>

@@ -26,6 +26,8 @@ import MyAddresses from "../pages/UserProfile/MyAddresses";
 import MyOrders from "../pages/UserProfile/MyOrders";
 import MyWishlist from "../pages/UserProfile/MyWishlist";
 import Payments from "../pages/UserProfile/Payments";
+import Stores from "../pages/Admin/Stores";
+import StoreOrdersHistory from "../pages/Admin/StoreOrdersHistory";
 
 export default function Routers() {
     
@@ -49,7 +51,8 @@ export default function Routers() {
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
             <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
             <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-            <Route path="/admin/store" element={<AdminLayout></AdminLayout>} />
+            <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />
+            <Route path="/admin/store/:userId/orders-History" element={<AdminLayout><StoreOrdersHistory /></AdminLayout>} />
 
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
             <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />
