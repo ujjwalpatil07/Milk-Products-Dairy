@@ -4,22 +4,23 @@ import OrderDetails from "../../components/AdminComponents/OrderComponents/Order
 import { getAdminOrders, getAllOrders } from "../../services/orderService";
 import { toast } from "react-toastify";
 import { AdminAuthContext } from "../../context/AuthProvider"
+import axios from "axios";
 
 export default function Orders() {
 
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const {authAdmin} = useContext(AdminAuthContext);
-  console.log(authAdmin)
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true)
-        const res = await getAllOrders();
-        setOrders(res.orders);
-
+        const res = await axios.get("http://localhost:9000/order/pending-orders");
+        if(res?.data?.success) {
+          setOrders(res?.data?.orders);
+        }
       } catch {
         toast.error("Failed to fetch orders, please try again!");
       } finally {

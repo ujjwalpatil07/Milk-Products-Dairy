@@ -1,10 +1,14 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { confirmUerOrder, rejectUserOrder } from "../../../services/orderService";
 import { toast } from "react-toastify";
-import PropTypes from "prop-types";
+import { AdminAuthContext } from "../../../context/AuthProvider";
 
 export default function OrderDetails({ orders, loading }) {
+
+  const { setAuthAdmin } = useContext(AdminAuthContext);
+
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
   const [sortOption, setSortOption] = useState("latest");
@@ -37,11 +41,17 @@ export default function OrderDetails({ orders, loading }) {
       if (data.success) {
         toast.update(toastId, { render: "Order confirmed!", type: "success", isLoading: false, autoClose: 3000 });
         setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setAuthAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          pendingOrders: prevAdmin.pendingOrders.filter(
+            (id) => id !== orderId && id !== orderId.toString()
+          ),
+        }));
       } else {
         toast.update(toastId, { render: "Failed to confirm order.", type: "error", isLoading: false, autoClose: 3000 });
       }
-    } catch {
-      toast.update(toastId, { render: "Error confirming order!", type: "error", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      toast.update(toastId, { render: error?.response?.data?.message || "Error confirming order!", type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }
@@ -52,14 +62,21 @@ export default function OrderDetails({ orders, loading }) {
     const toastId = toast.loading("Rejecting order...");
     try {
       const data = await rejectUserOrder(orderId);
+
       if (data.success) {
         toast.update(toastId, { render: "Order rejected.", type: "info", isLoading: false, autoClose: 3000 });
         setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setAuthAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          pendingOrders: prevAdmin.pendingOrders.filter(
+            (id) => id !== orderId && id !== orderId.toString()
+          ),
+        }));
       } else {
-        toast.update(toastId, { render: "Failed to reject order.", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: (data.error || "Failed to reject order."), type: "error", isLoading: false, autoClose: 3000 });
       }
-    } catch {
-      toast.update(toastId, { render: "Error rejecting order.", type: "error", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      toast.update(toastId, { render: (error?.response?.data?.message || "Error rejecting order."), type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }

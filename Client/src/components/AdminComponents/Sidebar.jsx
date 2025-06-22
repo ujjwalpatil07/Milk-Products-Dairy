@@ -21,13 +21,13 @@ export default function Sidebar() {
 
     const { isSidebarOpen, setIsSidebarOpen } = useContext(SidebarContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { handleAdminLogout } = useContext(AdminAuthContext);
+    const { handleAdminLogout, authAdmin } = useContext(AdminAuthContext);
     const location = useLocation();
 
     const navItems = [
         { label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/dashboard" },
         { label: "Inventory", icon: <InventoryIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/inventory"},
-        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders" },
+        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: authAdmin?.pendingOrders?.length || 0  },
         { label: "Manage Store", icon: <StoreIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/store" },
     ];
 
@@ -66,6 +66,12 @@ export default function Sidebar() {
                                 {item.icon}
                                 <span className="text-sm font-medium">{item.label}</span>
                             </div>
+
+                            {
+                                (item?.orderCount) && <div className="text-sm bg-red-500 px-2 rounded-full text-white">
+                                    {item?.orderCount}
+                                </div>
+                            }
                         </Link>
                     );
                 })}
