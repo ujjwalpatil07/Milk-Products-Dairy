@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import OverallInventory from "../../components/AdminComponents/InventoryComponents/OverallInventory";
 import ProductsList from "../../components/AdminComponents/InventoryComponents/ProductsList";
 import { getProducts } from "../../services/productServices";
-import { useState, useEffect } from "react";
 import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalCategories, totalStock } from "../../services/inventoryServices";
 
 export default function Inventory() {

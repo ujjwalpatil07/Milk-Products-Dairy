@@ -28,6 +28,7 @@ import MyWishlist from "../pages/UserProfile/MyWishlist";
 import Payments from "../pages/UserProfile/Payments";
 
 export default function Routers() {
+    
     return (
         <Routes>
             <Route path="/" element={<Layout><LandingPage /></Layout>} />
@@ -48,6 +49,7 @@ export default function Routers() {
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
             <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
             <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
+            <Route path="/admin/store" element={<AdminLayout></AdminLayout>} />
 
             <Route path="/about" element={<Layout><AboutPage /></Layout>} />
             <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />

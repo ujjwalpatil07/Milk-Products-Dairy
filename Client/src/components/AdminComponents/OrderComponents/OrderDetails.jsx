@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { confirmUerOrder, rejectUserOrder } from "../../../services/orderService";
 import { toast } from "react-toastify";
+import { AdminAuthContext } from "../../../context/AuthProvider";
 
 export default function OrderDetails({ orders, loading }) {
+
+  const { setAuthAdmin } = useContext(AdminAuthContext);
+
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
 
@@ -20,11 +24,17 @@ export default function OrderDetails({ orders, loading }) {
       if (data.success) {
         toast.update(toastId, { render: "Order confirmed!", type: "success", isLoading: false, autoClose: 3000 });
         setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setAuthAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          pendingOrders: prevAdmin.pendingOrders.filter(
+            (id) => id !== orderId && id !== orderId.toString()
+          ),
+        }));
       } else {
         toast.update(toastId, { render: "Failed to confirm order.", type: "error", isLoading: false, autoClose: 3000 });
       }
-    } catch {
-      toast.update(toastId, { render: "Error confirming order!", type: "error", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      toast.update(toastId, { render: error?.response?.data?.message || "Error confirming order!", type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }
@@ -36,14 +46,21 @@ export default function OrderDetails({ orders, loading }) {
 
     try {
       const data = await rejectUserOrder(orderId);
+
       if (data.success) {
         toast.update(toastId, { render: "Order rejected.", type: "info", isLoading: false, autoClose: 3000 });
         setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
+        setAuthAdmin((prevAdmin) => ({
+          ...prevAdmin,
+          pendingOrders: prevAdmin.pendingOrders.filter(
+            (id) => id !== orderId && id !== orderId.toString()
+          ),
+        }));
       } else {
-        toast.update(toastId, { render: "Failed to reject order.", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: (data.error || "Failed to reject order."), type: "error", isLoading: false, autoClose: 3000 });
       }
-    } catch {
-      toast.update(toastId, { render: "Error rejecting order.", type: "error", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      toast.update(toastId, { render: (error?.response?.data?.message || "Error rejecting order."), type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }
@@ -146,22 +163,20 @@ export default function OrderDetails({ orders, loading }) {
               <button
                 onClick={() => handleAcceptOrders(order._id)}
                 disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${
-                  processingId === order._id
-                    ? "bg-green-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
+                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
+                  ? "bg-green-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+                  }`}
               >
                 Accept
               </button>
               <button
                 onClick={() => handleRejectOrders(order._id)}
                 disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${
-                  processingId === order._id
-                    ? "bg-red-400 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
+                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
+                  ? "bg-red-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700"
+                  }`}
               >
                 Reject
               </button>
