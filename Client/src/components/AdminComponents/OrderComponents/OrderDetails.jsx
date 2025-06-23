@@ -4,10 +4,16 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { confirmUerOrder, rejectUserOrder } from "../../../services/orderService";
 import { toast } from "react-toastify";
 import { AdminAuthContext } from "../../../context/AuthProvider";
+import { SidebarContext } from "../../../context/SidebarProvider";
+import { filterOrdersBySearch } from "../../../utils/filterOrders";
+import { useDebounce } from "use-debounce";
 
 export default function OrderDetails({ orders, loading }) {
 
+  const { navbarInput } = useContext(SidebarContext);
   const { setAuthAdmin } = useContext(AdminAuthContext);
+
+  const [debouncedSearchText] = useDebounce(navbarInput, 300);
 
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
@@ -82,6 +88,7 @@ export default function OrderDetails({ orders, loading }) {
     }
   };
 
+  const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
 
   const filterOptions = [
     { value: "latest", label: "Order Date: Newest First" },
@@ -98,14 +105,14 @@ export default function OrderDetails({ orders, loading }) {
         <span className="text-xl">Loading orders...</span>
       </div>
     );
-  } else if (!localOrders || localOrders.length === 0) {
+  } else if (filteredOrders?.length === 0) {
     content = (
       <div className="text-center text-gray-500 dark:text-gray-300 py-4">
         No orders found.
       </div>
     );
   } else {
-    content = localOrders.map((order) => {
+    content = filteredOrders.map((order) => {
       const address = order?.address;
       const owner = address?.owner;
       const products = order?.productsData;
@@ -202,8 +209,6 @@ export default function OrderDetails({ orders, loading }) {
       );
     });
   }
-
-
 
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 shadow-md w-full overflow-x-auto flex flex-col gap-y-4">

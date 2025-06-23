@@ -50,7 +50,7 @@ export default function Sidebar() {
 
             <nav className="flex-1 px-4 py-6 space-y-4">
                 {navItems.map((item) => {
-                    const isActive = location.pathname === item.to;
+                    const isActive = location.pathname.startsWith(item.to);
                     return (
                         <Link
                             key={item.label}
@@ -68,7 +68,7 @@ export default function Sidebar() {
                             </div>
 
                             {
-                                (item?.orderCount) && <div className="text-sm bg-red-500 px-2 rounded-full text-white">
+                                (item?.orderCount > 0) && <div className="text-sm bg-red-500 px-2 rounded-full text-white">
                                     {item?.orderCount}
                                 </div>
                             }

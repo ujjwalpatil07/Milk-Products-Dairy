@@ -23,7 +23,8 @@ export default function Orders() {
         }else {
           console.log(res);
         }
-      } catch {
+      } catch (error) {
+        console.log(error)
         toast.error("Failed to fetch orders, please try again!");
       } finally {
         setLoading(false);
@@ -41,8 +42,9 @@ export default function Orders() {
         if (res?.success) {
           setAllOrders(res?.orders);
         }
-      } catch {
-        toast.error("Failed to fetch orders, please try again!");
+      } catch (error) {
+        console.log(error)
+        toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
       } finally {
         setLoading(false);
       }
@@ -63,7 +65,7 @@ export default function Orders() {
     </div>
 
     <div className="p-3">
-      <OrderDetails orders={orders} loading={loading} allOrders={allOrders}/>
+      <OrderDetails orders={orders} loading={loading}/>
     </div>
   </>;
 }

@@ -13,6 +13,7 @@ import {
   addToWishlistedProducts,
 } from "../controllers/profileEdit.js";
 import { upload } from "../config/cloudinary.js";
+
 const router = express.Router();
 
 router.put("/profile-edit", wrapAsync(editProfile));
