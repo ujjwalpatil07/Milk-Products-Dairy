@@ -170,7 +170,7 @@ export const getAllOrders = async (req, res) => {
   });
 };
 
-export const getPendingOrders = async (req, res) => {
+export const getAdminOrders = async (req, res) => {
   
   const admin = await Admin.findOne().populate({
     path: "pendingOrders",

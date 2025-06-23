@@ -1,6 +1,6 @@
 import express from "express";
 import wrapAsync from "../utils/wrapAsync.js";
-import { addNewOrder, confirmOrder, getAllOrders, getAllUserOrders, getPendingOrders, rejectOrder } from "../controllers/orderController.js";
+import { addNewOrder, confirmOrder, getAllOrders, getAllUserOrders, getAdminOrders, rejectOrder } from "../controllers/orderController.js";
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post("/get-user-orders", wrapAsync(getAllUserOrders));
 
 router.post("/get-all-orders", wrapAsync(getAllOrders));
 
-router.get("/pending-orders", wrapAsync(getPendingOrders));
+router.post("/get-admin-orders", wrapAsync(getAdminOrders));
 
 router.put("/confirm-order", wrapAsync(confirmOrder));
 

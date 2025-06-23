@@ -49,7 +49,7 @@ export default function StoreOrdersHistory() {
         )
     }
 
-    if (!userData || !userData.orders?.length) {
+    if (!userData.orders?.length) {
         return (
             <div className="text-center text-gray-500 dark:text-white py-10">
                 No order history available.
@@ -157,7 +157,7 @@ export default function StoreOrdersHistory() {
                                         </thead>
                                         <tbody>
                                             {order.productsData.map((item) => (
-                                                <tr key={item._id} className="border-b dark:border-gray-700 text-sm">
+                                                <tr key={item._id} className="border-b border-gray-200 dark:border-gray-700 text-sm">
                                                     <td className="px-3 py-2">{item.productId?.name || "N/A"}</td>
                                                     <td className="px-3 py-2">{item.productQuantity}</td>
                                                     <td className="px-3 py-2">₹{item.productPrice}</td>
@@ -186,7 +186,6 @@ export default function StoreOrdersHistory() {
                                         <span>₹{order.totalAmount}</span>
                                     </p>
                                 </div>
-
                             </div>
                         )))
                 }

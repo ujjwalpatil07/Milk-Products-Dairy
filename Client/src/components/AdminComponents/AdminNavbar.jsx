@@ -16,7 +16,7 @@ export default function AdminNavbar() {
 
     useEffect(() => {
         setNavbarInput("");
-    }, [location.pathname]);
+    }, [location.pathname, setNavbarInput]);
 
     return (
         <nav className="sticky top-0 left-0 flex items-center justify-between px-4 py-5 bg-white/60 dark:bg-gray-500/20 border-b border-gray-300 dark:border-gray-700 backdrop-blur-md">
