@@ -39,12 +39,3 @@ export const totalActiveOrders = (orders) => {
 export const totalOrdersCount = (orders) => {
   return orders.length;
 };
-
-
-export const totalReturnedOrders = (orders) => {
-  console.log(orders);
-};
-
-export const totaldraftedOrders = (orders) => {
-  console.log(orders)
-};
