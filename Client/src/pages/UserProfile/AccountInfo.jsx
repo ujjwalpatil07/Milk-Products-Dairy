@@ -276,7 +276,7 @@ export default function AccountInfo() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md p-6 transition-all duration-300">
+    <div className="w-full max-w-3xl bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md p-6 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold flex items-center gap-2">
           <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information

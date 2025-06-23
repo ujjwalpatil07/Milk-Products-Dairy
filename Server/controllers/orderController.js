@@ -5,7 +5,14 @@ import Address from "../models/AddressShema.js";
 import Product from "../models/ProductSchema.js";
 
 export const addNewOrder = async (req, res) => {
-  const { address, productsData, paymentMode, totalAmount, userId } = req.body;
+  const {
+    address,
+    productsData,
+    paymentMode,
+    totalAmount,
+    userId,
+    paymentInfo,
+  } = req.body;
 
   if (
     !address ||
@@ -91,6 +98,14 @@ export const addNewOrder = async (req, res) => {
     productsData: validatedProducts,
     paymentMode,
     totalAmount: formattedServerTotal,
+    razorpay:
+      paymentMode === "Online" && paymentInfo
+        ? {
+            orderId: paymentInfo.razorpayOrderId,
+            paymentId: paymentInfo.razorpayPaymentId,
+            signature: paymentInfo.razorpaySignature,
+          }
+        : undefined,
   });
 
   const admin = await Admin.findOne();
@@ -171,7 +186,6 @@ export const getAllOrders = async (req, res) => {
 };
 
 export const getAdminOrders = async (req, res) => {
-  
   const admin = await Admin.findOne().populate({
     path: "pendingOrders",
     model: "Order",

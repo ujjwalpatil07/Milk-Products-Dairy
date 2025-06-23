@@ -17,7 +17,7 @@ export default function OrderDetails({ orders, loading }) {
 
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
-  const [sortOption, setSortOption] = useState("latest");
+  const [sortOption, setSortOption] = useState("oldest");
 
   useEffect(() => {
     setLocalOrders(orders);
@@ -89,9 +89,10 @@ export default function OrderDetails({ orders, loading }) {
   };
 
   const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
-
+  
   const filterOptions = [
     { value: "latest", label: "Order Date: Newest First" },
+    { value: "oldest", label: "Order Date: Oldest First" },
     { value: "amountHigh", label: "Total Amount: High to Low" },
     { value: "amountLow", label: "Total Amount: Low to High" },
   ];

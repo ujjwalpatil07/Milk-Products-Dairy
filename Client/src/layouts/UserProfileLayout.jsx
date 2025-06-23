@@ -49,11 +49,9 @@ export default function UserProfileLayout({ children }) {
     return (
         <div ref={scrollRef} className="h-screen scroll-smooth flex flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
             <Navbar />
-            <main className="flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto">
+            <main className="w-full flex-1 flex flex-col justify-center md:flex-row py-5 p-3 gap-5 mx-auto">
                 <UserProfileSidebar />
-
                 {children}
-
             </main>
             <Footer />
         </div>

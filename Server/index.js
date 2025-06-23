@@ -8,7 +8,9 @@ import ProfileEditRoute from "./routes/profileEditRoutes.mjs";
 import ProductsRoutes from "./routes/productRoutes.mjs"
 import InventoryRoutes from "./routes/inventoryRoutes.mjs"
 import OrderRoute from "./routes/orderRoutes.js";
+import PaymentRoute from "./routes/paymentRoutes.js";
 import StoreRoute from "./routes/storeRoutes.js";
+import PDFRoute from "./routes/pdfRoutes.js";
 
 import { connectDB } from "./config/db.js";
 
@@ -34,7 +36,11 @@ app.use("/inventory", InventoryRoutes);
 
 app.use("/order", OrderRoute);
 
+app.use("/payment", PaymentRoute);
+
 app.use("/store", StoreRoute);
+
+app.use("/pdf", PDFRoute);
 
 
 app.get("*", (req, res) => {

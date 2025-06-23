@@ -29,7 +29,14 @@ const OrderSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Confirmed"],
+      enum: [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Confirmed",
+      ],
       default: "Pending",
     },
 
@@ -37,6 +44,12 @@ const OrderSchema = new Schema(
       type: String,
       enum: ["Cash on Delivery", "Online"],
       required: true,
+    },
+
+    razorpay: {
+      orderId: String,
+      paymentId: String,
+      signature: String,
     },
 
     totalAmount: {

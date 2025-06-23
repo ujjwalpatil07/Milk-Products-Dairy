@@ -74,7 +74,7 @@ export default function MyWishlist() {
   }
 
   return (
-    <div className="w-full h-fit max-w-4xl mx-auto p-4 bg-white dark:bg-gray-500/20 rounded-lg">
+    <div className="w-full h-fit sm:w-fit max-w-4xl p-4 bg-white dark:bg-gray-500/20 rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">
         My Wishlist
       </h2>

@@ -20,6 +20,8 @@ import { getProducts } from "../services/productServices";
 import { placeNewOrder } from "../services/orderService";
 import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
+import { razorpayOrderPayment } from "../services/paymentService";
+import { ThemeContext } from "../context/ThemeProvider";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -27,6 +29,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function OrderCheckoutPage() {
 
+  const { theme } = useContext(ThemeContext);
   const { authUser, deliveryAddress } = useContext(UserAuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
@@ -35,6 +38,7 @@ export default function OrderCheckoutPage() {
   const [allProducts, setAllProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
   useEffect(() => {
     const getAllProducts = async () => {
@@ -73,39 +77,91 @@ export default function OrderCheckoutPage() {
 
   const handlePlaceOrder = async (selectedMode) => {
 
+    setSelectedPaymentMode(selectedMode);
     setOrderLoading(true);
 
+    const orderData = {
+      address: deliveryAddress?._id,
+      productsData: cartDetails.map((item) => {
+        const discount = item.discount || 0;
+        const discountedPrice = item.price - (item.price * discount) / 100;
+
+        return {
+          productId: item.id,
+          productQuantity: item.selectedQuantity,
+          productPrice: parseFloat(discountedPrice.toFixed(2)),
+          productName: item.name,
+        };
+      }),
+      paymentMode: selectedMode,
+      totalAmount: totalAmount,
+      userId: authUser?._id
+    };
+
     try {
-      const orderData = {
-        address: deliveryAddress?._id,
-        productsData: cartDetails.map((item) => {
-          const discount = item.discount || 0;
-          const discountedPrice = item.price - (item.price * discount) / 100;
 
-          return {
-            productId: item.id,
-            productQuantity: item.selectedQuantity,
-            productPrice: parseFloat(discountedPrice.toFixed(2)),
-            productName: item.name,
-          };
-        }),
-        paymentMode: selectedMode,
-        totalAmount: totalAmount,
-        userId: authUser?._id
-      };
+      if (selectedMode === "Cash on Delivery") {
+        const response = await placeNewOrder(orderData);
+        if (response?.success) {
+          toast.success("Order placed successfully!");
+          clearCart();
+          setOpen(false);
+          navigate(`/user-profile/orders`);
+        } else {
+          toast.error(response?.message || "Failed to place order");
+        }
+      } else if (selectedMode === "Online") {
 
-      const response = await placeNewOrder(orderData);
-      if (response?.success) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        setOpen(false);
-        navigate(`/user-profile/orders`);
-      } else {
-        toast.error(response?.message || "Failed to place order");
+        const data = await razorpayOrderPayment(totalAmount);
+
+        const options = {
+          key: data.keyId,
+          amount: data.amount,
+          currency: data.currency,
+          name: "Madhur Dairy & Daily Needs",
+          description: "Payment for your order",
+          order_id: data.orderId,
+          handler: async (response) => {
+            const paymentInfo = {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            };
+
+            try {
+              const finalResponse = await placeNewOrder({
+                ...orderData,
+                paymentInfo,
+              });
+              if (finalResponse?.success) {
+                toast.success("Order placed successfully!");
+                clearCart();
+                setOpen(false);
+                navigate("/user-profile/orders");
+              } else {
+                toast.error(finalResponse?.message || "Order failed after payment. Please contact support.");
+              }
+            } catch {
+              toast.error("Error completing order after payment. Please contact support.");
+            }
+          },
+          prefill: {
+            name: authUser?.firstName && authUser?.lastName
+              ? `${authUser.firstName} ${authUser.lastName}`
+              : authUser?.username || authUser?.shopName,
+            email: authUser?.email,
+            contact: authUser?.mobileNo,
+          },
+          theme: {
+            color: theme === "dark" ? "#1f2937" : "#9ca3af",
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       }
     } catch (error) {
-      console.error("Order error:", error);
-      toast.error("An error occurred while placing the order.");
+      toast.error(error?.response?.data?.message || "An error occurred while placing the order.");
     } finally {
       setOrderLoading(false);
     }
@@ -320,7 +376,7 @@ export default function OrderCheckoutPage() {
               onClick={() => handlePlaceOrder("Cash on Delivery")}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-2 sm:px-4 py-2 rounded shadow disabled:cursor-not-allowed"
             >
-              {orderLoading ? (
+              {(orderLoading && selectedPaymentMode === "Cash on Delivery") ? (
                 <span className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   Processing...
@@ -335,11 +391,20 @@ export default function OrderCheckoutPage() {
 
             <button
               disabled={orderLoading}
-              onClick={() => toast.info("Online payment not yet implemented")}
+              onClick={() => handlePlaceOrder("Online")}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow disabled:cursor-not-allowed"
             >
-              <PaidIcon fontSize="small" className="!hidden sm:!flex" />
-              Online Payment
+              {(orderLoading && selectedPaymentMode === "Online") ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Processing...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <PaidIcon fontSize="small" className="!hidden sm:!flex" />
+                  Online Payment
+                </span>
+              )}
             </button>
           </div>
         </div>

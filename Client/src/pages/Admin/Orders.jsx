@@ -43,7 +43,6 @@ export default function Orders() {
           setAllOrders(res?.orders);
         }
       } catch (error) {
-        console.log(error)
         toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
       } finally {
         setLoading(false);
