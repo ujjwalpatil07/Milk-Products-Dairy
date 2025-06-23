@@ -33,9 +33,11 @@ export const rejectUserOrder = async (orderId) => {
 export const totalCanceledOrders = (orders) => {
   return orders.filter((order) => order.status === "Cancelled").length;
 };
+
 export const totalActiveOrders = (orders) => {
   return orders.length;
 };
+
 export const totalOrdersCount = (orders) => {
   return orders.length;
 };
