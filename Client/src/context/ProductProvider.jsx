@@ -1,4 +1,6 @@
 import {  useMemo, useState, createContext } from "react";
+import PropTypes from "prop-types";
+
 
 export const ProductContext = createContext();
 
@@ -17,4 +19,8 @@ export const ProductProvider = ({ children }) => {
             { children }
         </ProductContext.Provider>
     )
+}
+
+ProductContext.proptypes = {
+    
 }

@@ -1,18 +1,21 @@
 import React from "react";
-import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban  } from "lucide-react";
+import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban } from "lucide-react";
+import PropTypes from 'prop-types';
 
-export default function OrdersSummary() {
+export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalCanceledOrders }) {
+
+
   const orderSummaryData = [
     {
       name: "Total Orders",
-      value: 50,
-      icon: <ShoppingCart size={ 28} className="text-green-600"/>,
+      value: totalOrders,
+      icon: <ShoppingCart size={28} className="text-green-600" />,
       bg: "bg-green-100 dark:bg-green-800/30",
     },
     {
       name: "Total Orders Recieved",
-      value: 41,
-      icon: <BookCheck size={28} className="text-yellow-600"/>,
+      value: totalRecievedOrders,
+      icon: <BookCheck size={28} className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
@@ -23,7 +26,7 @@ export default function OrdersSummary() {
     },
     {
       name: "Total Canceled Orders",
-      value: 34,
+      value: totalCanceledOrders,
       icon: <Ban size={28} className="text-red-600" />,
       bg: "bg-red-100 dark:bg-red-800/30",
     },
@@ -37,24 +40,30 @@ export default function OrdersSummary() {
 
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
-                <h2 className="text-lg font-semibold mb-4">Orders Overview</h2>
-    
-                <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
-                    {orderSummaryData.map((item, index) => (
-                        <div
-                            key={index * 0.9}
-                            className={`min-w-[320px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
-                        >
-                            <div className="text-2xl shrink-0">{item.icon}</div>
-                            <div className="flex flex-col">
-                                <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{item.name}</div>
-                                <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
-                                     {(item.value)}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+      <h2 className="text-lg font-semibold mb-4">Orders Overview</h2>
+
+      <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
+        {orderSummaryData.map((item, index) => (
+          <div
+            key={index * 0.9}
+            className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+          >
+            <div className="text-2xl shrink-0">{item.icon}</div>
+            <div className="flex flex-col">
+              <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{item.name}</div>
+              <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
+                {item.value}
+              </div>
             </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
+}
+
+OrdersSummary.propTypes = {
+  totalOrders : PropTypes.number.isRequired,
+  totalRecievedOrders: PropTypes.number.isRequired,
+  totalCanceledOrders: PropTypes.number.isRequired
 }

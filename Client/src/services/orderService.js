@@ -15,34 +15,22 @@ export const getAllOrders = async () => {
   return res.data;
 };
 
-export const getAdminOrders = async (adminId) => {
-  const res = await api.post("/order/get-admin-orders", { adminId })
+export const getAdminOrders = async () => {
+  const res = await api.get("/order/get-admin-orders");
   return res.data;
-}
+};
 
 export const confirmUerOrder = async (orderId, status) => {
   const res = await api.put("/order/confirm-order", { orderId, status });
   return res.data;
-}
+};
 
 export const rejectUserOrder = async (orderId) => {
-   const res = await api.put("/order/reject-order", { orderId });
+  const res = await api.put("/order/reject-order", { orderId });
   return res.data;
-}
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-export const totalOrdercount = (orders) => {
+export const totalActiveOrders = (orders) => {
   return orders.length;
 };
 
@@ -51,13 +39,14 @@ export const totalReturnedOrders = (orders) => {
 };
 
 export const totaldraftedOrders = (orders) => {
-  console.log(orders)
+  console.log(orders);
 };
 
-export const totalActiveOrders = (orders) => {
-  console.log(orders);
+export const totalOrdersCount = (orders) => {
+  return orders.length;
 };
 
 export const totalCanceledOrders = (orders) => {
-  console.log(orders);
+  // return console.log(orders)
+  return orders.filter((order) => order.status === "Cancelled").length;
 };
