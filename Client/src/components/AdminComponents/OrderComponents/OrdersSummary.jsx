@@ -50,6 +50,7 @@ export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalC
           >
             <div className="text-2xl shrink-0">{item.icon}</div>
             <div className="flex flex-col">
+
               <div className="text-sm text-gray-500 dark:text-gray-300 break-words">{item.name}</div>
               <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
                 {item.value}
@@ -67,3 +68,4 @@ OrdersSummary.propTypes = {
   totalRecievedOrders: PropTypes.number.isRequired,
   totalCanceledOrders: PropTypes.number.isRequired
 }
+

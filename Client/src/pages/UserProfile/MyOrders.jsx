@@ -46,30 +46,23 @@ export default function MyOrders() {
     }
   };
 
+  let content;
+
   if (loading) {
-    return (
+    content = (
       <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <p className="text-sm">Loading...</p>
       </div>
     );
-  }
-
-  if (error) {
-    return <p className="text-red-500 text-center mt-6">{error}</p>;
-  }
-
-  if (orders.length === 0) {
-    return (
+  } else if (!orders || orders.length === 0) {
+    content = (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16">
         You haven't placed any orders yet.
       </div>
     );
-  }
-
-  return (
-    <div className="w-full h-fit md:w-xl lg:w-2xl bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
-      <h2 className="text-2xl font-bold mb-3 py-3 text-center">My Orders</h2>
+  } else {
+    content = (
       <div className="space-y-6">
         {orders.map((order) => (
           <div
@@ -152,6 +145,18 @@ export default function MyOrders() {
           </div>
         ))}
       </div>
+    )
+  }
+
+  if (error) {
+    return <p className="text-red-500 text-center mt-6">{error}</p>;
+  }
+
+
+  return (
+    <div className="w-full h-fit md:w-xl lg:w-2xl bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
+      <h2 className="text-2xl font-bold mb-3 py-3 text-center">My Orders</h2>
+      {content}
     </div>
   );
 }

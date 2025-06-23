@@ -89,7 +89,6 @@ export default function OrderDetails({ orders, loading }) {
   };
 
   const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
-  
 
   const filterOptions = [
     { value: "latest", label: "Order Date: Newest First" },

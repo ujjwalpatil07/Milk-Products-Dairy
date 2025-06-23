@@ -1,24 +1,27 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import UpdateProductModel from './Models/UpdateProductModel';
 import AddProductModel from "./Models/AddProductModel"
 import RemoveModel from './Models/RemoveModel';
+import { SidebarContext } from '../../../context/SidebarProvider';
 
-export default function ProductsList({ fetchProducts, fetchedProducts }) {
+export default function ProductsList({ fetchProducts, fetchedProducts, loading }) {
+
+  const {navbarInput, setNavbarInput} = useContext(SidebarContext)
   const [addModel, setAddModel] = useState(false);
   const [updateModel, setUpdateModel] = useState(false);
   const [removeModel, setRemoveModel] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState({});  
 
-  useEffect(() => {
+
+  useEffect(() => { 
     if (!addModel || !removeModel || !updateModel) fetchProducts();
-  }, [addModel, removeModel, updateModel, fetchProducts]);
+  }, [addModel, removeModel, updateModel]);
 
   const filteredProducts = fetchedProducts.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.name.toLowerCase().includes(navbarInput.toLowerCase())
   );
 
   const highlightMatch = (text, term) => {
@@ -41,6 +44,108 @@ export default function ProductsList({ fetchProducts, fetchedProducts }) {
     );
   };
 
+  let content;
+
+  if (loading) {
+    content = (
+      <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
+        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <span className="text-xl">Loading products...</span>
+      </div>
+    );
+  } else if (!fetchedProducts || fetchedProducts.length === 0) {
+    content = (
+      <div className="text-center text-gray-500 dark:text-gray-300 py-4">
+        No products found.
+      </div>
+    );
+  } else {
+    content = (
+      <>
+        <div className="overflow-x-auto">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-10 text-gray-600 dark:text-gray-300">
+              <p className="text-lg font-medium">No products found.</p>
+              <p className="text-sm mt-2">Add a new product to get started.</p>
+            </div>
+          ) : (
+            <table className="min-w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b text-gray-600 dark:text-gray-300">
+                  <th className="pb-3 px-3 whitespace-nowrap">Products</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Category</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product, index) => (
+                  <tr
+                    key={product._id || index}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
+                      {highlightMatch(product.name, navbarInput)}
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      {product.stock} {product.quantityUnit}
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      {product.thresholdVal} {product.quantityUnit}
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">{product.category}</td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setUpdateModel(true);
+                          }}
+                          className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
+                        >
+                          Update
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setRemoveModel(true);
+                          }}
+                          className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="flex  flex-row justify-between items-center px-3 mt-6 gap-2 text-sm">
+          <button className="border px-4 py-2 rounded-xl">Previous</button>
+          <p className="text-gray-700 dark:text-white">Page 1 of 12</p>
+          <button className="border px-4 py-2 rounded-xl">Next</button>
+        </div>
+
+        {addModel && (
+          <AddProductModel setAddModel={setAddModel} />
+        )}
+
+        {updateModel && (
+          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
+        )}
+
+        {removeModel && (
+          <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
+        )}
+      </>
+    )
+  }
 
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-xl p-4 md:p-6 shadow-md w-full">
@@ -53,8 +158,8 @@ export default function ProductsList({ fetchProducts, fetchedProducts }) {
               type="text"
               placeholder="Search products..."
               className="pl-10 pr-4 py-2 rounded-lg  border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={navbarInput}
+              onChange={(e) => setNavbarInput(e.target.value)}
             />
             <SearchIcon className="absolute left-3 top-2.5 text-gray-500 dark:text-white" />
           </div>
@@ -75,92 +180,17 @@ export default function ProductsList({ fetchProducts, fetchedProducts }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-10 text-gray-600 dark:text-gray-300">
-            <p className="text-lg font-medium">No products found.</p>
-            <p className="text-sm mt-2">Add a new product to get started.</p>
-          </div>
-        ) : (
-          <table className="min-w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b text-gray-600 dark:text-gray-300">
-                <th className="pb-3 px-3 whitespace-nowrap">Products</th>
-                <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
-                <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
-                <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
-                <th className="pb-3 px-3 whitespace-nowrap">Category</th>
-                <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product, index) => (
-                <tr
-                  key={product._id || index}
-                  className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
-                    {highlightMatch(product.name, searchTerm)}
-                  </td>
-                  <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    {product.stock} {product.quantityUnit}
-                  </td>
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    {product.thresholdVal} {product.quantityUnit}
-                  </td>
-                  <td className="py-2 px-3 whitespace-nowrap">{product.category}</td>
-                  <td className="py-2 px-3 whitespace-nowrap">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setSelectedProduct(product);
-                          setUpdateModel(true);
-                        }}
-                        className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
-                      >
-                        Update
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedProduct(product);
-                          setRemoveModel(true);
-                        }}
-                        className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <div className="flex  flex-row justify-between items-center px-3 mt-6 gap-2 text-sm">
-        <button className="border px-4 py-2 rounded-xl">Previous</button>
-        <p className="text-gray-700 dark:text-white">Page 1 of 12</p>
-        <button className="border px-4 py-2 rounded-xl">Next</button>
-      </div>
-
-      {addModel && (
-        <AddProductModel setAddModel={setAddModel} />
-      )}
-
-      {updateModel && (
-        <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
-      )}
-
-      {removeModel && (
-        <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
-      )}
+      {content}
     </div>
-  );
+  )
+
+
+
 }
 
 ProductsList.propTypes = {
   fetchProducts: PropTypes.func.isRequired,
   fetchedProducts: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+
 };

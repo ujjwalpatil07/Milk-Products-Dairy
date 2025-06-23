@@ -44,7 +44,7 @@ export default function Orders() {
         }
       } catch (error) {
         console.log(error)
-        toast.error("Failed to fetch orders, please try again!");
+        toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
       } finally {
         setLoading(false);
       }
