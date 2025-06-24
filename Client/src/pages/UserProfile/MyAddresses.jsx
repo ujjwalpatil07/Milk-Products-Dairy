@@ -227,18 +227,19 @@ export default function MyAddresses() {
 
 
   return (
-    <div className="w-full md:max-w-2xl lg:w-3xl md:h-full mx-auto bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md py-6 px-4 transition-all duration-300">
-      <h3 className="text-xl font-semibold mb-4">Manage Addresses</h3>
+    <>
+      <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold">Manage Addresses</h3>
 
-      <button
-        className="flex items-center text-sm gap-2 border dark:border-[#843E71] dark:hover:bg-[#843E71] text-blue-800 dark:text-white font-medium py-1 px-2 rounded mb-6"
-        onClick={() => setNewAddressModel(true)}
-      >
-        <HiPlus className="text-lg" /> ADD A NEW ADDRESS
-      </button>
-
+        <button
+          className="flex items-center text-sm gap-2 border dark:border-[#843E71] dark:hover:bg-[#843E71] text-blue-800 dark:text-white font-medium py-2 px-2 rounded"
+          onClick={() => setNewAddressModel(true)}
+        >
+          <HiPlus className="text-lg" /> ADD A NEW ADDRESS
+        </button>
+      </div>
 
       {content}
-    </div>
+    </>
   );
 }

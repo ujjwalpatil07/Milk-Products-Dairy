@@ -52,7 +52,6 @@ export default function UserProfileLayout({ children }) {
         >
             <Navbar />
 
-            {/* Top drawer trigger on small screens */}
             <div className="md:hidden flex items-center justify-center p-4 border mt-2 mx-3 rounded-lg">
                 <button
                     onClick={() => setToggleDrawer(true)}
@@ -63,7 +62,6 @@ export default function UserProfileLayout({ children }) {
                 </button>
             </div>
 
-            {/* Drawer shown only on small screens */}
             <SwipeableDrawer
                 anchor="top"
                 open={toggleDrawer}
@@ -92,17 +90,14 @@ export default function UserProfileLayout({ children }) {
                 </div>
             </SwipeableDrawer>
 
-            {/* Main layout */}
-            <main className="max-sm:w-full flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto h-full  md:h-[calc(100vh-64px)]">
-            {/* Sidebar only on medium+ screens */}
+            <main className="max-sm:w-full flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto h-full md:h-[calc(100vh-64px)]">
                 <div className="hidden md:block">
                     <UserProfileSidebar />
                 </div>
 
-                <div className="flex-1 w-full overflow-y-auto rounded-lg shadow-md scrollbar-hide max-sm:h-full">
+                <div className="flex-1 w-full h-full overflow-y-auto rounded-lg shadow-md scrollbar-hide bg-white dark:bg-gray-500/20 dark:text-white p-4 transition-all duration-300 border-y-15 border-white dark:border-transparent">
                     {children}
                 </div>
-
             </main>
 
             <Footer />

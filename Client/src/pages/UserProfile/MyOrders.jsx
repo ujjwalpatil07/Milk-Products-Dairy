@@ -167,9 +167,9 @@ export default function MyOrders() {
 
 
   return (
-    <div className="w-full md:min-h-screen md:h-fit md:max-w-2xl lg:w-3xl bg-white dark:bg-gray-500/20 text-gray-800 dark:text-white md:p-3 rounded-md shadow">
-      <h2 className="text-2xl font-bold mb-3 py-3 text-center">My Orders</h2>
+    <>
+      <h2 className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4 text-xl font-bold">My Orders</h2>
       {content}
-    </div>
+    </>
   );
 }
