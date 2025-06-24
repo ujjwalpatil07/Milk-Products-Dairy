@@ -1,10 +1,9 @@
-import InventoryIcon from "@mui/icons-material/Inventory";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import PropTypes from "prop-types";
 
-import { formatNumberWithCommas } from "../../../utils/format"
 
 export default function InventorySummary({ totalProducts, lowStockCount, outOfStockProducts, expiringSoonCount }) {
 
@@ -59,3 +58,10 @@ export default function InventorySummary({ totalProducts, lowStockCount, outOfSt
     </div>
   );
 }
+
+InventorySummary.propTypes = {
+  totalProducts: PropTypes.number.isRequired,
+  lowStockCount: PropTypes.number.isRequired,
+  outOfStockProducts: PropTypes.number.isRequired,
+  expiringSoonCount: PropTypes.number.isRequired,
+};
