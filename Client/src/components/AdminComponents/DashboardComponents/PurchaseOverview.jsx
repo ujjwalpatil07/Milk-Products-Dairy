@@ -1,15 +1,15 @@
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import UndoIcon from "@mui/icons-material/Undo";
 import CancelIcon from "@mui/icons-material/Cancel";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { Timer } from "lucide-react";
 
-export default function PurchaseOverview() {
+export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders }) {
 
 
   const purchaseOverviewData = [
     {
-      name: "Total Purchased",
-      value: 540, // e.g. number of orders placed
+      name: "Total Orders Recieved",
+      value: totalOrdersRecieved, // e.g. number of orders placed
       icon: <ShoppingCartIcon className="text-green-600" />,
       bg: "bg-green-100 dark:bg-green-800/30",
     },
@@ -26,9 +26,9 @@ export default function PurchaseOverview() {
       bg: "bg-red-100 dark:bg-red-800/30",
     },
     {
-      name: "Total Wishlisted",
-      value: 98, // e.g. items users have added to wishlist
-      icon: <FavoriteIcon className="text-blue-600" />,
+      name: "Total Pending Orders",
+      value: totalPendingOrders, // e.g. items users have added to wishlist
+      icon: <Timer className="text-blue-600" />,
       bg: "bg-blue-100 dark:bg-blue-800/30",
     },
   ];

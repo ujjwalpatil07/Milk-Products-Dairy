@@ -56,120 +56,122 @@ export default function MyWishlist() {
     }
   };
 
+  let content;
+
   if (loading) {
-    return (
+    content = (
       <div className="text-center py-20 text-gray-600 md:w-90 lg:w-xl">
         <div className="animate-spin w-6 h-6 border-4 border-dashed rounded-full mx-auto border-[#843E71] mb-3" />
         Loading your wishlist...
       </div>
     );
-  }
-
-  if (wishlist.length === 0) {
-    return (
-      <div className="text-center py-16 px-3 text-gray-600 dark:text-gray-300 lg:w-xl bg-white dark:bg-gray-500/20 rounded-lg">
+  }else if (wishlist.length === 0) {
+    content = (
+      <div className="text-center py-16 px-3  text-gray-600 dark:text-gray-300 lg:w-xl bg-white dark:bg-gray-500/20 rounded-lg">
         You haven't added anything to your wishlist yet.
       </div>
     );
-  }
+  } else {
+    content = (
+      
+        <ul className="space-y-4">
+          {wishlist.map((product) => {
+            const { discountedPrice } = getDiscountedPrice(
+              product?.price,
+              product?.discount
+            );
+            return (
+              <li
+                key={product?._id}
+                className="w-full sm:w-100 lg:w-full rounded-lg bg-gray-100 dark:bg-gray-500/10 hover:shadow transition"
+              >
+                <div className="flex items-start">
+                  <div className="w-25 h-25 flex-shrink-0 bg-white rounded-tl sm:rounded-s overflow-hidden flex justify-center items-center">
+                    {product?.image?.[0] ? (
+                      <img
+                        src={product.image[0]}
+                        alt={product?.name || "Product"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaGlassWhiskey className="text-xl text-gray-400" />
+                    )}
+                  </div>
 
-  return (
-    <div className="w-full h-fit max-w-4xl mx-auto p-4 bg-white dark:bg-gray-500/20 rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">
-        My Wishlist
-      </h2>
+                  <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
+                    <div>
+                      <Link to={`/product-details/${slugify(product?.category)}`} className="font-semibold text-gray-800 dark:text-white truncate">
+                        {product?.name || "Unnamed Product"}
+                      </Link>
+                      <p className="text-sm text-gray-500 dark:text-gray-300">
+                        {product?.category || "Category"} &bull; {product?.quantityUnit || ""}
+                      </p>
+                      <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
+                        <div>
+                          <span className="text-[#843E71] font-bold text-sm">
+                            &#8377;{discountedPrice}
+                          </span>
+                          {product?.discount > 0 && (
+                            <>
+                              <span className="text-xs line-through text-gray-500 ml-1">
+                                &#8377;{product?.price}
+                              </span>
+                              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded ml-1">
+                                {product.discount}&#37; OFF
+                              </span>
+                            </>
+                          )}
+                        </div>
 
-      <ul className="space-y-4">
-        {wishlist.map((product) => {
-          const { discountedPrice } = getDiscountedPrice(
-            product?.price,
-            product?.discount
-          );
-
-          return (
-            <li
-              key={product?._id}
-              className="w-full sm:w-100 lg:w-120 rounded-lg bg-gray-100 dark:bg-gray-500/10 hover:shadow transition"
-            >
-              <div className="flex items-start">
-                <div className="w-25 h-25 flex-shrink-0 bg-white rounded-tl sm:rounded-s overflow-hidden flex justify-center items-center">
-                  {product?.image?.[0] ? (
-                    <img
-                      src={product.image[0]}
-                      alt={product?.name || "Product"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FaGlassWhiskey className="text-xl text-gray-400" />
-                  )}
-                </div>
-
-                <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
-                  <div>
-                    <Link to={`/product-details/${slugify(product?.category)}`} className="font-semibold text-gray-800 dark:text-white truncate">
-                      {product?.name || "Unnamed Product"}
-                    </Link>
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                      {product?.category || "Category"} &bull; {product?.quantityUnit || ""}
-                    </p>
-                    <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
-                      <div>
-                        <span className="text-[#843E71] font-bold text-sm">
-                          &#8377;{discountedPrice}
-                        </span>
-                        {product?.discount > 0 && (
-                          <>
-                            <span className="text-xs line-through text-gray-500 ml-1">
-                              &#8377;{product?.price}
-                            </span>
-                            <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded ml-1">
-                              {product.discount}&#37; OFF
-                            </span>
-                          </>
-                        )}
-                      </div>
-
-                      <button
-                        onClick={() => handleRemove(product._id)}
-                        disabled={deleteLoading}
-                        className={`hidden sm:flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full transition 
+                        <button
+                          onClick={() => handleRemove(product._id)}
+                          disabled={deleteLoading}
+                          className={`hidden sm:flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full transition 
     ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:bg-red-500/30"}`}
-                      >
-                        {deleteLoading ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
-                            Removing...
-                          </>
-                        ) : (
-                          "Remove"
-                        )}
-                      </button>
+                        >
+                          {deleteLoading ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
+                              Removing...
+                            </>
+                          ) : (
+                            "Remove"
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <button
-                onClick={() => handleRemove(product._id)}
-                disabled={deleteLoading}
-                className={`w-full py-1 rounded-b text-sm font-medium transition sm:hidden 
+                <button
+                  onClick={() => handleRemove(product._id)}
+                  disabled={deleteLoading}
+                  className={`w-full py-1 rounded-b text-sm font-medium transition sm:hidden 
     ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:text-red-800"}`}
-              >
-                {deleteLoading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
-                    Removing...
-                  </div>
-                ) : (
-                  "Remove"
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                >
+                  {deleteLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
+                      Removing...
+                    </div>
+                  ) : (
+                    "Remove"
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
 
+    )
+  }
 
+  return (
+    <div className="w-full md:max-w-2xl lg:w-3xl md:h-full mx-auto bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md py-6 px-4 transition-all duration-300">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">
+        My Wishlist
+      </h2>
+      {content}
     </div>
   );
 }

@@ -1,21 +1,26 @@
-import { useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import { Link, useLocation } from "react-router-dom";
-import { UserAuthContext } from "../context/AuthProvider";
 import UserProfileSidebar from "../components/UserProfileSidebar";
+import { UserAuthContext } from "../context/AuthProvider";
+import PropTypes from "prop-types"
+import MenuIcon from '@mui/icons-material/Menu';
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import { KeyboardDoubleArrowUp } from "@mui/icons-material";
 
 export default function UserProfileLayout({ children }) {
-
+    const [toggleDrawer, setToggleDrawer] = useState(false);
     const scrollRef = useRef(null);
     const location = useLocation();
-
     const { authUser } = useContext(UserAuthContext);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTo({ top: 0 });
         }
+
+        setToggleDrawer(false)
     }, [location.pathname]);
 
     const isUserInStorage = localStorage.getItem("User");
@@ -32,30 +37,78 @@ export default function UserProfileLayout({ children }) {
     if (!isUserInStorage && !authUser) {
         return (
             <div className="h-screen p-4 flex flex-col items-center justify-center text-center space-y-4 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-                <span className="text-red-500 font-medium">
-                    You must be logged in to access this page.
-                </span>
-                <Link
-                    to="/login"
-                    className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E7190] transition"
-                >
+                <span className="text-red-500 font-medium">You must be logged in to access this page.</span>
+                <Link to="/login" className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E7190] transition">
                     Go to Login
                 </Link>
             </div>
         );
     }
 
-
     return (
-        <div ref={scrollRef} className="h-screen scroll-smooth flex flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
+        <div
+            ref={scrollRef}
+            className="h-screen scroll-smooth flex  flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300"
+        >
             <Navbar />
-            <main className="flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto">
-                <UserProfileSidebar />
 
-                {children}
+            {/* Top drawer trigger on small screens */}
+            <div className="md:hidden flex items-center justify-center p-4 border mt-2 mx-3 rounded-lg">
+                <button
+                    onClick={() => setToggleDrawer(true)}
+                    className="flex items-center gap-2 text-[#843E71] text-lg font-semibold"
+                >
+                    <MenuIcon />
+                    View Profile
+                </button>
+            </div>
 
+            {/* Drawer shown only on small screens */}
+            <SwipeableDrawer
+                anchor="top"
+                open={toggleDrawer}
+                onClose={() => setToggleDrawer(false)}
+                onOpen={() => setToggleDrawer(true)}
+                slotProps={{
+                    paper: {
+                        sx: {
+                            backgroundColor: "#F0F1F3",
+                            padding: "1rem",
+                        },
+                    },
+                }}
+            >
+
+                <div className="px-2 py-2">
+                    <UserProfileSidebar />
+                    <div className="flex justify-center mt-3">
+                        <button
+                            onClick={() => setToggleDrawer(false)}
+                            className="text-[#843E71] text-xl"
+                        >
+                            <KeyboardDoubleArrowUp />
+                        </button>
+                    </div>
+                </div>
+            </SwipeableDrawer>
+
+            {/* Main layout */}
+            <main className="max-sm:w-full flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 mx-auto h-full  md:h-[calc(100vh-64px)]">
+            {/* Sidebar only on medium+ screens */}
+                <div className="hidden md:block">
+                    <UserProfileSidebar />
+                </div>
+
+                <div className="flex-1 w-full overflow-y-auto rounded-lg shadow-md scrollbar-hide max-sm:h-full">
+                    {children}
+                </div>
             </main>
+
             <Footer />
         </div>
-    )
+    );
 }
+
+UserProfileLayout.propTypes = {
+    children: PropTypes.node
+};

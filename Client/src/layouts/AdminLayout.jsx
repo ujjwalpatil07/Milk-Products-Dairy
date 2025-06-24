@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import Sidebar from "../components/AdminComponents/Sidebar";
 import { useLocation, Link } from "react-router-dom";
 import { SidebarProvider } from "../context/SidebarProvider";
@@ -57,3 +58,7 @@ export default function AdminLayout({ children }) {
         </SidebarProvider>
     )
 }
+
+AdminLayout.propTypes = {
+    children: PropTypes.node
+};

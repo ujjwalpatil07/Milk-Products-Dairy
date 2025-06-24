@@ -10,7 +10,7 @@ import { useDebounce } from "use-debounce";
 
 export default function OrderDetails({ orders, loading }) {
 
-  const { navbarInput } = useContext(SidebarContext);
+  const { navbarInput, highlightMatch } = useContext(SidebarContext);
   const { setAuthAdmin } = useContext(AdminAuthContext);
 
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
@@ -131,7 +131,7 @@ export default function OrderDetails({ orders, loading }) {
               />
               <div>
                 <p className="font-semibold">
-                  {owner?.firstName} {owner?.lastName}
+                  {highlightMatch(owner?.firstName, navbarInput)} {highlightMatch(owner?.lastName, navbarInput)}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-300">
                   {owner?.mobileNo}
@@ -147,7 +147,7 @@ export default function OrderDetails({ orders, loading }) {
             <h3 className="font-semibold">Delivery Details</h3>
             <p><strong>Name:</strong> {address?.name}</p>
             <p><strong>Phone:</strong> {address?.phone}</p>
-            <p><strong>Address:</strong> {address?.streetAddress}</p>
+            <p><strong>Address:</strong> {highlightMatch(address?.streetAddress, navbarInput)}</p>
           </div>
 
           <div className="overflow-x-auto">

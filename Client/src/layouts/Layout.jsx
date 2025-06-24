@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 
 export default function Layout({ children }) {
@@ -24,3 +25,7 @@ export default function Layout({ children }) {
         </div>
     )
 }
+
+Layout.propTypes = {
+    children: PropTypes.node
+};
