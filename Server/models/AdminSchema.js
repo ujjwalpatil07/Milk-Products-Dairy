@@ -4,8 +4,8 @@ const AdminSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      minlength: 2,
-      maxlength: 50,
+      min: 2,
+      max: 50,
     },
 
     username: {
@@ -13,8 +13,8 @@ const AdminSchema = new mongoose.Schema(
       // required: true,
       trim: true,
       unique: true,
-      minlength: 3,
-      maxlength: 20,
+      min: 3,
+      max: 20,
     },
 
     email: {
@@ -29,7 +29,8 @@ const AdminSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      min: 6,
+      max: 20,
     },
 
     mobileNo: {

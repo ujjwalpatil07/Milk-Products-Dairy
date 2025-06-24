@@ -221,10 +221,18 @@ export default function AccountInfo() {
               </h2>
               <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {["streetAddress", "city", "pincode"].map((field, i) => (
-                  <div key={i} className={`${["streetAddress"].includes(field) ? "md:col-span-2" : ""}`}>
-                    <label className="text-sm font-medium capitalize flex items-center gap-2">
-                      {field === "streetAddress" ? <FaRoad /> : field === "city" ? <FaCity /> : <FaMapPin />} {field.replace(/([A-Z])/g, ' $1')}
-                    </label>
+                  <div key={i * 0.9} className={`${["streetAddress"].includes(field) ? "md:col-span-2" : ""}`}>
+                    {(() => {
+                      let icon;
+                      if (field === "streetAddress") icon = <FaRoad />;
+                      else if (field === "city") icon = <FaCity />;
+                      else icon = <FaMapPin />;
+                      return (
+                        <label className="text-sm font-medium capitalize flex items-center gap-2">
+                          {icon} {field.replace(/([A-Z])/g, ' $1')}
+                        </label>
+                      );
+                    })()}
                     <input
                       type="text"
                       className="w-full p-2 border rounded transition focus:ring-2 focus:ring-indigo-300  dark:bg-gray-500/20 dark:border-gray-600"
@@ -276,7 +284,7 @@ export default function AccountInfo() {
   }
 
   return (
-    <div className="w-full max-w-3xl bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md p-6 transition-all duration-300">
+    <div className="w-full md:max-w-2xl lg:w-3xl md:h-full bg-white dark:bg-gray-500/20 dark:text-white shadow-md rounded-md py-6 px-4 transition-all duration-300">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold flex items-center gap-2">
           <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
