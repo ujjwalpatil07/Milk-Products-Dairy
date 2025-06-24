@@ -37,25 +37,19 @@ export default function NotFound() {
         <p className="text-xl md:text-2xl font-semibold">Oops! Page not found.</p>
       </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
+      <p
         className="text-gray-500 dark:text-gray-400 text-sm mb-6 text-center"
       >
         The page you're looking for doesn't exist or has been moved.
-      </motion.p>
+      </p>
 
-      <motion.button
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
+      <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 mt-4 px-6 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition duration-300 dark:bg-indigo-500 dark:hover:bg-indigo-600"
       >
         <KeyboardBackspaceIcon sx={{ fontSize: "1.2rem" }} />
         <span>Go Back</span>
-      </motion.button>
+      </button>
     </div>
   );
 }

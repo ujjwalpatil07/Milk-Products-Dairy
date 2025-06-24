@@ -35,11 +35,7 @@ const productWorkflow = [
 
 export default function ProductProcess() {
     return (
-        <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+        <section
             className="mb-10 px-3"
         >
             <motion.div
@@ -95,6 +91,6 @@ export default function ProductProcess() {
                     ))}
                 </motion.div>
             </motion.div>
-        </motion.section>
+        </section>
     );
 }

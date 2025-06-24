@@ -96,6 +96,7 @@ export default function UserSignUp() {
           <TextField
             label="Email Address"
             name="email"
+            type="email"
             value={formData.email}
             onChange={handleInputChange}
             className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}

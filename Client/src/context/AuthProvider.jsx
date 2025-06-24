@@ -8,13 +8,18 @@ export const AuthProvider = ({ children }) => {
 
     const [authUser, setAuthUser] = useState(null);
     const [authAdmin, setAuthAdmin] = useState(null);
+    const [authUserLoading, setAuthUserLoading] = useState(false);
+    const [authAdminLoading, setAuthAdminLoading] = useState(false);
+    const [openLoginDialog, setOpenLoginDialog] = useState(false);
 
     const storedAddress = JSON.parse(localStorage.getItem("deliveryAddress"));
     const [deliveryAddress, setDeliveryAddress] = useState(storedAddress || null);
 
     useEffect(() => {
         const fetchUserData = async () => {
+            
             try {
+                setAuthUserLoading(true);
                 const localUser = JSON.parse(localStorage.getItem("User"));
 
                 if (localUser?._id && authUser?._id !== localUser?._id) {
@@ -28,6 +33,8 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 console.error("User fetch failed", error);
                 setAuthUser(null);
+            } finally {
+                setAuthUserLoading(false);
             }
         };
 
@@ -40,6 +47,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const fetchAdminData = async () => {
             try {
+                setAuthAdminLoading(true);
                 const localAdmin = JSON.parse(localStorage.getItem("Admin"));
                 if (localAdmin?._id && localAdmin?._id !== authAdmin?._id) {
                     const res = await axios.post(`http://localhost:9000/admin/get-admin`, { _id: localAdmin?._id });
@@ -48,6 +56,8 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 console.error("Admin fetch failed", error);
                 setAuthAdmin(null);
+            } finally {
+                setAuthAdminLoading(false);
             }
         };
 
@@ -69,17 +79,23 @@ export const AuthProvider = ({ children }) => {
 
     const value1 = useMemo(() => ({
         authAdmin,
+        authAdminLoading,
         setAuthAdmin,
-        handleAdminLogout
-    }), [authAdmin]);
+        setAuthAdminLoading,
+        handleAdminLogout,
+    }), [authAdmin, authAdminLoading]);
 
     const value2 = useMemo(() => ({
         authUser,
         deliveryAddress,
+        authUserLoading,
+        openLoginDialog,
         setAuthUser,
         setDeliveryAddress,
+        setAuthUserLoading,
+        setOpenLoginDialog,
         handleUserLogout
-    }), [authUser, deliveryAddress]);
+    }), [authUser, deliveryAddress, authUserLoading, openLoginDialog]);
 
     return (
         <AdminAuthContext.Provider value={value1}>

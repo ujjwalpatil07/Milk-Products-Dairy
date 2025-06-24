@@ -126,10 +126,7 @@ export default function ProductDetailsPage() {
             }
 
             {
-                (relatedProducts?.length > 0 && !recommendProductLoading) && <motion.section
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                (relatedProducts?.length > 0 && !recommendProductLoading) && <section
                     className="px-3 md:px-6 pb-6 md:pb-10 md:max-w-6xl mx-auto"
                 >
 
@@ -206,7 +203,7 @@ export default function ProductDetailsPage() {
                         </div>
                     )}
 
-                </motion.section>
+                </section>
             }
 
             {

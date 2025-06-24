@@ -27,11 +27,7 @@ export default function Footer() {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <motion.footer
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={containerVariants}
+        <footer
             className="bg-white dark:bg-[#282828] text-gray-700 dark:text-gray-300 transition-colors duration-300"
         >
             <div className="max-w-7xl mx-auto px-6 py-10">
@@ -113,6 +109,6 @@ export default function Footer() {
                     &copy; {new Date().getFullYear()} Madhur Dairy & Daily Needs. All rights reserved.
                 </motion.div>
             </div>
-        </motion.footer>
+        </footer>
     );
 }

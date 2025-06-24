@@ -17,10 +17,9 @@ import { getRandomImage } from "../utils/imagePicker";
 export default function ProductPage() {
 
     const { productId } = useParams();
-    const { filter } = useContext(ProductContext);
+    const { filter, products, setProducts } = useContext(ProductContext);
 
     const [loading, setLoading] = useState(true);
-    const [fetchedProducts, setFetchedProducts] = useState();
     const [query, setQuery] = useState(productId || "");
     const [debouncedQuery] = useDebounce(query, 300);
     const [visibleCount, setVisibleCount] = useState(5);
@@ -30,7 +29,9 @@ export default function ProductPage() {
         const fetchProducts = async () => {
             try {
                 const dbProducts = await getProducts();
-                setFetchedProducts(Array.isArray(dbProducts?.products) ? dbProducts.products : []);
+                if(dbProducts?.success) {
+                    setProducts(dbProducts.products);
+                }
             } catch (err) {
                 console.error("Error fetching products:", err);
             } finally {
@@ -40,19 +41,19 @@ export default function ProductPage() {
 
         setQuery(productId);
         fetchProducts();
-    }, [productId]);
+    }, [productId, setProducts]);
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
     }
 
     const filteredProducts = useMemo(() => {
-        return searchProducts(fetchedProducts ?? [], debouncedQuery);
-    }, [fetchedProducts, debouncedQuery]);
+        return searchProducts(products ?? [], debouncedQuery);
+    }, [products, debouncedQuery]);
 
     const recommendedProducts = useMemo(() => {
-        return recommendProducts(fetchedProducts ?? [], debouncedQuery);
-    }, [fetchedProducts, debouncedQuery]);
+        return recommendProducts(products ?? [], debouncedQuery);
+    }, [products, debouncedQuery]);
 
     const topProducts = getTopProductsByReviewsAndLikes(filteredProducts ?? []);
 
@@ -70,7 +71,7 @@ export default function ProductPage() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="hidden md:block w-60 p-4 h-fit bg-white dark:bg-gray-500/20 rounded-lg shadow-sm transition-colors duration-500"
+                    className="sticky top-18 scrollbar-hide hidden md:block w-60 p-4 h-[calc(100vh-90px)] overflow-y-auto bg-white dark:bg-gray-500/20 rounded-lg shadow-sm transition-colors duration-500 border-y-15 border-white dark:border-transparent"
                 >
                     <ProductList />
                 </motion.div>
@@ -85,14 +86,11 @@ export default function ProductPage() {
                         </div>
                     ) : (
                         <>
-                            <motion.section
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5 }}
+                            <section
                                 className="w-full lg:px-6"
                             >
                                 {(sortedFilteredProducts?.length ?? 0) === 0 ? (
-                                    <div className="py-20 text-center border-b border-dashed border-gray-500/50">No products found matching your search/filter.</div>
+                                    <div className="py-20 text-center">No products found matching your search/filter.</div>
                                 ) : (
                                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-5 border-b border-dashed border-gray-500/50">
                                         {sortedFilteredProducts.map((product, index) => (
@@ -113,13 +111,10 @@ export default function ProductPage() {
                                         ))}
                                     </div>
                                 )}
-                            </motion.section>
+                            </section>
 
                             {recommendedProducts?.length > 0 && (
-                                <motion.section
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                <section
                                     className="pt-5 lg:px-6"
                                 >
                                     <h2 className="text-lg font-semibold py-2">Recommended</h2>
@@ -148,14 +143,11 @@ export default function ProductPage() {
                                             </button>
                                         </div>
                                     )}
-                                </motion.section>
+                                </section>
                             )}
 
                             {topProducts?.length > 0 && (
-                                <motion.section
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: 0.4 }}
+                                <section
                                     className="lg:px-6"
                                 >
                                     <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
@@ -186,15 +178,12 @@ export default function ProductPage() {
                                             </button>
                                         </div>
                                     )}
-                                </motion.section>
+                                </section>
                             )}
                         </>
                     )}
                 </div>
             </div>
-
-            <br />
-            <br />
         </>
     );
 }

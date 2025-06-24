@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, Navigate } from "react-router-dom"
 import Layout from "../layouts/Layout";
 import AdminLayout from "../layouts/AdminLayout";
 
@@ -63,7 +63,7 @@ export default function Routers() {
 
             <Route path="/contact-us" element={<Layout><ContactPage /></Layout>} />
 
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<Navigate to={"/login"} replace />} />
         </Routes>
     )
 }

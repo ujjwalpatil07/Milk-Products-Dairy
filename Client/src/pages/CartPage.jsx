@@ -107,13 +107,14 @@ export default function CartPage() {
 
     return (
         <>
-            <motion.section
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+            <section
                 className="max-w-4xl mx-auto my-5 px-3"
             >
-                <div className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="p-3 md:p-5 rounded-lg bg-white dark:bg-gray-500/20">
                     {deliveryAddress ? (
                         <>
                             <h1>
@@ -160,13 +161,10 @@ export default function CartPage() {
                             </button>
                         </div>
                     )}
-                </div>
-            </motion.section>
+                </motion.div>
+            </section>
 
-            <motion.section
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
+            <section
                 className="max-w-4xl mx-auto my-5 px-3 flex flex-wrap gap-5"
             >
                 <motion.div layout className="space-y-3 w-full md:flex-1">
@@ -241,12 +239,9 @@ export default function CartPage() {
                     </div>
 
                 </motion.div>
-            </motion.section >
+            </section >
 
-            <motion.section
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+            <section
                 className="max-w-4xl mx-auto my-10 px-3 flex justify-center"
             >
                 <Link
@@ -255,7 +250,7 @@ export default function CartPage() {
                 >
                     Add More Products
                 </Link>
-            </motion.section>
+            </section>
 
             <SavedAddressList open={open} handleDialogStatus={handleDialogStatus} />
         </>

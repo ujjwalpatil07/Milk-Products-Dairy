@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Box, Drawer, Avatar, IconButton, Badge, Tooltip,
 } from '@mui/material';
@@ -22,10 +22,11 @@ import { CartContext } from '../context/CartProvider';
 
 export default function Navbar() {
 
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { authUser, handleUserLogout } = useContext(UserAuthContext);
+    const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
 
     const location = useLocation();
@@ -41,10 +42,20 @@ export default function Navbar() {
         { label: 'About Us', icon: <Diversity3Icon sx={{ fontSize: '1.2rem' }} />, path: '/about' },
         { label: 'Contact Us', icon: <CallIcon sx={{ fontSize: '1.2rem' }} />, path: '/contact-us' },
     ];
-    
+
     const handleLogout = () => {
         setOpen(false);
         handleUserLogout();
+    }
+
+    const handleUserCart = () => {
+        setOpen(false);
+        if(!authUser) {
+            setOpenLoginDialog(true);
+            return;
+        }
+
+        navigate("/cart");
     }
 
     return (
@@ -76,16 +87,14 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {
-                        (authUser) && <Tooltip title="Cart">
-                            <Link to="/cart">
-                                <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
-                                    <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
-                                    <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
-                                </div>
-                            </Link>
-                        </Tooltip>
-                    }
+                    <Tooltip title="Cart">
+                        <button onClick={handleUserCart}>
+                            <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
+                                <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
+                                <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
+                            </div>
+                        </button>
+                    </Tooltip>
 
                     <div className='hidden sm:flex bg-gray-500/10 hover:bg-gray-500/20 dark:bg-[#00000050] dark:hover:bg-[#00000090] rounded-full'>
                         <IconButton onClick={toggleTheme}>
@@ -101,11 +110,11 @@ export default function Navbar() {
                             <Avatar alt={authUser?.firstName} src={authUser?.photo} />
                         </Link>
                     ) : (
-                        <div className='space-x-2'>
-                            <Link to="/login" className={`text-white bg-[#843E71] px-3 py-[0.4rem] rounded-sm`}>
+                        <div className='space-x-2 flex'>
+                            <button onClick={() => setOpenLoginDialog(true)} className={`text-white bg-[#843E71] px-3 py-[0.4rem] rounded-sm`}>
                                 Login
-                            </Link>
-                            <Link to="/signup" className={`border text-[#843E71] border-[#843E71] dark:text-white dark:border-gray-500 px-3 py-[0.4rem] rounded-sm`}>
+                            </button>
+                            <Link to="/signup" className={`hidden sm:flex border text-[#843E71] border-[#843E71] dark:text-white dark:border-gray-500 px-3 py-[0.4rem] rounded-sm`}>
                                 Register
                             </Link>
                         </div>
@@ -133,12 +142,12 @@ export default function Navbar() {
                             <span>Theme</span>
                         </button>
 
-                        {authUser && (<Link to="/cart" onClick={toggleDrawer(false)} className={linkStyle}>
+                        <Link onClick={handleUserCart} className={linkStyle}>
                             <Badge badgeContent={cartItems?.length || 0} color="primary">
                                 <ShoppingCartIcon sx={{ fontSize: '1.2rem' }} />
                             </Badge>
                             My Orders
-                        </Link>)}
+                        </Link>
 
                         {!authUser && (
                             <Link to="/login" onClick={toggleDrawer(false)} className={linkStyle}>

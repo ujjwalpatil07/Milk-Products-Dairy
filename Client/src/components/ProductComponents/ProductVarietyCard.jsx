@@ -11,8 +11,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { Tooltip } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 import { slugify } from "../../utils/slugify";
 import { UserAuthContext } from "../../context/AuthProvider";
@@ -115,8 +115,8 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
             } else {
                 toast.error(data?.error || "Something went wrong.");
             }
-        } catch {
-            toast.error("Failed to add to wishlist.");
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Failed to add to wishlist.");
         } finally {
             setWishlistLoading(false);
         }
@@ -129,11 +129,10 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
             <div className="w-4 h-4 border-2 border-t-transparent border-red-500 rounded-full animate-spin"></div>
         );
     } else if (isWishlisted) {
-        wishlistIconContent = <FavoriteIcon sx={{ fontSize: "1.2rem" }} />;
+        wishlistIconContent = <BookmarkIcon sx={{ fontSize: "1.2rem" }} />;
     } else {
-        wishlistIconContent = <FavoriteBorderIcon sx={{ fontSize: "1.2rem" }} />;
+        wishlistIconContent = <BookmarkBorderIcon sx={{ fontSize: "1.2rem" }} />;
     }
-
 
     return (
         <motion.div
@@ -142,7 +141,6 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            whileHover={{ scale: 1.02 }}
         >
             <div className="relative h-44 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
                 {(!image || image === "null") ? (
@@ -218,23 +216,19 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                     </p>
                 )}
 
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center">
                     <button
                         onClick={() => handleAddProductInWishlist(id)}
                         disabled={isWishlisted || wishlistLoading}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-sm text-sm transition-all duration-300 ${isWishlisted
-                                ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
-                                : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
+                        className={`w-fit flex items-center gap-1 px-2 py-1.5 rounded-sm text-sm transition-all duration-300 ${isWishlisted
+                            ? "bg-red-100 text-red-600 dark:bg-[#843E71]/20 dark:text-[#b02e8d]"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-gray-200/20"
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {wishlistIconContent}
-                        <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
                     </button>
-                </div>
 
-
-                <div className="grid grid-cols-2 mb-2">
-                    {stock === 0 && (
+                    {stock !== 0 && (
                         <p className="text-red-600 font-semibold text-sm">Out of Stock</p>
                     )}
 
@@ -245,7 +239,7 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                     )}
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between space-x-2">
                     <div className="flex items-center gap-2">
                         <Tooltip
                             title={quantity <= 0 ? "Minimum quantity reached" : "Decrease quantity"}
@@ -300,11 +294,10 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
 
                     <button
                         onClick={() => handleAddProduct(id, price)}
-                        disabled={quantity === 0 || quantity > stock}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#843E71] hover:bg-[#843E7190] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#843E71] hover:bg-[#843E7190] text-white cursor-pointer"
                     >
                         <ShoppingCartIcon sx={{ fontSize: "1.2rem" }} />
-                        <span>Add to Cart</span>
+                        <span className="line-clamp-1">Add to Cart</span>
                     </button>
                 </div>
             </div>

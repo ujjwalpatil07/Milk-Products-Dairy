@@ -1,17 +1,20 @@
-import Marquee from "react-fast-marquee";
+import { lazy, Suspense, useContext, useState } from "react";
+import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import DairyProductsCarousel from "../components/HomeComponents/DairyProductsCarousel";
 import heroImage from "../assets/heroImage.png"
-import OfferingCard from "../components/HomeComponents/OfferingCard";
 import { offerings, products } from "../data/products";
-import { useContext, useState } from "react";
-import OfferingProductCard from "../components/HomeComponents/OfferingProductCard";
-import { Link } from "react-router-dom";
-import TestimonialCard from "../components/HomeComponents/TestimonialCard";
+
 import { testimonials } from "../data/productGoodness ";
-import ProductProcess from "../components/ProductProcess";
 import { UserAuthContext } from "../context/AuthProvider";
+import OfferingCard from "../components/HomeComponents/OfferingCard";
+import OfferingProductCard from "../components/HomeComponents/OfferingProductCard";
+
+const Marquee = lazy(() => import("react-fast-marquee"));
+const DairyProductsCarousel = lazy(() => import("../components/HomeComponents/DairyProductsCarousel"));
+const TestimonialCard = lazy(() => import("../components/HomeComponents/TestimonialCard"));
+const ProductProcess = lazy(() => import("../components/ProductProcess"));
+
 
 
 export default function HomePage() {
@@ -33,13 +36,12 @@ export default function HomePage() {
                     transition={{ duration: 0.7, ease: "easeOut" }}
                     className="relative max-w-7xl mx-auto overflow-hidden rounded-xl shadow-lg"
                 >
-                    <motion.img
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-10" />
+
+                    <img
                         src={heroImage}
                         alt="Welcome Banner"
-                        loading="lazy"
-                        initial={{ scale: 1.05 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        fetchPriority="high"
                         className="w-full object-cover"
                     />
 
@@ -47,90 +49,73 @@ export default function HomePage() {
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.8 }}
-                        className="absolute inset-0 bg-black/30 flex items-center justify-center px-6"
+                        className="absolute inset-0 bg-black/30 flex items-center justify-center px-6 z-20"
                     >
                         <div className="text-center">
                             {authUser && (
                                 <>
-                                    <motion.h1
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
+                                    <h1
                                         className="text-lg sm:text-xl md:text-5xl font-bold md:mb-2 text-yellow-100"
                                     >
                                         Hi{" "}
                                         <span className="text-[#FFEB3B]">
                                             {authUser?.firstName} {authUser?.lastName}
                                         </span>
-                                    </motion.h1>
+                                    </h1>
 
-                                    <motion.h2
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.4 }}
+                                    <h2
                                         className="text-lg md:text-3xl text-white"
                                     >
                                         Welcome To
-                                    </motion.h2>
+                                    </h2>
                                 </>
                             )}
 
-                            <motion.h1
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.5, duration: 0.7 }}
-                                className="text-lg sm:text-2xl md:text-7xl font-bold mb-4 bg-gradient-to-t from-[#00ce03] to-white bg-clip-text text-transparent"
-                            >
+                            <h1 className="text-lg sm:text-2xl md:text-7xl font-bold mb-4 bg-gradient-to-t from-[#00ce03] to-white bg-clip-text text-transparent drop-shadow-md">
                                 Madhur Dairy and Daily Needs
-                            </motion.h1>
+                            </h1>
 
-                            <motion.p
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
+                            <p
                                 className="hidden sm:flex text-sm md:text-2xl max-w-2xl mx-auto text-gray-100"
                             >
                                 Pure goodness in every drop — nourishing your family with love, care,
                                 and the freshest dairy delights.
-                            </motion.p>
+                            </p>
                         </div>
                     </motion.div>
                 </motion.div>
             </section>
 
             <section className="px-3 py-5 sm:px-6 md:py-15">
-                <motion.h2
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                <h2
                     className="text-xl md:text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-800 dark:text-white"
                 >
                     Discover Our Delicious Dairy Range
-                </motion.h2>
+                </h2>
 
-                <Marquee speed={40} gradient={false} pauseOnHover={true}>
-                    <DairyProductsCarousel half={"first"} />
-                </Marquee>
-                <Marquee speed={35} gradient={false} direction="right" className="mt-6" pauseOnHover={true}>
-                    <DairyProductsCarousel half={"second"} />
-                </Marquee>
+                <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading carousel...</div>}>
+                    <Marquee speed={40} gradient={false} pauseOnHover={true}>
+                        <DairyProductsCarousel half="first" />
+                    </Marquee>
+                </Suspense>
+
+                <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading carousel...</div>}>
+                    <Marquee speed={35} gradient={false} direction="right" className="mt-6" pauseOnHover={true}>
+                        <DairyProductsCarousel half={"second"} />
+                    </Marquee>
+                </Suspense>
             </section>
 
             <section className="py-16 px-3 md:px-10 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto text-center">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
+                    <h2
                         className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight"
                     >
                         Elevate Your Health <br />
                         <span className="text-[#706c93] dark:text-indigo-400">
                             With Our Superior Dairy Range
                         </span>
-                    </motion.h2>
+                    </h2>
 
                     <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 md:px-5 lg:px-20">
                         {offerings.map((item, index) => (
@@ -215,16 +200,22 @@ export default function HomePage() {
                 <h2 className="text-2xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-6">
                     What Our Customers Say
                 </h2>
-                <Marquee gradient={false} speed={20}>
-                    <div className="flex gap-10 p-3">
-                        {testimonials.map((testimonial, index) => (
-                            <TestimonialCard key={index * 0.6} {...testimonial} />
-                        ))}
-                    </div>
-                </Marquee>
+                <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading testimonials...</div>}>
+                    <Marquee gradient={false} speed={20}>
+                        <div className="flex gap-10 p-3">
+                            {testimonials.map((testimonial, index) => (
+                                <TestimonialCard key={index * 0.6} {...testimonial} />
+                            ))}
+                        </div>
+                    </Marquee>
+                </Suspense>
+
             </section>
 
-            <ProductProcess />
+            <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading product process...</div>}>
+                <ProductProcess />
+            </Suspense>
+
         </>
     );
 }

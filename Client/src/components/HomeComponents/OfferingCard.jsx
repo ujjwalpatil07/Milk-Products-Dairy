@@ -13,12 +13,10 @@ export default function OfferingCard({ image, title, description }) {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="overflow-hidden transition duration-300"
         >
-            <motion.img
+            <img
                 src={image}
                 alt={title}
                 loading="lazy"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
                 className="w-full h-52 object-cover rounded-lg"
             />
             <div className="p-4 text-center">

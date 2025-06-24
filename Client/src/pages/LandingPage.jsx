@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -6,10 +6,11 @@ import EastIcon from '@mui/icons-material/East';
 import { ThemeContext } from "../context/ThemeProvider";
 import { faqs, products } from "../data/products";
 import ProductCard from "../components/LandingComponents/ProductCard";
-import QuestionAnswer from "../components/LandingComponents/QuestionAnswer";
 import { features } from "../data/productGoodness ";
-import FeatureCard from "../components/LandingComponents/FeatureCard";
 import { UserAuthContext } from "../context/AuthProvider";
+
+const QuestionAnswer = lazy(() => import("../components/LandingComponents/QuestionAnswer"));
+const FeatureCard = lazy(() => import("../components/LandingComponents/FeatureCard"));
 
 export default function LandingPage() {
 
@@ -21,34 +22,35 @@ export default function LandingPage() {
         <>
             <section className="relative w-full overflow-hidden">
                 <img
-                    src={"https://res.cloudinary.com/dyahibuzy/image/upload/v1750157405/happyFamily_uuyftj.png"}
+                    src="https://res.cloudinary.com/dyahibuzy/image/upload/v1750157405/happyFamily_uuyftj.png"
                     alt="Happy Family"
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
+                    className="absolute top-0 left-0 w-full h-full object-cover z-0"
+                    fetchPriority="high"
                 />
+
+                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-10" />
 
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8 }}
-                    className="md:absolute py-16 px-3 text-center top-0 left-0 md:bg-black/30 w-full h-full flex flex-col justify-center items-center"
+                    className="relative z-20 py-16 px-3 text-center w-full h-full flex flex-col justify-center items-center"
                 >
-                    <h1 className="text-xl sm:text-4xl md:text-5xl mb-2 font-bold text-gray-900 dark:text-gray-100 md:text-white">WelCome to</h1>
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent inline-block " >
+                    <h1 className="text-xl sm:text-4xl md:text-5xl mb-2 font-bold text-white">
+                        Welcome to
+                    </h1>
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 bg-clip-text text-transparent">
                         Madhur Dairy & Daily Needs
                     </h1>
-
-                    <p className="text-xl md:text-2xl mb-6 font-semibold text-gray-900 dark:text-gray-100 md:text-gray-100">
+                    <p className="text-xl md:text-2xl mb-6 font-semibold text-white">
                         Bringing Nature's Best, Straight to Your Home
                     </p>
-
-                    <p className="max-w-2xl mx-auto mb-8 text-lg md:text-xl leading-relaxed text-gray-700 dark:text-gray-300 md:text-gray-300">
+                    <p className="max-w-2xl mx-auto mb-8 text-lg md:text-xl leading-relaxed text-white">
                         From farm-fresh milk to creamy ghee, soft paneer to delicious sweets — savor the pure taste of tradition in every bite.
                     </p>
-
                     <Link
                         to={authUser ? "/home" : "/login"}
-                        className="flex items-center gap-4 px-8 py-3 rounded-full font-semibold text-lg bg-[#843E71] text-white transition-colors duration-300 "
+                        className="flex items-center gap-4 px-8 py-3 rounded-full font-semibold text-lg bg-[#843E71] text-white transition-colors duration-300"
                     >
                         Get Started <EastIcon />
                     </Link>
@@ -56,15 +58,11 @@ export default function LandingPage() {
             </section>
 
             <section className="md:pb-16 md:pt-16 px-3 md:px-20">
-                <motion.h2
-                    initial={{ opacity: 0, y: -20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                <h2
                     className="text-2xl md:text-4xl font-bold mb-5 md:mb-5 text-gray-900 dark:text-gray-100"
                 >
                     Our Product Categories
-                </motion.h2>
+                </h2>
 
 
                 <div className="space-y-14 max-w-7xl mx-auto">
@@ -99,40 +97,40 @@ export default function LandingPage() {
             </section>
 
             <section className="max-w-6xl mx-auto px-4 pb-10 pt-5">
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                <h1
                     className="text-2xl md:text-4xl font-bold text-center mb-5"
                 >
                     Why Choose Madhur Dairy & <br /> Daily Needs ?
-                </motion.h1>
+                </h1>
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {
-                        features?.map((feature, idx) => (
-                            <FeatureCard key={idx * 0.8} image={feature?.image} title={feature?.title} description={feature?.description} />
-                        ))
-                    }
+                    <Suspense fallback={<div className="text-center text-gray-600 dark:text-gray-300">Loading Features...</div>}>
+                        {
+                            features?.map((feature, idx) => (
+                                <FeatureCard key={idx * 0.8} {...feature} />
+                            ))
+                        }
+                    </Suspense>
+
                 </div>
             </section>
 
             <section className="max-w-3xl mx-auto px-3 py-10">
-                <motion.h2
-                    initial={{ opacity: 0, y: -20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
+                <h2
                     className="text-2xl font-bold mb-6 text-gray-800 dark:text-white"
                 >
                     Frequently Asked Questions
-                </motion.h2>
+                </h2>
 
                 <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                        <QuestionAnswer key={index * 0.5} question={faq.question} answer={faq.answer} />
-                    ))}
+                    <Suspense fallback={<div className="text-center text-gray-600 dark:text-gray-300">Loading FAQs...</div>}>
+                        {
+                            faqs.map((faq, index) => (
+                                <QuestionAnswer key={index * 0.9} question={faq.question} answer={faq.answer} />
+                            ))
+                        }
+                    </Suspense>
+
                 </div>
             </section>
 

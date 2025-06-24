@@ -201,20 +201,14 @@ export default function OrderCheckoutPage() {
 
   return (
     <>
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <section
         className="max-w-4xl mx-auto my-10 px-4"
       >
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+        <h1
           className="text-2xl font-bold mb-4 text-[#843E71] dark:text-white"
         >
           Confirm Delivery Details
-        </motion.h1>
+        </h1>
 
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -335,7 +329,7 @@ export default function OrderCheckoutPage() {
             Place Order
           </button>
         </motion.div>
-      </motion.section>
+      </section>
 
       <Dialog
         open={open}

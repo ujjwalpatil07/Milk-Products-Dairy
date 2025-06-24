@@ -13,7 +13,7 @@ export default function UserProfileLayout({ children }) {
     const [toggleDrawer, setToggleDrawer] = useState(false);
     const scrollRef = useRef(null);
     const location = useLocation();
-    const { authUser } = useContext(UserAuthContext);
+    const { authUser, authUserLoading } = useContext(UserAuthContext);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -25,7 +25,7 @@ export default function UserProfileLayout({ children }) {
 
     const isUserInStorage = localStorage.getItem("User");
 
-    if (isUserInStorage && !authUser) {
+    if (authUserLoading) {
         return (
             <div className="h-screen p-4 gap-3 flex justify-center items-center bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
                 <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>

@@ -15,13 +15,11 @@ export default function OfferingProductCard({ image, title }) {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="relative bg-white dark:bg-gray-800 shadow-md rounded-2xl group transition duration-300 mb-5 md:mb-10"
         >
-            <motion.img
+            <img
                 src={image}
                 alt={title}
                 loading="lazy"
                 className="w-full h-64 object-cover rounded-xl"
-                whileHover={{ scale: 1.01 }}
-                transition={{ duration: 0.3 }}
             />
 
             <div className="absolute rounded-xl inset-0 bg-black/20 bg-opacity-30 flex items-end justify-center">
