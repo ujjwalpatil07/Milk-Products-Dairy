@@ -102,6 +102,7 @@ export default function UserProfileLayout({ children }) {
                 <div className="flex-1 w-full overflow-y-auto rounded-lg shadow-md scrollbar-hide max-sm:h-full">
                     {children}
                 </div>
+
             </main>
 
             <Footer />

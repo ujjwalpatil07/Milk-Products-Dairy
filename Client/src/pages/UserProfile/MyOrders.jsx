@@ -134,13 +134,26 @@ export default function MyOrders() {
               </span>
             </div>
 
-            <div className="flex justify-between items-center mt-4 border-t pt-3">
+            <div className="flex flex-row flex-wrap justify-between items-center gap-3 mt-4 border-t pt-3">
               <p className="font-semibold text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
                 <FaMoneyBillWave className="text-green-500" /> Payment Mode: {order.paymentMode}
               </p>
+
               <p className="text-lg font-bold text-green-600 dark:text-green-400">
                 &#8377;{order.totalAmount}
               </p>
+
+              {order.status === "Confirmed" && (
+                <a
+                  href={`http://localhost:9000/pdf/generate-bill/${order?._id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-fit px-4 py-1.5 text-sm font-semibold rounded bg-[#843E71] hover:bg-[#843E7190] text-white inline-block text-center"
+                >
+                  Download Bill
+                </a>
+              )}
+
             </div>
           </div>
         ))}

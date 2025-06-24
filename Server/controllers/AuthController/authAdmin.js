@@ -12,12 +12,12 @@ export const loginAdmin = async (req, res) => {
   const admin = await Admin.findOne({ email });
 
   if (!admin) {
-    return res.status(400).json({ message: "Invalid Username or Password" });
+    return res.status(400).json({ message: "Invalid Email Address." });
   }
 
   const isMatched = await bcryptjs.compare(password, admin.password);
   if (!isMatched) {
-    return res.status(400).json({ message: "Invalid Username or Password" });
+    return res.status(400).json({ message: "Wrong Password" });
   }
 
   res.status(200).json({

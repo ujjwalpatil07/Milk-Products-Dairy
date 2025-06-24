@@ -146,7 +146,7 @@ export default function UserProfileSidebar() {
                     <Link
                         key={item.key}
                         to={item.key}
-                        className={`w-full flex items-center gap-2 px-4 py-2 text-left rounded transition duration-300 ${location?.pathname === item.key ? "bg-[#D595C3] dark:bg-[#843E71] text-black dark:text-white" : "hover:bg-[#D595C3] dark:hover:bg-[#843E71] text-black dark:text-white"}`}
+                        className={`w-full flex items-center gap-2 px-4 py-2 text-left rounded transition duration-300 ${location?.pathname === item.key ? "bg-[#843E71] text-white dark:bg-[#843E71]" : "hover:bg-[#D595C3] dark:hover:bg-[#843E71] text-black dark:text-white"}`}
                     >
                         {item.icon} {item.label}
                     </Link>

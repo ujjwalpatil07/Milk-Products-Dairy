@@ -4,8 +4,8 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      minlength: 5,
-      maxlength: 15,
+      min: 5,
+      max: 15,
       trim: true,
     },
 
@@ -21,7 +21,8 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      min: [8, "Password must be at lest 8 characters"],
+      max: [20, "Password too long, please enter less than 20 characters"],
     },
 
     firstName: {
@@ -51,6 +52,13 @@ const UserSchema = new mongoose.Schema(
 
     mobileNo: {
       type: String,
+      validate: {
+        validator: function (v) {
+          return /^\d{10}$/.test(v); 
+        },
+        message: (props) => `${props.value} is not a valid phone number!`,
+      },
+      required: [true, "User phone number required"],
     },
 
     savedAddresses: [

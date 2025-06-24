@@ -100,7 +100,7 @@ export default function MyWishlist() {
 
                   <div className="p-3 flex flex-col justify-between flex-1 min-w-0">
                     <div>
-                      <Link to={`/product-details/${slugify(product?.category)}`} className="font-semibold text-gray-800 dark:text-white truncate">
+                      <Link to={/product-details/${slugify(product?.category)}} className="font-semibold text-gray-800 dark:text-white truncate">
                         {product?.name || "Unnamed Product"}
                       </Link>
                       <p className="text-sm text-gray-500 dark:text-gray-300">
