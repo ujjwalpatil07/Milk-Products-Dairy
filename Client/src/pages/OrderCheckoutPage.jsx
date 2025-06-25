@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
@@ -16,12 +16,12 @@ import Slide from '@mui/material/Slide';
 import { CartContext } from "../context/CartProvider";
 import { UserAuthContext } from "../context/AuthProvider";
 import { calculateCartTotals, getCartProductDetails } from "../utils/cartUtils";
-import { getProducts } from "../services/productServices";
 import { placeNewOrder } from "../services/orderService";
 import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
 import { razorpayOrderPayment } from "../services/paymentService";
 import { ThemeContext } from "../context/ThemeProvider";
+import { ProductContext } from "../context/ProductProvider";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -32,34 +32,16 @@ export default function OrderCheckoutPage() {
   const { theme } = useContext(ThemeContext);
   const { authUser, deliveryAddress } = useContext(UserAuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
+  const { products, productLoading } = useContext(ProductContext);
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [allProducts, setAllProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
-  useEffect(() => {
-    const getAllProducts = async () => {
-      try {
-        const res = await getProducts();
-        if (res?.success) {
-          setAllProducts(res?.products || []);
-        }
-      } catch (error) {
-        toast.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getAllProducts();
-  }, []);
-
   const cartDetails = useMemo(
-    () => getCartProductDetails(cartItems, allProducts),
-    [cartItems, allProducts]
+    () => getCartProductDetails(cartItems, products),
+    [cartItems, products]
   );
 
   const { subtotal, totalAmount, totalSaving } = useMemo(() => {
@@ -99,7 +81,6 @@ export default function OrderCheckoutPage() {
     };
 
     try {
-
       if (selectedMode === "Cash on Delivery") {
         const response = await placeNewOrder(orderData);
         if (response?.success) {
@@ -167,7 +148,7 @@ export default function OrderCheckoutPage() {
     }
   };
 
-  if (loading) {
+  if (productLoading) {
     return (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
         <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>

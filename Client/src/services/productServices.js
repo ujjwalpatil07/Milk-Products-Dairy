@@ -38,11 +38,6 @@ export const productLike = async (productId, userId) => {
   return res.data;
 };
 
-export const getProductByName = async (name) => {
-  const res = await api.get(`/products/get-product/${encodeURIComponent(name)}`);
-  return res.data;
-};
-
 export const addProductReviewLike = async (productId, reviewId, userId) => {
   const res = await api.put(`/products/review/like`, { productId, reviewId, userId });
   return res.data;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react"
+import React, { useContext, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -12,39 +12,21 @@ import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
 import ProductCard from "../components/CartComponents/ProductCard";
 import SavedAddressList from "../components/CartComponents/SavedAddressList";
-import { getProducts } from "../services/productServices";
 import { toast } from "react-toastify";
+import { ProductContext } from "../context/ProductProvider";
 
 export default function CartPage() {
 
     const navigate = useNavigate();
     const { authUser, deliveryAddress } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
+    const { products, productLoading } = useContext(ProductContext);
 
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [allProducts, setAllProducts] = useState([]);
-
-    useEffect(() => {
-        const getAllProducts = async () => {
-            try {
-                const res = await getProducts();
-                if (res?.success) {
-                    setAllProducts(res.products || []);
-                }
-            } catch (error) {
-                toast.error("Failed to fetch products:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getAllProducts();
-    }, []);
 
     const cartDetails = useMemo(
-        () => getCartProductDetails(cartItems, allProducts),
-        [cartItems, allProducts]
+        () => getCartProductDetails(cartItems, products),
+        [cartItems, products]
     );
 
     const { subtotal, totalAmount, totalSaving } = useMemo(() => {
@@ -65,7 +47,7 @@ export default function CartPage() {
         navigate("/order-checkout");
     };
 
-    if (loading) {
+    if (productLoading) {
         return (
             <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
                 <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>

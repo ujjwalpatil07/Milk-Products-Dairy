@@ -4,7 +4,13 @@ import Review from "../models/ReviewSchema.js";
 import mongoose from "mongoose";
 
 export const getProducts = async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.find().populate({
+    path: "reviews",
+    populate: {
+      path: "userId",
+      select: "username photo",
+    },
+  });
 
   res.status(200).json({
     success: true,
@@ -46,34 +52,6 @@ export const likeProduct = async (req, res) => {
     message: "Product liked successfully.",
     updatedLikes: product.likes,
   });
-};
-
-export const getProductByName = async (req, res) => {
-  const { name } = req.params;
-
-  if (!name) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Product name is required." });
-  }
-
-  const product = await Product.findOne({
-    name: { $regex: new RegExp(`^${name}$`, "i") },
-  }).populate({
-    path: "reviews",
-    populate: {
-      path: "userId",
-      select: "username photo",
-    },
-  });
-
-  if (!product) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Product not found." });
-  }
-
-  res.status(200).json({ success: true, product });
 };
 
 export const productReviewLike = async (req, res) => {
