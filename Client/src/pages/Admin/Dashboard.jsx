@@ -10,12 +10,12 @@ import { useState, useEffect } from "react";
 import OrdersOverview from "../../components/AdminComponents/DashboardComponents/PurchaseOverview";
 import { getAllOrders, totalActiveOrders } from "../../services/orderService";
 import { toast } from "react-toastify";
+import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../services/dashboardServices";
 
 export default function Dashboard() {
 
     const [fetchedProducts, setFetchedProducts] = useState([])
-      const [allOrders, setAllOrders] = useState([]);
-    //   const [loading, setLoading] = useState(false);
+    const [allOrders, setAllOrders] = useState([]);
 
     const fetchProducts = async () => {
         try {
@@ -33,7 +33,6 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchAllOrders = async () => {
             try {
-                // setLoading(true)
                 const res = await getAllOrders();
                 if (res?.success) {
                     setAllOrders(res?.orders);
@@ -41,20 +40,22 @@ export default function Dashboard() {
             } catch (error) {
                 console.log(error)
                 toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
-            } finally {
-                // setLoading(false);
             }
         };
 
         fetchAllOrders();
     }, []);
 
+    // if(allOrders.length > 0) {
+    //     console.log(allOrders)
+    // }
+
     const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
 
     return (
         <>
             <section className="p-3">
-                <SalesOverview />
+                <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} />
             </section>
 
             <section className="w-full flex flex-col md:flex-row gap-4 p-3">
@@ -80,7 +81,7 @@ export default function Dashboard() {
                     </div>
 
                     <div className="w-full">
-                        <TopSellingStock />
+                        <TopSellingStock topSellingStocks={topSellingStocks(fetchedProducts)} />
                     </div>
                 </section>
 

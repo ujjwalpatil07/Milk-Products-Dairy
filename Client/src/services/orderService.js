@@ -35,7 +35,9 @@ export const totalCanceledOrders = (orders) => {
 };
 
 export const totalActiveOrders = (orders) => {
-  return orders.length;
+  return orders.filter((order) => (
+    order.status === "Pending"
+  )).length;
 };
 
 export const totalOrdersCount = (orders) => {

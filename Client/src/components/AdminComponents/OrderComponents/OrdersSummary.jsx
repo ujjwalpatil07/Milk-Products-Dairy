@@ -20,7 +20,7 @@ export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalC
     },
     {
       name: "Total Returned Orders",
-      value: 63,
+      value: 0,
       icon: <Undo2 size={28} className="text-orange-600" />,
       bg: "bg-orange-100 dark:bg-orange-800/30",
     },
@@ -32,7 +32,7 @@ export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalC
     },
     {
       name: "Total Drafted Orders",
-      value: 3,
+      value: 0,
       icon: <NotepadTextDashedIcon size={28} className="text-blue-600" />,
       bg: "bg-blue-100 dark:bg-blue-800/30",
     },

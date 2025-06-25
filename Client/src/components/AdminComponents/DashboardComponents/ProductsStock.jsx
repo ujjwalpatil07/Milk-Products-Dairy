@@ -11,6 +11,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const ProductsStock = ({ fetchedProducts }) => {
   const [chartData, setChartData] = useState(null);
+  const theme = localStorage.getItem("theme");
 
   useEffect(() => {
     if (!Array.isArray(fetchedProducts)) return;
@@ -26,7 +27,7 @@ export const ProductsStock = ({ fetchedProducts }) => {
       labels,
       datasets: [
         {
-          label: 'Inventory (in kg/liters)',
+          label: 'In Inventory (in kg/liters)',
           data,
           backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
           borderWidth: 0,
@@ -46,7 +47,7 @@ export const ProductsStock = ({ fetchedProducts }) => {
       legend: {
         position: 'bottom',
         labels: {
-          color: '#374151', 
+          color: `${theme === "light" ? "#1c1b1b" : "#E0E0E0"}`, 
         },
       },
     },

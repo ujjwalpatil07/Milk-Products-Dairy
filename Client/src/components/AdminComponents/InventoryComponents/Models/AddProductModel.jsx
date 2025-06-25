@@ -1,12 +1,12 @@
-// import React, { useState } from "react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { addNewProduct } from "../../../../services/productServices";
-import { Image, Tag, DollarSign, Archive, Package, AlertCircle, Scale3D, FlaskConical } from "lucide-react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import ScienceIcon from '@mui/icons-material/Science';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 const categories = [
   "Milk",
@@ -44,6 +44,7 @@ export default function AddProductModal({ setAddModel }) {
     stock: 0,
     thresholdVal: 0,
     price: 0,
+    manufacturingCost: 0,
     nutrition: {},
     discount: 0
   })
@@ -116,11 +117,30 @@ export default function AddProductModal({ setAddModel }) {
 
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
-      <div className="bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto"
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 50 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl space-y-4"
+      >
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Add New Product
         </h2>
+
+        <button
+          onClick={() => {
+            setAddModel(false);
+          }}
+          className="absolute top-3 right-5 text-xl"
+        >X</button>
 
         <form onSubmit={handleAddProduct} className="space-y-6 text-sm sm:text-base">
           {/* Image upload */}
@@ -213,6 +233,14 @@ export default function AddProductModal({ setAddModel }) {
                 nutrition: nutritionData,
               }))
             }
+          />
+
+          <InputWithLabel
+            label="Manufacturing Cost for admin"
+            name="manufacturingCost"
+            placeholder="Ex. 20Rs"
+            icon={<CurrencyRupeeIcon className="text-gray-500" />}
+            onChange={handleInputChange}
           />
 
           {/* Product"s Shelflife and Selling Price */}
@@ -326,8 +354,9 @@ export default function AddProductModal({ setAddModel }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+
   );
 }
 

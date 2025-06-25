@@ -26,14 +26,6 @@ export default function Inventory() {
   }, []);
 
 
-  const categoryCount = totalCategories(fetchedProducts)
-
-  const stockCount = totalStock(fetchedProducts)
-
-  const lowStockProducts = lowStockCount(fetchedProducts)
-
-  const outOfStockCount = outOfStockProducts(fetchedProducts)
-
   const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
 
 
@@ -41,10 +33,10 @@ export default function Inventory() {
     <>
       <div className="p-3">
         <OverallInventory
-          totalCategories={categoryCount}
-          totalStock={stockCount}
-          lowStockCount={lowStockProducts}
-          outOfStockProducts={outOfStockCount}
+          totalCategories={totalCategories(fetchedProducts)}
+          totalStock={totalStock(fetchedProducts)}
+          lowStockCount={lowStockCount(fetchedProducts)}
+          outOfStockProducts={outOfStockProducts(fetchedProducts)}
           expiringSoonCount={expiringSoonCount}
           expiredCount={expiredCount}
         />

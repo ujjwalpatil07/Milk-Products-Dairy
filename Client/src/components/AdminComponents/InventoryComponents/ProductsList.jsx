@@ -1,52 +1,83 @@
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SearchIcon from '@mui/icons-material/Search';
+
 import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import UpdateProductModel from './Models/UpdateProductModel';
 import AddProductModel from "./Models/AddProductModel"
 import RemoveModel from './Models/RemoveModel';
 import { SidebarContext } from '../../../context/SidebarProvider';
+import { FilterIcon } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+
 
 export default function ProductsList({ fetchProducts, fetchedProducts, loading }) {
 
-  const {navbarInput, setNavbarInput} = useContext(SidebarContext)
+  const { navbarInput, highlightMatch } = useContext(SidebarContext)
   const [addModel, setAddModel] = useState(false);
   const [updateModel, setUpdateModel] = useState(false);
   const [removeModel, setRemoveModel] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState({});  
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const [productList, setProductList] = useState(fetchedProducts || []);
+  const [filterType, setFilterType] = useState('priceLowToHigh');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
-
-  useEffect(() => { 
+  useEffect(() => {
     if (!addModel || !removeModel || !updateModel) fetchProducts();
   }, [addModel, removeModel, updateModel]);
 
-  const filteredProducts = fetchedProducts.filter(product =>
-    product.name.toLowerCase().includes(navbarInput.toLowerCase())
-  );
+  useEffect(() => {
+    setProductList(fetchedProducts || []);
+  }, [fetchedProducts]);
 
-  const highlightMatch = (text, term) => {
-    if (!term) return text;
+  const filterOptions = [
+    { label: "Price: Low to High", value: "priceLowToHigh" },
+    { label: "Price: High to Low", value: "priceHighToLow" },
+    { label: "Quantity: Low to High", value: "quantityLowToHigh" },
+    { label: "Quantity: High to Low", value: "quantityHighToLow" },
+    { label: "Name: A to Z", value: "alphabeticalAZ" },
+    { label: "Name: Z to A", value: "alphabeticalZA" },
+    { label: "Sold: Low to High", value: "soldLowToHigh" },
+    { label: "Sold: High to Low", value: "soldHighToLow" },
+  ];
+  
+  const handleFilter = (type) => {
+    setFilterType(type);
 
-    const regex = new RegExp(`(${term})`, "gi");
-    const parts = text.split(regex);
+    let sortedProducts = [...fetchedProducts];
 
-    return parts.map((part, i) =>
-      part.toLowerCase() === term.toLowerCase() ? (
-        <span
-          key={i * 0.9}
-          className="bg-yellow-300 dark:bg-yellow-600 font-semibold rounded px-1"
-        >
-          {part}
-        </span>
-      ) : (
-        <span key={i * 0.9}>{part}</span>
-      )
-    );
+    switch (type) {
+      case 'priceLowToHigh':
+        sortedProducts.sort((a, b) => a.price - b.price);
+        break;
+      case 'priceHighToLow':
+        sortedProducts.sort((a, b) => b.price - a.price);
+        break;
+      case 'quantityLowToHigh':
+        sortedProducts.sort((a, b) => a.stock - b.stock);
+        break;
+      case 'quantityHighToLow':
+        sortedProducts.sort((a, b) => b.stock - a.stock);
+        break;
+      case 'alphabeticalAZ':
+        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'alphabeticalZA':
+        sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'soldLowToHigh':
+        sortedProducts.sort((a, b) => (a.totalQuantitySold || 0) - (b.totalQuantitySold || 0));
+        break;
+      case 'soldHighToLow':
+        sortedProducts.sort((a, b) => (b.totalQuantitySold || 0) - (a.totalQuantitySold || 0));
+        break;
+      default:
+        sortedProducts = fetchedProducts;
+    }
+
+    setProductList(sortedProducts);
   };
-
+  
   let content;
-
-  if (loading) {
+  if ((!addModel && !updateModel && !removeModel) && loading) {
     content = (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
         <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
@@ -63,7 +94,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
     content = (
       <>
         <div className="overflow-x-auto">
-          {filteredProducts.length === 0 ? (
+          {fetchedProducts.length === 0 ? (
             <div className="text-center py-10 text-gray-600 dark:text-gray-300">
               <p className="text-lg font-medium">No products found.</p>
               <p className="text-sm mt-2">Add a new product to get started.</p>
@@ -80,48 +111,54 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
                   <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredProducts.map((product, index) => (
-                  <tr
-                    key={product._id || index}
-                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
-                      {highlightMatch(product.name, navbarInput)}
-                    </td>
-                    <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
-                    <td className="py-2 px-3 whitespace-nowrap">
-                      {product.stock} {product.quantityUnit}
-                    </td>
-                    <td className="py-2 px-3 whitespace-nowrap">
-                      {product.thresholdVal} {product.quantityUnit}
-                    </td>
-                    <td className="py-2 px-3 whitespace-nowrap">{product.category}</td>
-                    <td className="py-2 px-3 whitespace-nowrap">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setUpdateModel(true);
-                          }}
-                          className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
-                        >
-                          Update
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setRemoveModel(true);
-                          }}
-                          className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                <tbody>
+                  {productList.map((product, index) => {
+                    const isLowStock = product.stock < product.thresholdVal;
+
+                    return (
+                      <tr
+                        key={product._id || index}
+                        className={`border-b hover:bg-gray-50 dark:hover:bg-gray-700 
+          ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""}`}
+                      >
+                        <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
+                          {highlightMatch(product.name, navbarInput)}
+                        </td>
+                        <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
+                        <td className="py-2 px-3 whitespace-nowrap">
+                          {product.stock} {product.quantityUnit}
+                        </td>
+                        <td className="py-2 px-3 whitespace-nowrap">
+                          {product.thresholdVal} {product.quantityUnit}
+                        </td>
+                        <td className="py-2 px-3 whitespace-nowrap">{product.category}</td>
+                        <td className="py-2 px-3 whitespace-nowrap">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedProduct(product);
+                                setUpdateModel(true);
+                              }}
+                              className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
+                            >
+                              Update
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedProduct(product);
+                                setRemoveModel(true);
+                              }}
+                              className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+
             </table>
           )}
         </div>
@@ -132,9 +169,10 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
           <button className="border px-4 py-2 rounded-xl">Next</button>
         </div>
 
-        {addModel && (
-          <AddProductModel setAddModel={setAddModel} />
-        )}
+        <AnimatePresence>
+          {addModel && <AddProductModel setAddModel={setAddModel} />}
+        </AnimatePresence>
+
 
         {updateModel && (
           <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
@@ -153,17 +191,6 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Products</h2>
 
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 w-full md:w-auto">
-          <div className="relative max-sm:w-full">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="pl-10 pr-4 py-2 rounded-lg  border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={navbarInput}
-              onChange={(e) => setNavbarInput(e.target.value)}
-            />
-            <SearchIcon className="absolute left-3 top-2.5 text-gray-500 dark:text-white" />
-          </div>
-
           <div className='flex gap-2'>
             <button
               onClick={() => setAddModel(true)}
@@ -172,9 +199,38 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
               Add Product
             </button>
 
-            <div className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500">
-              <FilterListIcon />
-              <button>Filter</button>
+            {/* Dropdown menu */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowFilterDropdown(prev => !prev)}
+                className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 cursor-pointer"
+                aria-haspopup="listbox"
+                aria-expanded={showFilterDropdown}
+              >
+                <FilterIcon />
+                <span>Filter</span>
+              </button>
+
+              {showFilterDropdown && (
+                <div className="absolute z-10 right-0 mt-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-md w-48">
+                  <ul className="text-sm text-gray-700 dark:text-white">
+                    {filterOptions.map((filter) => (
+                      <li key={filter.value}>
+                        <button
+                          onClick={() => {
+                            handleFilter(filter.value);
+                            setShowFilterDropdown(false); // close dropdown after selection
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        >
+                          {filter.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>

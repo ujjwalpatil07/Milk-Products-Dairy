@@ -125,11 +125,18 @@ export const addNewOrder = async (req, res) => {
   const bulkOperations = validatedProducts.map((item) => ({
     updateOne: {
       filter: { _id: item.productId },
-      update: { $inc: { stock: -item.productQuantity } },
+      update: {
+        $inc: {
+          stock: -item.productQuantity,
+          totalQuantitySold: item?.productQuantity,
+        },
+      },
     },
   }));
 
   await Product.bulkWrite(bulkOperations);
+
+  
 
   return res.status(201).json({
     success: true,
