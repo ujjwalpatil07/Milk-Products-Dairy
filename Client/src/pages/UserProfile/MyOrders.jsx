@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey } from "react-icons/fa";
 import { getUserOrders } from "../../services/orderService";
 import { UserAuthContext } from "../../context/AuthProvider";
+import OrderStatCard from "../../components/UserOrderComponents/OrderStatCard";
 
 export default function MyOrders() {
   const { authUser } = useContext(UserAuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -46,8 +48,37 @@ export default function MyOrders() {
     }
   };
 
-  let content;
+  const filteredOrders = selectedStatus === "All"
+    ? orders
+    : orders.filter((order) => order.status === selectedStatus);
 
+
+  const orderStats = {
+    Pending: 0,
+    Processing: 0,
+    Shipped: 0,
+    Delivered: 0,
+    Cancelled: 0,
+    Confirmed: 0,
+  };
+
+  orders.forEach(order => {
+    if (orderStats[order.status] !== undefined) {
+      orderStats[order.status]++;
+    }
+  });
+
+  const statCards = [
+    { title: "All", count: orders.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
+    { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600", icon: <FaCheckCircle /> },
+    { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500", icon: <FaHourglassHalf /> },
+    { title: "Processing", count: orderStats.Processing, color: "bg-blue-400", icon: <FaBoxOpen /> },
+    { title: "Shipped", count: orderStats.Shipped, color: "bg-purple-500", icon: <FaShippingFast /> },
+    { title: "Delivered", count: orderStats.Delivered, color: "bg-green-600", icon: <FaCheckCircle /> },
+    { title: "Cancelled", count: orderStats.Cancelled, color: "bg-red-500", icon: <FaTimesCircle /> },
+  ];
+
+  let content;
   if (loading) {
     content = (
       <div className="flex items-center justify-center py-20 text-gray-500 max-sm:max-w-xl min-w-xl space-x-2">
@@ -55,7 +86,7 @@ export default function MyOrders() {
         <p className="text-sm">Loading...</p>
       </div>
     );
-  } else if (!orders || orders.length === 0) {
+  } else if (!filteredOrders || filteredOrders.length === 0) {
     content = (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16">
         You haven't placed any orders yet.
@@ -63,8 +94,8 @@ export default function MyOrders() {
     );
   } else {
     content = (
-      <div className="space-y-6 max-sm:px-4 ">
-        {orders.map((order) => (
+      <div className="space-y-6">
+        {filteredOrders.map((order) => (
           <div
             key={order._id}
             className="bg-gray-100 dark:bg-gray-500/10 md:rounded-lg p-3 md:p-5 shadow-sm"
@@ -165,11 +196,29 @@ export default function MyOrders() {
     return <p className="text-red-500 text-center mt-6">{error}</p>;
   }
 
-
   return (
     <>
       <h2 className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4 text-xl font-bold">My Orders</h2>
+
+      <div className="sticky top-0 left-0 flex sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 overflow-x-auto p-1 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-lg shadow-sm scrollbar-hide">
+        {statCards.map((card) => (
+          <button
+            key={card.title}
+            onClick={() => setSelectedStatus(card.title)}
+          >
+            <OrderStatCard
+              title={card.title}
+              count={card.count}
+              color={`${card.color} ${selectedStatus !== card.title ? "rounded-md" : "ring-2 ring-offset-2 ring-[#843E71]"}`}
+              icon={card.icon}
+            />
+          </button>
+        ))}
+      </div>
+
       {content}
     </>
   );
 }
+
+

@@ -11,7 +11,7 @@ export default function MyWishlist() {
   const { authUser, setAuthUser } = useContext(UserAuthContext);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(null);
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -37,7 +37,7 @@ export default function MyWishlist() {
     }
 
     try {
-      setDeleteLoading(true);
+      setDeleteLoading(productId);
       const data = await removeProductFromWishList(authUser._id, productId);
       if (data?.success) {
         setWishlist((prev) => prev.filter((item) => item._id !== productId));
@@ -52,7 +52,7 @@ export default function MyWishlist() {
     } catch {
       toast.error("Failed to remove from wishlist");
     } finally {
-      setDeleteLoading(false);
+      setDeleteLoading(null);
     }
   };
 
@@ -124,12 +124,12 @@ export default function MyWishlist() {
                       </div>
 
                       <button
-                        onClick={() => handleRemove(product._id)}
-                        disabled={deleteLoading}
+                        onClick={() => handleRemove(product?._id)}
+                        disabled={deleteLoading === product?._id}
                         className={`hidden sm:flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full transition 
-    ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:bg-red-500/30"}`}
+    ${(deleteLoading === product?._id) ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:bg-red-500/30"}`}
                       >
-                        {deleteLoading ? (
+                        {(deleteLoading === product?._id) ? (
                           <>
                             <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
                             Removing...
@@ -145,11 +145,11 @@ export default function MyWishlist() {
 
               <button
                 onClick={() => handleRemove(product._id)}
-                disabled={deleteLoading}
+                disabled={deleteLoading === product?._id}
                 className={`w-full py-1 rounded-b text-sm font-medium transition sm:hidden 
-    ${deleteLoading ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:text-red-800"}`}
+    ${deleteLoading === product?._id ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-red-500/20 text-red-600 hover:text-red-800"}`}
               >
-                {deleteLoading ? (
+                {deleteLoading === product?._id ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin" />
                     Removing...

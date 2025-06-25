@@ -34,6 +34,7 @@ export const addNewOrder = async (req, res) => {
   }
 
   const foundAddress = await Address.findById(address);
+ 
   if (!foundAddress || !foundAddress.owner) {
     return res
       .status(404)

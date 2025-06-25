@@ -20,7 +20,7 @@ export default function LandingPage() {
 
     return (
         <>
-            <section className="relative w-full overflow-hidden">
+            <section className="relative w-full md:h-[100vh] overflow-hidden">
                 <img
                     src="https://res.cloudinary.com/dyahibuzy/image/upload/v1750157405/happyFamily_uuyftj.png"
                     alt="Happy Family"
@@ -57,7 +57,7 @@ export default function LandingPage() {
                 </motion.div>
             </section>
 
-            <section className="md:pb-16 md:pt-16 px-3 md:px-20">
+            <section className="py-10 md:py-16 px-3 md:px-20">
                 <h2
                     className="text-2xl md:text-4xl font-bold mb-5 md:mb-5 text-gray-900 dark:text-gray-100"
                 >

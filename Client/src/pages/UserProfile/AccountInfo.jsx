@@ -109,7 +109,7 @@ export default function AccountInfo() {
     content = (
       <>
         <form className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { label: "First Name", name: "firstName", value: editData.firstName, display: dbData.firstName },
               { label: "Last Name", name: "lastName", value: editData.lastName, display: dbData.lastName },
@@ -147,7 +147,7 @@ export default function AccountInfo() {
               </div>
             ))}
 
-            <div className="md:col-span-2">
+            <div className="sm:col-span-2">
               <label className="mb-1 font-medium flex items-center gap-1">
                 <FaVenusMars /> Gender
               </label>
@@ -286,7 +286,7 @@ export default function AccountInfo() {
   return (
     <>
       <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold flex items-center gap-2">
+        <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
           <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
         </h3>
         <button

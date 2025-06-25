@@ -228,7 +228,7 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                         {wishlistIconContent}
                     </button>
 
-                    {stock !== 0 && (
+                    {stock === 0 && (
                         <p className="text-red-600 font-semibold text-sm">Out of Stock</p>
                     )}
 
