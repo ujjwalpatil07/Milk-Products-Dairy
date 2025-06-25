@@ -1,6 +1,7 @@
 import { useMemo, useState, createContext, useEffect } from "react";
 import { getProducts } from "../services/productServices";
 import { toast } from "react-toastify";
+import { socket } from "../socket/socket";
 
 export const ProductContext = createContext();
 
@@ -28,6 +29,33 @@ export const ProductProvider = ({ children }) => {
         fetchProducts();
     }, []);
 
+    const updateProducts = ({ updatedData }) => {
+
+        const updateMap = new Map();
+        updatedData.forEach((u) => {
+            updateMap.set(u.productId, u.change);
+        });
+
+        setProducts((prevProducts) =>
+            prevProducts.map((product) => {
+                const change = updateMap.get(product?._id)
+                if (change !== undefined) {
+                    const updatedStock = Math.max(product.stock + change, 0);
+                    return { ...product, stock: updatedStock };
+                }
+                return product;
+            })
+        );
+    }
+
+    useEffect(() => {
+        socket.on("product-stock-update", updateProducts);
+
+        return () => {
+            socket.off("product-stock-update", updateProducts);
+        }
+    }, []);
+
     const contextValue = useMemo(() => ({
         filter,
         showHeaderExtras,
@@ -44,8 +72,4 @@ export const ProductProvider = ({ children }) => {
             {children}
         </ProductContext.Provider>
     )
-}
-
-ProductContext.proptypes = {
-
 }

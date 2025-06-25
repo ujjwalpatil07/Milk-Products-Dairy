@@ -136,8 +136,6 @@ export const addNewOrder = async (req, res) => {
 
   await Product.bulkWrite(bulkOperations);
 
-  
-
   return res.status(201).json({
     success: true,
     message: "Order created successfully",

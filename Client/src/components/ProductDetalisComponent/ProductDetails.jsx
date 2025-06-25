@@ -215,7 +215,7 @@ export default function ProductDetails({ productId }) {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="flex-1"
             >
-                <h2 className="text-2xl font-bold mb-1">{name}</h2>
+                <h2 className="text-2xl font-bold mb-1">{selectedProduct?.name || "Not Defined"}</h2>
 
                 <div className="flex items-center gap-3 mb-1 flex-wrap">
                     <div className="text-gray-600 dark:text-gray-300 font-semibold text-sm">

@@ -13,7 +13,7 @@ function App() {
     <>
       <Routers />
 
-      <ToastContainer position="top-right" autoClose={3000} theme={theme}  />
+      <ToastContainer position="bottom-right" autoClose={3000} theme={theme}  />
     </>
   )
 }
