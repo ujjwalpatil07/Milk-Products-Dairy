@@ -19,7 +19,7 @@ export default function AdminNavbar() {
     }, [location.pathname, setNavbarInput]);
 
     return (
-        <nav className="sticky top-0 left-0 flex items-center justify-between px-4 py-5 bg-white/60 dark:bg-gray-500/20 border-b border-gray-300 dark:border-gray-700 backdrop-blur-md">
+        <nav className="sticky top-0 left-0 z-50 flex items-center justify-between px-4 py-5 bg-white/60 dark:bg-gray-500/20 border-b border-gray-300 dark:border-gray-700 backdrop-blur-md">
             <button
                 className="lg:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setIsSidebarOpen(true)}

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { removeProduct } from "../../../../services/productServices"
 import { toast } from "react-toastify";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+
 
 export default function RemoveModel({ setRemoveModel, selectedProduct }) {
 
@@ -23,15 +26,25 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
       }
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setIsRemoving(false),
-      setRemoveModel(false)
+        setRemoveModel(false)
     }
-      
+
   }
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center justify-center overflow-auto">
-      <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fadeIn scale-95 animate-scaleIn">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center justify-center overflow-auto">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 50 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fadeIn scale-95 animate-scaleIn">
 
         <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 text-gray-800 dark:text-gray-100">
           Do you want to remove this product?
@@ -62,7 +75,7 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
             {isRemoving ? "Removing..." : "Remove"}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

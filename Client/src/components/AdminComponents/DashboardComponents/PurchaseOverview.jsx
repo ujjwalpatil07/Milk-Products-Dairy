@@ -15,13 +15,13 @@ export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders
     },
     {
       name: "Total Returns",
-      value: 23, // e.g. number of returned orders
+      value: 0, // e.g. number of returned orders
       icon: <UndoIcon className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
       name: "Total Canceled",
-      value: 12, // e.g. number of canceled orders
+      value: 0, // e.g. number of canceled orders
       icon: <CancelIcon className="text-red-600" />,
       bg: "bg-red-100 dark:bg-red-800/30",
     },

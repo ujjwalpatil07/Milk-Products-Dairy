@@ -6,40 +6,41 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 
 import { formatNumberWithCommas } from "../../../utils/format"
 
-const salesData = [
-    {
-        name: "Revenue",
-        value: 8000,
-        icon: <TrendingUpIcon className="text-green-600" />,
-        bg: "bg-green-100 dark:bg-green-800/30",
-    },
-    {
-        name: "Sales",
-        value: 1240,
-        icon: <PercentIcon className="text-blue-600" />,
-        bg: "bg-blue-100 dark:bg-blue-800/30",
-    },
-    {
-        name: "Profit",
-        value: 26500,
-        icon: <BarChartIcon className="text-purple-600" />,
-        bg: "bg-purple-100 dark:bg-purple-800/30",
-    },
-    {
-        name: "Cost",
-        value: 45700,
-        icon: <MoneyOffIcon className="text-yellow-600" />,
-        bg: "bg-yellow-100 dark:bg-yellow-800/30",
-    },
-    {
-        name: "Expenses",
-        value: 13200,
-        icon: <ListAltIcon className="text-red-600" />,
-        bg: "bg-red-100 dark:bg-red-800/30",
-    },
-];
+export default function SalesOverview({ totalRevenue, totalProfit }) {
 
-export default function SalesOverview() {
+
+    const salesData = [
+        {
+            name: "Revenue",
+            value: totalRevenue,
+            icon: <TrendingUpIcon className="text-green-600" />,
+            bg: "bg-green-100 dark:bg-green-800/30",
+        },
+        {
+            name: "Sales",
+            value: totalRevenue,
+            icon: <PercentIcon className="text-blue-600" />,
+            bg: "bg-blue-100 dark:bg-blue-800/30",
+        },
+        {
+            name: "Profit",
+            value: totalProfit,
+            icon: <BarChartIcon className="text-purple-600" />,
+            bg: "bg-purple-100 dark:bg-purple-800/30",
+        },
+        {
+            name: "Cost",
+            value: totalRevenue - totalProfit,
+            icon: <MoneyOffIcon className="text-yellow-600" />,
+            bg: "bg-yellow-100 dark:bg-yellow-800/30",
+        },
+        {
+            name: "Expenses",
+            value: (totalProfit / 100 * 10),
+            icon: <ListAltIcon className="text-red-600" />,
+            bg: "bg-red-100 dark:bg-red-800/30",
+        },
+    ];
     return (
         <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
             <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>

@@ -24,19 +24,26 @@ export default function OverallInventory({ totalCategories, totalStock, lowStock
       name: "Low Stock Items",
       value: lowStockCount,
       icon: <TrendingDownIcon className="text-red-600" />,
-      bg: "bg-red-100 dark:bg-red-800/30",
+      bg: lowStockCount > 0
+        ? "bg-red-300 dark:bg-red-700/70 animate-pulse"
+        : "bg-red-100 dark:bg-red-800/30"
+
     },
     {
       name: "Out of Stock",
       value: outOfStockProducts,
       icon: <ErrorOutlineIcon className="text-orange-600" />,
-      bg: "bg-orange-100 dark:bg-orange-800/30",
+      bg: outOfStockProducts > 0
+        ? "bg-orange-300 dark:bg-orange-700/70 animate-pulse"
+        : "bg-orange-100 dark:bg-orange-800/30"
     },
     {
       name: "Expiring Soon",
       value: expiringSoonCount,
       icon: <AccessTimeIcon className="text-blue-600" />,
-      bg: "bg-blue-100 dark:bg-blue-800/30",
+      bg: expiringSoonCount > 0
+        ? "bg-blue-300 dark:bg-blue-700/70 animate-pulse"
+        : "bg-blue-100 dark:bg-blue-800/30"
     },
   ];
 

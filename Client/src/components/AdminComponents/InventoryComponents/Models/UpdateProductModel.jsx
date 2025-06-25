@@ -6,6 +6,9 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
 import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+
 
 const categories = [
   "Milk",
@@ -55,26 +58,28 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       : productDetails?.image?.[0]?.url || ""
   );
 
+
   useEffect(() => {
     if (selectedProduct) {
       setProductDetails({
-        _id: selectedProduct._id,
-        name: selectedProduct.name || "",
-        category: selectedProduct.category || "",
-        description: selectedProduct.description || "",
-        image: selectedProduct.image?.[0] || "",
-        shelfLife: selectedProduct.shelfLife || 0,
-        quantityUnit: selectedProduct.quantityUnit || "",
-        stock: selectedProduct.stock || 0,
-        thresholdVal: selectedProduct.thresholdVal || 0,
-        price: selectedProduct.price || 0,
-        nutrition: selectedProduct.nutrition || {},
-        discount: selectedProduct.discount || 0,
+        _id: selectedProduct?._id,
+        name: selectedProduct?.name || "",
+        category: selectedProduct?.category || "",
+        description: selectedProduct?.description || "",
+        image: selectedProduct?.image?.[0] || "",
+        shelfLife: selectedProduct?.shelfLife || 0,
+        quantityUnit: selectedProduct?.quantityUnit || "",
+        manufacturingCost: selectedProduct?.manufacturingCost || 0,
+        stock: selectedProduct?.stock || 0,
+        thresholdVal: selectedProduct?.thresholdVal || 0,
+        price: selectedProduct?.price || 0,
+        nutrition: selectedProduct?.nutrition || {},
+        discount: selectedProduct?.discount || 0,
       });
     }
   }, [selectedProduct]);
 
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -147,11 +152,31 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
-      <div className="bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={() => {
+        setUpdateModel(false)
+      }} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 50 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Update the Product
         </h2>
+
+        <button
+          onClick={() => {
+            setUpdateModel(false);
+          }}
+          className="absolute top-3 right-5 text-xl"
+        >X</button>
 
         <form onSubmit={handleUpdateProduct} className="space-y-6 text-sm sm:text-base">
           {/* Image upload */}
@@ -257,6 +282,15 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
             }
           />
 
+          <InputWithLabel
+            label="Manufacturing Cost for admin"
+            name="manufacturingCost"
+            value={productDetails?.manufacturingCost}
+            placeholder="Ex. 20Rs"
+            icon={<CurrencyRupeeIcon className="text-gray-500" />}
+            onChange={handleInputChange}
+          />
+
           {/* Product"s Shelflife and Selling Price */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
             <div className="w-1/2">
@@ -271,7 +305,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
             </div>
             <div className="w-1/2">
               <InputWithLabel
-                value={productDetails.price}
+                value={productDetails?.price}
                 label="Selling Price (₹)"
                 name="price"
                 placeholder="Ex: 50"
@@ -285,7 +319,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 ">
             <div className="w-1/2">
               <InputWithLabel
-                value={productDetails.stock}
+                value={productDetails?.stock}
                 label="Stock"
                 name="stock"
                 placeholder="Ex: 100"
@@ -374,8 +408,8 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div >
   );
 }
 

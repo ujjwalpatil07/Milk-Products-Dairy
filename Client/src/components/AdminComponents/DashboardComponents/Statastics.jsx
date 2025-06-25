@@ -12,6 +12,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+const theme = localStorage.getItem("theme");
 
 const options = {
   responsive: true,
@@ -20,19 +21,14 @@ const options = {
     legend: {
       position: 'top',
       labels: {
-        color: '#374151', 
+        color: `${theme === "light" ? "#1c1b1b" : "#E0E0E0"}`,
       },
-    },
-    title: {
-      display: true,
-      text: 'Weekly Sales Overview',
-      color: '#374151',
     },
   },
   scales: {
     x: {
       ticks: {
-        color: '#6B7280', 
+        color: '#6B7280',
       },
     },
     y: {
@@ -72,7 +68,9 @@ const data = {
 const Statistics = () => {
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
-      <div className="w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]">
+      <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>
+
+      <div className="w-full h-[450px] sm:h-[400px] md:h-[450px] lg:h-[600px]">
         <Bar options={options} data={data} />
       </div>
     </div>
