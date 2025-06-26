@@ -126,11 +126,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-
-
-
-    
-
     socket.on("review:add-new", async (data) => {
       const { productId, userId, message, rating, username, photo } = data;
 
