@@ -168,7 +168,7 @@ export default function MyWishlist() {
 
   return (
     <>
-      <h2 className="font-semibold text-xl w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
+      <h2 className="font-semibold text-xl w-full !h-fit md:h-full mx-auto flex justify-between items-center mb-4">
         My Wishlist
       </h2>
       {content}

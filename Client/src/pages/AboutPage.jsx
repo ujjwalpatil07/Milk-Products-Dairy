@@ -18,10 +18,6 @@ export default function AboutPage() {
 
       <section className="py-16 px-3 md:px-20 space-y-10">
         <div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center flex flex-col mb-10"
         >
           <h2 className="text-3xl md:text-5xl font-bold tracking-wide">

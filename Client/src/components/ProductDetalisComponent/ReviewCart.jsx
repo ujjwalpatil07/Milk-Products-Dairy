@@ -134,7 +134,7 @@ export default function ReviewCard({ id, productId, username, image, message, da
                         onChange={(e) => setEditMessage(e.target.value)}
                     />
                 ) : (
-                    <p className="text-sm text-gray-700 dark:text-gray-200 break-all">
+                    <p className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-line break-all">
                         {editMessage}
                     </p>
                 )}

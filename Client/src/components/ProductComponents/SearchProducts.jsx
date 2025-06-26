@@ -83,7 +83,7 @@ export default function SearchProducts({ query, handleInputChange }) {
                         <div className={`relative flex-1 ${showHeaderExtras && "max-w-150"}`}>
                             <input
                                 type="text"
-                                value={query}
+                                value={query || ""}
                                 onChange={handleInputChange}
                                 placeholder="Search products..."
                                 className={`w-full pl-4 pr-10 py-1.5 rounded-md bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none transition-colors duration-300 ${showHeaderExtras && "!bg-gray-500/10"}`}

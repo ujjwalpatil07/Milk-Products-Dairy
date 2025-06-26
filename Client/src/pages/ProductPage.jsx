@@ -3,45 +3,29 @@ import { useParams } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useDebounce } from "use-debounce";
-import ProductVarietyCart from "../components/ProductComponents/ProductVarietyCard";
 import { getTopProductsByReviewsAndLikes, recommendProducts, searchProducts, sortProducts } from "../utils/filterData";
 import ProductList from "../components/ProductComponents/ProductList";
 import SearchProducts from "../components/ProductComponents/SearchProducts";
 import RecommendedCard from "../components/ProductComponents/RecommendedCard";
+import ProductVarietyCart from "../components/ProductComponents/ProductVarietyCard";
 import { getAverageRating } from "../utils/averageRating";
 
 import { ProductContext } from "../context/ProductProvider";
-import { getProducts } from "../services/productServices";
 import { getRandomImage } from "../utils/imagePicker";
 
 export default function ProductPage() {
 
     const { productId } = useParams();
-    const { filter, products, setProducts } = useContext(ProductContext);
+    const { filter, products, productLoading } = useContext(ProductContext);
 
-    const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState(productId || "");
     const [debouncedQuery] = useDebounce(query, 300);
     const [visibleCount, setVisibleCount] = useState(5);
     const [visibleCount1, setVisibleCount1] = useState(3);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const dbProducts = await getProducts();
-                if(dbProducts?.success) {
-                    setProducts(dbProducts.products);
-                }
-            } catch (err) {
-                console.error("Error fetching products:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         setQuery(productId);
-        fetchProducts();
-    }, [productId, setProducts]);
+    }, [productId]);
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
@@ -65,7 +49,7 @@ export default function ProductPage() {
         <>
             <SearchProducts query={query} handleInputChange={handleInputChange} />
 
-            <div className="w-full px-3 lg:px-8 py-3 flex flex-col sm:flex-row md:gap-5">
+            <div className="w-full p-3 lg:px-8 flex flex-col sm:flex-row md:gap-5">
 
                 <motion.div
                     initial={{ opacity: 0, x: -30 }}
@@ -77,7 +61,7 @@ export default function ProductPage() {
                 </motion.div>
 
                 <div className="flex-1 space-y-5">
-                    {loading ? (
+                    {productLoading ? (
                         <div className="w-full flex justify-center text-gray-500 dark:text-gray-300 py-16 text-lg">
                             <div className="w-fit flex items-center gap-3">
                                 <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
@@ -87,7 +71,7 @@ export default function ProductPage() {
                     ) : (
                         <>
                             <section
-                                className="w-full lg:px-6"
+                                className="w-full"
                             >
                                 {(sortedFilteredProducts?.length ?? 0) === 0 ? (
                                     <div className="py-20 text-center">No products found matching your search/filter.</div>
@@ -115,7 +99,7 @@ export default function ProductPage() {
 
                             {recommendedProducts?.length > 0 && (
                                 <section
-                                    className="pt-5 lg:px-6"
+                                    className="pt-5"
                                 >
                                     <h2 className="text-lg font-semibold py-2">Recommended</h2>
 
@@ -147,9 +131,7 @@ export default function ProductPage() {
                             )}
 
                             {topProducts?.length > 0 && (
-                                <section
-                                    className="lg:px-6"
-                                >
+                                <section>
                                     <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
                                         Most Reviews & Likes
                                     </h2>

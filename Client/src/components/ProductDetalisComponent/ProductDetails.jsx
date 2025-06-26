@@ -9,6 +9,8 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -18,34 +20,48 @@ import { productLike } from "../../services/productServices";
 import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
 import { addToWishlist } from "../../services/userProfileService";
+import { ProductContext } from "../../context/ProductProvider";
+import { slugify } from "../../utils/slugify";
+import { getAverageRating } from "../../utils/averageRating";
 
-export default function ProductDetails({ id, name, description, image = [], discount, minQuantity, quantityUnit, type, stock, shelfLife, avgRating, reviewsLength, nutrition, likes, price }) {
+export default function ProductDetails({ productId }) {
 
     const navigate = useNavigate();
     const { authUser, setAuthUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
+    const { products } = useContext(ProductContext);
 
-    const minQty = Number(minQuantity) || 1;
-    const existing = cartItems?.find(item => item?.productId === id);
-
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [quantity, setQuantity] = useState(0);
-    const [selectedImage, setSelectedImage] = useState(image[0] || "");
-    const [localLikes, setLocalLikes] = useState(likes || []);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [localLikes, setLocalLikes] = useState([]);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
 
     useEffect(() => {
-        setLocalLikes(likes || []);
-        setIsWishlisted(authUser?.wishlistedProducts?.includes(id));
-    }, [id, likes, authUser]);
 
-    useEffect(() => {
-        setSelectedImage(image[0]);
-    }, [image]);
+        if (!productId || !products) return;
 
-    const priceNumber = Number(price) || 0;
-    const discountPercent = Number(discount) || 0;
+        if (products.length === 0) {
+            setSelectedProduct(null);
+            return;
+        }
+
+        const selected = products.find((p) => slugify(p._id) === productId);
+        setSelectedProduct(selected);
+        setIsWishlisted(authUser?.wishlistedProducts?.includes(productId));
+        setLocalLikes(selected?.likes || []);
+        setSelectedImage(selected?.image[0]);
+    }, [productId, products, authUser?.wishlistedProducts]);
+
+    const minQty = Number(selectedProduct?.minQuantity) || 1;
+    const existing = cartItems?.find(item => item?.productId === productId);
+    const stock = selectedProduct?.stock || 0;
+    const avgRating = getAverageRating(selectedProduct?.reviews) || 0;
+
+    const priceNumber = Number(selectedProduct?.price) || 0;
+    const discountPercent = Number(selectedProduct?.discount) || 0;
     const { discountedPrice, saved } = getDiscountedPrice(priceNumber, discountPercent);
 
 
@@ -123,7 +139,7 @@ export default function ProductDetails({ id, name, description, image = [], disc
                     ...prev,
                     wishlistedProducts: Array.isArray(prev?.wishlistedProducts)
                         ? [...prev.wishlistedProducts, productId]
-                        : [productId], 
+                        : [productId],
                 }));
             } else {
                 toast.error(data?.error || "Something went wrong.");
@@ -148,7 +164,7 @@ export default function ProductDetails({ id, name, description, image = [], disc
                         (!selectedImage || selectedImage === 'null') ? (<div className="w-full h-[200px] md:h-[400px] flex flex-col items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 rounded-xl" >
                             <EmojiFoodBeverageIcon className="text-gray-400 dark:text-gray-300 text-5xl" />
                             <span className="text-gray-500 dark:text-gray-300 text-sm font-medium hover:text-blue-500">
-                                {name}
+                                {selectedProduct?.name}
                             </span>
                         </div>) : (
                             <img
@@ -161,7 +177,7 @@ export default function ProductDetails({ id, name, description, image = [], disc
 
                     {!localLikes?.includes(authUser?._id) && (
                         <button
-                            onClick={() => handleLikeProduct(id)}
+                            onClick={() => handleLikeProduct(productId)}
                             className="absolute top-4 right-4 md:top-8 md:right-8 bg-white rounded-full w-8 h-8 flex items-center justify-center text-red-500 hover:bg-white/50 dark:bg-gray-500/50 transition-colors cursor-pointer"
                             disabled={likeLoading}
                         >
@@ -176,7 +192,7 @@ export default function ProductDetails({ id, name, description, image = [], disc
                 </div>
 
                 <div className="flex justify-center gap-2 flex-wrap">
-                    {image?.map((img, idx) => (
+                    {selectedProduct?.image?.map((img, idx) => (
                         <button
                             key={idx * 0.8}
                             onClick={() => setSelectedImage(img)}
@@ -201,30 +217,30 @@ export default function ProductDetails({ id, name, description, image = [], disc
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="flex-1"
             >
-                <h2 className="text-2xl font-bold mb-1">{name}</h2>
+                <h2 className="text-2xl font-bold mb-1">{selectedProduct?.name || "Not Defined"}</h2>
 
                 <div className="flex items-center gap-3 mb-1 flex-wrap">
                     <div className="text-gray-600 dark:text-gray-300 font-semibold text-sm">
                         <span>Quality: </span>
-                        <span>{type}</span>
+                        <span>{selectedProduct?.type || "Unknown"}</span>
                     </div>
                     <span className="border-e-2 border-gray-300 dark:border-gray-500 py-[5.2px]"></span>
                     <div className="text-yellow-500 font-semibold flex items-center gap-2">
-                        <div className="dark:bg-white flex p-0.5 rounded">
+                        <div className="dark:bg-white flex px-1 py-0.5 rounded">
                             <Rating sx={{ fontSize: "1rem" }} name="read-only" value={avgRating} readOnly />
                         </div>
                         <span>{avgRating}</span>
-                        <span className="text-gray-500 dark:text-gray-300 text-sm">({reviewsLength} reviews)</span>
+                        <span className="text-gray-500 dark:text-gray-300 text-sm">({selectedProduct?.reviews?.length || 0} reviews)</span>
                     </div>
                     <span className="border-e-2 border-gray-300 dark:border-gray-500 py-[5.2px]"></span>
                     <p className="text-gray-500 dark:text-gray-300 text-sm font-semibold">
-                        Shelf Life: {shelfLife}
+                        Shelf Life: {selectedProduct?.shelfLife || "Not specified"}
                     </p>
                 </div>
 
                 {stock > 0 ? (
                     <div className="bg-red-600/10 text-red-500 px-2 rounded text-[14px] inline-block mb-1">
-                        AVAILABILITY: ONLY {stock} {(quantityUnit || "").toUpperCase()} IN STOCK
+                        AVAILABILITY: ONLY {stock} {(selectedProduct?.quantityUnit || "Unit").toUpperCase()} IN STOCK
                     </div>
                 ) : (
                     <div className="text-red-600 font-semibold text-[14px] mb-1">
@@ -233,19 +249,19 @@ export default function ProductDetails({ id, name, description, image = [], disc
                 )}
 
                 <div className="text-green-700 dark:text-green-500 font-semibold text-sm mb-3">
-                    Minimum Quantity: {minQuantity || 1} {quantityUnit}
+                    Minimum Quantity: {minQty || 1} {selectedProduct?.quantityUnit || "Unit"}
                 </div>
 
                 <div className="border-t border-dashed border-gray-500/50 pt-2">
                     <h3 className="font-bold pb-1">Description: </h3>
-                    <p className="whitespace-pre-line text-gray-500 dark:text-gray-200 text-sm line-clamp-15">{description}</p>
+                    <p className="whitespace-pre-line text-gray-500 dark:text-gray-200 text-sm line-clamp-15">{selectedProduct?.description || "No description available"}</p>
                 </div>
 
-                {nutrition && (
+                {selectedProduct?.nutrition && (
                     <div className="my-4">
                         <h3 className="font-semibold mb-1">Nutrition Facts:</h3>
                         <ul className="list-disc list-inside space-y-1 text-sm text-gray-500 dark:text-gray-200">
-                            {Object.entries(nutrition).map(([key, value]) => (
+                            {Object.entries(selectedProduct?.nutrition).map(([key, value]) => (
                                 <li key={key} className="capitalize">
                                     <span className="font-medium">{key}:</span> {value}
                                 </li>
@@ -256,42 +272,44 @@ export default function ProductDetails({ id, name, description, image = [], disc
 
                 <br />
 
-                {existing && (
-                    <span className="text-sm text-gray-500 dark:text-gray-300">
-                        In Cart: {existing?.quantity} {quantityUnit}
-                    </span>
-                )}
-
-                {
-                    !wishlistLoading ? (
-                        <button
-                            onClick={() => handleAddProductInWishlist(id)}
-                            disabled={isWishlisted}
-                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-300
+                <div className="flex justify-between items-center">
+                    {
+                        !wishlistLoading ? (
+                            <button
+                                onClick={() => handleAddProductInWishlist(productId)}
+                                disabled={isWishlisted}
+                                className={`flex items-center gap-1 px-3 py-1.5 rounded transition-all duration-300
                                      ${isWishlisted
-                                    ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
-                                    : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
-                                }
+                                        ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
+                                        : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
+                                    }
                                  disabled:cursor-not-allowed`}
-                        >
-                            {isWishlisted ? (
-                                <FavoriteIcon sx={{ fontSize: "1.3rem" }} />
-                            ) : (
-                                <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
-                            )}
-                            <span className="text-sm">{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
-                        </button>
-                    ) : (
-                        <button
-                            className={`flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-300
+                            >
+                                {isWishlisted ? (
+                                    <BookmarkIcon sx={{ fontSize: "1.3rem" }} />
+                                ) : (
+                                    <BookmarkBorderIcon sx={{ fontSize: "1.3rem" }} />
+                                )}
+                                <span className="text-sm">{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
+                            </button>
+                        ) : (
+                            <button
+                                className={`flex items-center gap-3 px-3 py-1.5 rounded transition-all duration-300
         bg-white text-gray-700 dark:bg-gray-500/20 dark:text-gray-100`}
-                            disabled
-                        >
-                            <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm">Adding...</span>
-                        </button>
-                    )
-                }
+                                disabled
+                            >
+                                <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="text-sm">Adding...</span>
+                            </button>
+                        )
+                    }
+
+                    {existing && (
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
+                            In Cart: {existing?.quantity} {selectedProduct?.quantityUnit || "Unit"}
+                        </span>
+                    )}
+                </div>
 
                 <div className="flex items-center justify-between pt-3">
                     <div className="mb-3">
@@ -374,15 +392,15 @@ export default function ProductDetails({ id, name, description, image = [], disc
 
                 <div className="py-5 grid grid-cols-2 gap-2">
                     <button
-                        onClick={() => handleBuyProductNow(id)}
-                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
+                        onClick={() => handleBuyProductNow(productId)}
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
                     >
                         <span>Buy Now</span>
                     </button>
                     <button
-                        onClick={() => handleAddProduct(id)}
+                        onClick={() => handleAddProduct(productId)}
                         disabled={quantity === 0 || quantity > stock}
-                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         <ShoppingCartIcon sx={{ fontSize: "1.2rem" }} />
                         <span>Add to Cart</span>
@@ -395,19 +413,5 @@ export default function ProductDetails({ id, name, description, image = [], disc
 };
 
 ProductDetails.propTypes = {
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    image: PropTypes.arrayOf(PropTypes.string),
-    discount: PropTypes.number.isRequired,
-    minQuantity: PropTypes.number.isRequired,
-    quantityUnit: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    stock: PropTypes.number.isRequired,
-    shelfLife: PropTypes.string,
-    avgRating: PropTypes.string,
-    reviewsLength: PropTypes.string,
-    nutrition: PropTypes.objectOf(PropTypes.string),
-    likes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    price: PropTypes.string,
+    productId: PropTypes.string.isRequired,
 };

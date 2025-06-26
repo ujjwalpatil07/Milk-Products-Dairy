@@ -280,6 +280,7 @@ export default function AccountInfo() {
 
 if (!dbData) {
   return (
+<<<<<<< main
     <div className="flex flex-col items-center justify-center py-20 text-gray-500">Unable to fetch user data, please try again.</div>
   )
 }
@@ -303,5 +304,21 @@ return (
     {content}
   </>
 );
+=======
+    <>
+      <div className="w-full !h-fit md:h-full mx-auto flex justify-between items-center mb-4">
+        <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
+          <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
+        </h3>
+        <button
+          type="button"
+          onClick={() => setEdit(!edit)}
+          className="px-4 py-2 text-sm bg-[#414141] text-white rounded transition duration-300 flex items-center gap-2"
+        >
+          <FaEdit />
+          {edit ? "Cancel" : "Edit Profile"}
+        </button>
+      </div>
+>>>>>>> main
 
 }

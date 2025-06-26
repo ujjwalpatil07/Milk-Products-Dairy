@@ -29,8 +29,23 @@ import Payments from "../pages/UserProfile/Payments";
 import Stores from "../pages/Admin/Stores";
 import StoreOrdersHistory from "../pages/Admin/StoreOrdersHistory";
 import Profile from "../pages/Admin/Profile";
+import { useEffect } from "react";
+import { socket } from "../socket/socket";
+import { toast } from "react-toastify";
 
 export default function Routers() {
+
+    const handleErrorMessage = (data) => {
+        toast.error(data?.message);
+    }
+
+    useEffect(() =>{
+        socket.on("server-error", handleErrorMessage);
+
+        return () =>{
+            socket.off("server-error", handleErrorMessage);
+        }
+    }, []);
 
     return (
         <Routes>

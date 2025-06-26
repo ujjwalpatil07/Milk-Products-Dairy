@@ -1,57 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
+import { MenuItem, Button, Menu, Badge } from "@mui/material";
 import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey } from "react-icons/fa";
 import { getUserOrders } from "../../services/orderService";
 import { UserAuthContext } from "../../context/AuthProvider";
-import OrderStatCard from "../../components/UserOrderComponents/OrderStatCard";
 
 export default function MyOrders() {
   const { authUser } = useContext(UserAuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("All");
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (authUser?._id) {
-          const res = await getUserOrders(authUser._id);
-          setOrders((res.orders || []).reverse());
-        }
-      } catch (err) {
-        console.error("Failed to fetch orders:", err);
-        setError("Something went wrong while fetching orders.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [authUser?._id]);
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "Pending":
-        return <FaHourglassHalf className="text-yellow-500" />;
-      case "Processing":
-        return <FaBoxOpen className="text-blue-500" />;
-      case "Shipped":
-        return <FaShippingFast className="text-purple-500" />;
-      case "Delivered":
-        return <FaCheckCircle className="text-green-600" />;
-      case "Cancelled":
-        return <FaTimesCircle className="text-red-500" />;
-      case "Confirmed":
-        return <FaCheckCircle className="text-blue-500" />;
-      default:
-        return null;
-    }
-  };
-
-  const filteredOrders = selectedStatus === "All"
-    ? orders
-    : orders.filter((order) => order.status === selectedStatus);
-
 
   const orderStats = {
     Pending: 0,
@@ -78,6 +35,63 @@ export default function MyOrders() {
     { title: "Cancelled", count: orderStats.Cancelled, color: "bg-red-500", icon: <FaTimesCircle /> },
   ];
 
+  const [selectedStatus, setSelectedStatus] = useState(statCards[0]);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        if (authUser?._id) {
+          const res = await getUserOrders(authUser._id);
+          setOrders((res.orders || []).reverse());
+        }
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+        setError("Something went wrong while fetching orders.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [authUser?._id]);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelect = (card) => {
+    setSelectedStatus(card);
+    handleClose();
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "Pending":
+        return <FaHourglassHalf className="text-yellow-500" />;
+      case "Processing":
+        return <FaBoxOpen className="text-blue-500" />;
+      case "Shipped":
+        return <FaShippingFast className="text-purple-500" />;
+      case "Delivered":
+        return <FaCheckCircle className="text-green-600" />;
+      case "Cancelled":
+        return <FaTimesCircle className="text-red-500" />;
+      case "Confirmed":
+        return <FaCheckCircle className="text-blue-500" />;
+      default:
+        return null;
+    }
+  };
+
+  const filteredOrders = (selectedStatus.title === "All")
+    ? orders
+    : orders.filter((order) => order.status === selectedStatus.title);
+
   let content;
   if (loading) {
     content = (
@@ -88,7 +102,7 @@ export default function MyOrders() {
     );
   } else if (!filteredOrders || filteredOrders.length === 0) {
     content = (
-      <div className="text-center text-gray-600 dark:text-gray-300 py-16">
+      <div className="text-center text-gray-600 dark:text-gray-300 py-16 w-full">
         You haven't placed any orders yet.
       </div>
     );
@@ -198,22 +212,47 @@ export default function MyOrders() {
 
   return (
     <>
-      <h2 className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4 text-xl font-bold">My Orders</h2>
+      <div className="flex justify-between items-center sticky top-0 mb-4">
+        <h2 className="w-fit !h-fit flex justify-between items-centertext-xl font-bold backdrop-blur-md px-2 py-1 rounded">My Orders</h2>
 
-      <div className="sticky top-0 left-0 flex sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 overflow-x-auto p-1 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-lg shadow-sm scrollbar-hide">
-        {statCards.map((card) => (
-          <button
-            key={card.title}
-            onClick={() => setSelectedStatus(card.title)}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <Button
+            id="basic-button"
+            aria-controls={open ? "basic-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+            className="!capitalize !rounded-md !shadow !p-0"
           >
-            <OrderStatCard
-              title={card.title}
-              count={card.count}
-              color={`${card.color} ${selectedStatus !== card.title ? "rounded-md" : "ring-2 ring-offset-2 ring-[#843E71]"}`}
-              icon={card.icon}
-            />
-          </button>
-        ))}
+            <div className={`flex items-center text-white rounded gap-2 px-2 py-1 ${selectedStatus.color}`} >
+              {selectedStatus.icon}
+              <span>{selectedStatus.title}</span>
+              {selectedStatus.count}
+            </div>
+          </Button>
+
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+
+          >
+            {statCards.map((card) => (
+              <MenuItem key={card.title} onClick={() => handleSelect(card)} sx={{ paddingY: "2px", paddingX: "15px" }}>
+                <div
+                  className={`flex items-center justify-between w-40 px-3 py-2 rounded text-white ${card.color} }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {card.icon}
+                    <span className="font-medium">{card.title}</span>
+                  </div>
+                  <span className="text-sm font-semibold">{card.count}</span>
+                </div>
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
       </div>
 
       {content}

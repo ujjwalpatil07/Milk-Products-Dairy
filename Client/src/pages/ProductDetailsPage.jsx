@@ -13,54 +13,34 @@ import ProductDetails from "../components/ProductDetalisComponent/ProductDetails
 import ReviewSection from "../components/ProductDetalisComponent/ReviewSection.jsx";
 
 import { slugify } from "../utils/slugify";
-import { getAverageRating } from "../utils/averageRating";
 import { recommendProducts } from "../utils/filterData";
 import { unslugify } from "../utils/unslugify.js"
-
-import { getProductByName, getProducts } from "../services/productServices.js";
-
+import { ProductContext } from "../context/ProductProvider.jsx";
 
 export default function ProductDetailsPage() {
 
     const { productId } = useParams();
     const { theme } = useContext(ThemeContext);
+    const { products, productLoading } = useContext(ProductContext);
 
     const [page, setPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [relatedProducts, setRelatedProducts] = useState([]);
-    const [recommendProductLoading, setRecommendProductLoading] = useState(true);
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                setLoading(true);
-                const { product } = await getProductByName(unslugify(productId));
-                setSelectedProduct(product);
-            } catch (error) {
-                console.log(error?.response?.data?.message || "Failed to fetch product");
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (!productId || !products) return;
 
-        const fetchAllProducts = async () => {
-            try {
-                const dbProducts = await getProducts();
-                if (dbProducts?.products) {
-                    const currRelatedProducts = recommendProducts(dbProducts.products, productId);
-                    setRelatedProducts(currRelatedProducts)
-                }
-            } catch (err) {
-                console.error("Error fetching products:", err);
-            } finally {
-                setRecommendProductLoading(false);
-            }
-        };
+        if (products.length === 0) {
+            setSelectedProduct(null);
+            return;
+        }
 
-        fetchProduct();
-        fetchAllProducts();
-    }, [productId]);
+        const selected = products.find((p) => slugify(p.name) === productId);
+        setSelectedProduct(selected);
+
+        const currRelatedProducts = recommendProducts(products, productId);
+        setRelatedProducts(currRelatedProducts);
+    }, [productId, products]);
 
     const totalPages = Math.ceil(relatedProducts.length / 10);
     const startIndex = (page - 1) * 10;
@@ -70,7 +50,7 @@ export default function ProductDetailsPage() {
         setPage(value);
     };
 
-    if (loading) {
+    if (productLoading) {
         return (
             <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
                 <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
@@ -79,10 +59,14 @@ export default function ProductDetailsPage() {
         );
     }
 
-    if (!selectedProduct || !productId) {
+    if (!selectedProduct) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-white text-lg mb-3">{unslugify(productId)} Product not found.</p>
+                <p className="text-gray-600 dark:text-white text-lg mb-3">
+                    {products.length === 0
+                        ? "No products available in the store."
+                        : `${unslugify(productId)} Product not found.`}
+                </p>
                 <Link
                     to="/products"
                     className="mt-4 px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E71] transition"
@@ -98,35 +82,13 @@ export default function ProductDetailsPage() {
             <section className="px-3 md:px-6 py-6 md:py-10 md:max-w-6xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-6 ">
                     <ProductDetails
-                        id={selectedProduct?._id || ""}
-                        name={selectedProduct?.name || "Unnamed Product"}
-                        description={selectedProduct?.description || "No description available."}
-                        image={selectedProduct?.image || []}
-                        discount={selectedProduct?.discount || 0}
-                        minQuantity={selectedProduct?.minQuantity || 1}
-                        quantityUnit={selectedProduct?.quantityUnit || "Unit"}
-                        type={selectedProduct?.type || "N/A"}
-                        stock={selectedProduct?.stock ?? 0}
-                        shelfLife={selectedProduct?.shelfLife || "N/A"}
-                        avgRating={getAverageRating(selectedProduct?.reviews || [])}
-                        reviewsLength={selectedProduct?.reviews?.length || 0}
-                        nutrition={selectedProduct?.nutrition || new Map()}
-                        likes={selectedProduct?.likes || []}
-                        price={selectedProduct?.price ?? 0}
+                        productId={selectedProduct?._id || ""}
                     />
-
                 </div>
             </section>
 
             {
-                recommendProductLoading && <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3 border-t border-dashed border-gray-500/50">
-                    <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
-                    <span>Recommended Products...</span>
-                </div>
-            }
-
-            {
-                (relatedProducts?.length > 0 && !recommendProductLoading) && <section
+                (relatedProducts?.length > 0) && <section
                     className="px-3 md:px-6 pb-6 md:pb-10 md:max-w-6xl mx-auto"
                 >
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
@@ -16,12 +16,12 @@ import Slide from '@mui/material/Slide';
 import { CartContext } from "../context/CartProvider";
 import { UserAuthContext } from "../context/AuthProvider";
 import { calculateCartTotals, getCartProductDetails } from "../utils/cartUtils";
-import { getProducts } from "../services/productServices";
-import { placeNewOrder } from "../services/orderService";
 import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
 import { razorpayOrderPayment } from "../services/paymentService";
 import { ThemeContext } from "../context/ThemeProvider";
+import { ProductContext } from "../context/ProductProvider";
+import { socket } from "../socket/socket";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -32,34 +32,39 @@ export default function OrderCheckoutPage() {
   const { theme } = useContext(ThemeContext);
   const { authUser, deliveryAddress } = useContext(UserAuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
+  const { products, productLoading } = useContext(ProductContext);
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [allProducts, setAllProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
-  useEffect(() => {
-    const getAllProducts = async () => {
-      try {
-        const res = await getProducts();
-        if (res?.success) {
-          setAllProducts(res?.products || []);
-        }
-      } catch (error) {
-        toast.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const orderPlaceConfirmation = useCallback((data) => {
+    toast.success(data.message || "Order placed successfully!");
+    clearCart();
+    setOpen(false);
+    navigate(`/user-profile/orders`);
+  }, [clearCart, navigate]);
 
-    getAllProducts();
-  }, []);
+  const orderPlaceFailed = (error) => {
+    setOrderLoading(false);
+    toast.error(error?.message || "Something went wrong while placing the order.");
+  }
+
+  useEffect(() => {
+    socket.on("new-order-place-success", orderPlaceConfirmation);
+    socket.on("new-order-place-failed", orderPlaceFailed);
+
+    return () => {
+      socket.off("new-order-place-success", orderPlaceConfirmation);
+      socket.off("new-order-place-failed", orderPlaceFailed);
+    }
+  }, [orderPlaceConfirmation]);
+
 
   const cartDetails = useMemo(
-    () => getCartProductDetails(cartItems, allProducts),
-    [cartItems, allProducts]
+    () => getCartProductDetails(cartItems, products),
+    [cartItems, products]
   );
 
   const { subtotal, totalAmount, totalSaving } = useMemo(() => {
@@ -78,7 +83,6 @@ export default function OrderCheckoutPage() {
   const handlePlaceOrder = async (selectedMode) => {
 
     setSelectedPaymentMode(selectedMode);
-    setOrderLoading(true);
 
     const orderData = {
       address: deliveryAddress?._id,
@@ -98,18 +102,11 @@ export default function OrderCheckoutPage() {
       userId: authUser?._id
     };
 
-    try {
+    setOrderLoading(true);
 
+    try {
       if (selectedMode === "Cash on Delivery") {
-        const response = await placeNewOrder(orderData);
-        if (response?.success) {
-          toast.success("Order placed successfully!");
-          clearCart();
-          setOpen(false);
-          navigate(`/user-profile/orders`);
-        } else {
-          toast.error(response?.message || "Failed to place order");
-        }
+        socket.emit("place-new-order", { orderData });
       } else if (selectedMode === "Online") {
 
         const data = await razorpayOrderPayment(totalAmount);
@@ -127,23 +124,7 @@ export default function OrderCheckoutPage() {
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             };
-
-            try {
-              const finalResponse = await placeNewOrder({
-                ...orderData,
-                paymentInfo,
-              });
-              if (finalResponse?.success) {
-                toast.success("Order placed successfully!");
-                clearCart();
-                setOpen(false);
-                navigate("/user-profile/orders");
-              } else {
-                toast.error(finalResponse?.message || "Order failed after payment. Please contact support.");
-              }
-            } catch {
-              toast.error("Error completing order after payment. Please contact support.");
-            }
+            socket.emit("place-new-order", { orderData, paymentInfo });
           },
           prefill: {
             name: authUser?.firstName && authUser?.lastName
@@ -167,7 +148,7 @@ export default function OrderCheckoutPage() {
     }
   };
 
-  if (loading) {
+  if (productLoading) {
     return (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
         <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>

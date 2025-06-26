@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import http from "http";
 
 import AuthAdminRoute from "./routes/AuthRoutes/authAdminRoute.mjs";
 import AuthUserRoute from "./routes/AuthRoutes/authUserRoute.mjs";
@@ -11,6 +12,7 @@ import OrderRoute from "./routes/orderRoutes.js";
 import PaymentRoute from "./routes/paymentRoutes.js";
 import StoreRoute from "./routes/storeRoutes.js";
 import PDFRoute from "./routes/pdfRoutes.js";
+import { connectToSocket } from "./socket/socket.js";
 
 import { connectDB } from "./config/db.js";
 
@@ -19,10 +21,18 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 9001;
 
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true
+}));
 
 connectDB();
+const server = http.createServer(app);
+connectToSocket(server);
+
 
 app.use("/admin", AuthAdminRoute);
 
@@ -55,7 +65,7 @@ app.use((err, req, res, next) => {
 });
 
 const startServer = async () => {
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 };

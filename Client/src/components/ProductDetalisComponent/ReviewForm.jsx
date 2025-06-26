@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Rating } from "@mui/material";
 import { toast } from "react-toastify";
-import { addNewProductReview } from "../../services/productServices";
 import { UserAuthContext } from "../../context/AuthProvider";
+import { socket } from "../../socket/socket";
 
 const ReviewForm = ({ productId }) => {
 
@@ -14,6 +14,28 @@ const ReviewForm = ({ productId }) => {
     const [message, setMessage] = useState("");
     const [rating, setRating] = useState(5);
     const [loading, setLoading] = useState(false);
+
+    const handleReviewSuccess = (data) => {
+        toast.success(data?.message);
+        setMessage("");
+        setRating(5);
+        setLoading(false);
+    }
+
+    const handleReviewFailed = (data) => {
+        toast.error(data.message);
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        socket.on("new-review-add-success", handleReviewSuccess);
+        socket.on("review:add-failed", handleReviewFailed);
+
+        return () => {
+            socket.off("new-review-add-success", handleReviewSuccess);
+            socket.off("review:add-failed", handleReviewFailed);
+        }
+    }, []);
 
     const handleSubmitReview = async (e) => {
         e.preventDefault();
@@ -33,25 +55,15 @@ const ReviewForm = ({ productId }) => {
             return;
         }
 
-        try {
-            setLoading(true);
-
-            const data = await addNewProductReview(productId, authUser._id, message.trim(), rating);
-
-            if (data?.success) {
-                toast.success("Review submitted successfully!");
-                setMessage("");
-                setRating(5);
-
-            } else {
-                toast.error(data?.error || "Failed to submit review.");
-            }
-        } catch (error) {
-            console.log(error)
-            toast.error(error?.response?.data?.error || error.message || "Failed to submit review.");
-        } finally {
-            setLoading(false);
-        }
+        setLoading(true);
+        socket.emit("review:add-new", {
+            productId,
+            userId: authUser._id,
+            message: message.trim(),
+            rating,
+            username: authUser?.username,
+            photo: authUser?.photo,
+        });
     };
 
     return (

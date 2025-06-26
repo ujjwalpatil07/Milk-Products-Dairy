@@ -25,7 +25,6 @@ export default function ReviewSection({ reviews, productId }) {
   const [page, setPage] = useState(1);
   const reviewsPerPage = 10;
 
-
   const filteredReviews = useMemo(
     () => filterReviews(reviews, selected),
     [reviews, selected]
