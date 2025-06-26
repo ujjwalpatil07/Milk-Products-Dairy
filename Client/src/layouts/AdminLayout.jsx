@@ -5,6 +5,7 @@ import { useLocation, Link } from "react-router-dom";
 import { SidebarProvider } from "../context/SidebarProvider";
 import AdminNavbar from "../components/AdminComponents/AdminNavbar";
 import { AdminAuthContext } from "../context/AuthProvider";
+import AdminOrderProvider from "../context/AdminOrderProvider";
 
 export default function AdminLayout({ children }) {
 
@@ -47,15 +48,17 @@ export default function AdminLayout({ children }) {
     }
 
     return (
-        <SidebarProvider>
-            <div ref={scrollRef} className="h-screen scroll-smooth flex overflow-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-                <Sidebar />
-                <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
-                    <AdminNavbar />
-                    {children}
-                </main>
-            </div>
-        </SidebarProvider>
+        <AdminOrderProvider>
+            <SidebarProvider>
+                <div ref={scrollRef} className="h-screen scroll-smooth flex overflow-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
+                    <Sidebar />
+                    <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
+                        <AdminNavbar />
+                        {children}
+                    </main>
+                </div>
+            </SidebarProvider>
+        </AdminOrderProvider>
     )
 }
 
