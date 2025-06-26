@@ -61,7 +61,6 @@ export default function OrderCheckoutPage() {
     }
   }, [orderPlaceConfirmation]);
 
-
   const cartDetails = useMemo(
     () => getCartProductDetails(cartItems, products),
     [cartItems, products]

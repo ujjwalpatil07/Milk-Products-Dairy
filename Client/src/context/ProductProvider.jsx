@@ -1,4 +1,4 @@
-import { useMemo, useState, createContext, useEffect } from "react";
+import { useMemo, useState, createContext, useEffect, useCallback } from "react";
 import { getProducts } from "../services/productServices";
 import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
@@ -29,19 +29,19 @@ export const ProductProvider = ({ children }) => {
         fetchProducts();
     }, []);
 
-    const updateProducts = ({ updatedData }) => {
+    const updateProducts = useCallback(({ updatedData }) => {
 
         const updateMap = new Map();
-        updatedData.forEach((u) => {
-            updateMap.set(u.productId, u.change);
+        updatedData?.forEach((u) => {
+            updateMap?.set(u?.productId, u?.change);
         });
 
         setProducts((prevProducts) =>
-            prevProducts.map((product) => {
-                const change = updateMap.get(product?._id)
+            prevProducts?.map((product) => {
+                const change = updateMap?.get(product?._id)
                 if (change !== undefined) {
-                    const updatedStock = Math.max(product.stock + change, 0);
-                    const updatedSoldQuantity = product.totalQuantitySold + (-1 * change)
+                    const updatedStock = Math.max(product?.stock + change, 0);
+                    const updatedSoldQuantity = product?.totalQuantitySold + (-1 * change)
                     return {
                         ...product,
                         stock: updatedStock,
@@ -51,53 +51,119 @@ export const ProductProvider = ({ children }) => {
                 return product;
             })
         );
-    }
+    }, []);
 
-    const handleAddReviewSuccess = ({ review, productId }) => {
+    const handleAddReviewSuccess = useCallback(({ review, productId }) => {
 
         setProducts((prevProducts) => {
-            return prevProducts.map((p) => {
-                if (p._id === productId) {
+            return prevProducts?.map((p) => {
+                if (p?._id === productId) {
                     return {
                         ...p,
-                        reviews: [...(p.reviews || []), review],
+                        reviews: [...(p?.reviews || []), review],
                     }
                 }
                 return p;
             })
         });
-    }
+    }, []);
 
-    const removeReviewFromProduct = (product, productId, reviewId) => {
-        if (product._id !== productId) return product;
+    const removeReviewFromProduct = useCallback((product, productId, reviewId) => {
+        if (product?._id !== productId) return product;
 
-        const updatedReviews = (product.reviews || []).filter(
-            (review) => review._id !== reviewId
+        const updatedReviews = (product?.reviews || [])?.filter(
+            (review) => review?._id !== reviewId
         );
 
         return { ...product, reviews: updatedReviews };
-    };
+    }, []);
 
-    const handleRemoveReviewSuccess = ({ productId, reviewId }) => {
+    const handleRemoveReviewSuccess = useCallback(({ productId, reviewId }) => {
         setProducts((prevProducts) => {
-            return prevProducts.map((product) =>
+            return prevProducts?.map((product) =>
                 removeReviewFromProduct(product, productId, reviewId)
             );
         });
-    };
+    }, [removeReviewFromProduct]);
+
+    const handleReviewEditSuccess = useCallback(({ productId, reviewId, message, rating }) => {
+        const updateReview = (review) => {
+            if (review?._id === reviewId) {
+                return {
+                    ...review,
+                    message,
+                    rating,
+                };
+            }
+            return review;
+        };
+
+        const updateProduct = (product) => {
+            if (product?._id !== productId) return product;
+
+            const updatedReviews = (product?.reviews || []).map(updateReview);
+
+            return {
+                ...product,
+                reviews: updatedReviews,
+            };
+        };
+
+        setProducts((prevProducts) => {
+            return prevProducts?.map(updateProduct);
+        });
+    }, []);
+
+    const handleReviewLikeSuccess = useCallback(({ userId, productId, reviewId }) => {
+        const updateReviewLikes = (review) => {
+            if (review?._id !== reviewId) return review;
+
+            const alreadyLiked = review?.likes?.includes(userId);
+            if (!alreadyLiked) {
+                return {
+                    ...review,
+                    likes: [...review.likes, userId],
+                };
+            }
+            return review;
+        };
+
+        const updateProductReviews = (product) => {
+            if (product?._id !== productId) return product;
+
+            const updatedReviews = (product?.reviews || []).map(updateReviewLikes);
+
+            return {
+                ...product,
+                reviews: updatedReviews,
+            };
+        };
+
+        setProducts((prevProducts) => {
+            return prevProducts?.map(updateProductReviews);
+        });
+    }, []);
+
 
     useEffect(() => {
         socket.on("product-stock-update", updateProducts);
         socket.on("review:add-success", handleAddReviewSuccess);
         socket.on("review:remove-success", handleRemoveReviewSuccess);
+        socket.on("review:edit-success", handleReviewEditSuccess);
+        socket.on("review:like-success", handleReviewLikeSuccess);
 
         return () => {
             socket.off("product-stock-update", updateProducts);
             socket.off("review:add-success", handleAddReviewSuccess);
             socket.off("review:remove-success", handleRemoveReviewSuccess);
-
+            socket.off("review:edit-success", handleReviewEditSuccess);
+            socket.off("review:like-success", handleReviewLikeSuccess);
         }
-    }, []);
+    }, [updateProducts,
+        handleAddReviewSuccess,
+        handleRemoveReviewSuccess,
+        handleReviewEditSuccess,
+        handleReviewLikeSuccess]);
 
     const contextValue = useMemo(() => ({
         filter,

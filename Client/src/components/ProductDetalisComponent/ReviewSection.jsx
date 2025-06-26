@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -6,9 +6,11 @@ import { Star, StarBorder } from "@mui/icons-material";
 import Pagination from "@mui/material/Pagination";
 import { getAverageRating } from "../../utils/averageRating";
 import { ThemeContext } from "../../context/ThemeProvider";
-import ReviewCard from "./ReviewCart";
+import ReviewCard from "./ReviewCard";
 import { filterReviews } from "../../utils/filterReviews";
 import ReviewForm from "./ReviewForm";
+import { ProductContext } from "../../context/ProductProvider";
+import { slugify } from "../../utils/slugify";
 
 const filters = [
   { label: "All Reviews", value: "all" },
@@ -18,12 +20,23 @@ const filters = [
 ];
 
 
-export default function ReviewSection({ reviews, productId }) {
+export default function ReviewSection({ productId }) {
 
   const { theme } = useContext(ThemeContext);
+  const { products } = useContext(ProductContext);
+
+  const [reviews, setReviews] = useState([]);
   const [selected, setSelected] = useState("all");
   const [page, setPage] = useState(1);
   const reviewsPerPage = 10;
+
+  useEffect(() => {
+
+    if (!productId || !products) return;
+
+    const selected = products.find((p) => slugify(p._id) === productId);
+    setReviews(selected?.reviews);
+  }, [productId, products]);
 
   const filteredReviews = useMemo(
     () => filterReviews(reviews, selected),
@@ -174,20 +187,7 @@ export default function ReviewSection({ reviews, productId }) {
                 Showing {filteredReviews.length} review{filteredReviews.length > 1 ? "s" : ""}
               </div>
 
-              {paginatedReviews.map((review) => (
-                <ReviewCard
-                  key={review._id}
-                  id={review?._id}
-                  productId={productId}
-                  username={review?.userId?.username}
-                  image={review?.userId?.photo}
-                  message={review?.message}
-                  date={review?.createdAt}
-                  rating={review?.rating}
-                  likes={review?.likes}
-                  postedUserId={review?.userId?._id}
-                />
-              ))}
+              <ReviewCard reviews={paginatedReviews} productId={productId} />
 
               {filteredReviews?.length > reviewsPerPage && (
                 <div className="pt-4 flex justify-center">
@@ -212,14 +212,5 @@ export default function ReviewSection({ reviews, productId }) {
 }
 
 ReviewSection.propTypes = {
-  reviews: PropTypes.arrayOf(
-    PropTypes.shape({
-      userId: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
-      message: PropTypes.string.isRequired,
-      rating: PropTypes.number.isRequired,
-      likes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    })
-  ),
   productId: PropTypes.string.isRequired
 };

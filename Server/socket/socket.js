@@ -24,7 +24,7 @@ export const connectToSocket = (server) => {
       const { address, productsData, paymentMode, totalAmount, userId } =
         data.orderData;
 
-      const { paymentInfo } = data.paymentInfo;
+      const { paymentInfo } = data;
 
       try {
         const validationError = validateOrderData(data);
@@ -125,9 +125,10 @@ export const connectToSocket = (server) => {
       }
     });
 
-    socket.on("", async (data) => {
-      
-    });
+
+
+
+    
 
     socket.on("review:add-new", async (data) => {
       const { productId, userId, message, rating, username, photo } = data;
@@ -198,11 +199,220 @@ export const connectToSocket = (server) => {
           productId,
         });
 
-        socket.emit("new-review-add-success", { message: "Review added successfully."});
+        socket.emit("new-review-add-success", {
+          message: "Review added successfully.",
+        });
       } catch (error) {
         return socket.emit("review:add-failed", {
           message:
             error.message || "Something went wrong while adding the review.",
+        });
+      }
+    });
+
+    socket.on("review:remove", async (data) => {
+      const { reviewId, productId } = data;
+
+      try {
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+          return socket.emit("review:remove-failed", {
+            message: "Invalid review ID.",
+          });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return socket.emit("review:remove-failed", {
+            message: "Invalid product ID.",
+          });
+        }
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+          return socket.emit("review:remove-failed", {
+            message: "Review not found.",
+          });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+          return socket.emit("review:remove-failed", {
+            message: "Product not found.",
+          });
+        }
+
+        if (product.reviews && !product.reviews.includes(reviewId)) {
+          return socket.emit("review:remove-failed", {
+            message: "Review does not belong to this product.",
+          });
+        }
+
+        await Review.findByIdAndDelete(reviewId);
+
+        await Product.findByIdAndUpdate(productId, {
+          $pull: { reviews: reviewId },
+        });
+
+        io.emit("review:remove-success", {
+          productId,
+          reviewId,
+        });
+
+        socket.emit("remove-review-success", {
+          message: "Review removed successfully.",
+        });
+      } catch (error) {
+        socket.emit("review:remove-failed", {
+          message:
+            error.message ||
+            "An unexpected error occurred while removing the review.",
+        });
+      }
+    });
+
+    socket.on("review:edit-update", async (data) => {
+      const { productId, reviewId, userId, message, rating } = data;
+
+      try {
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Invalid product ID.",
+          });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Invalid review ID.",
+          });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Invalid user ID.",
+          });
+        }
+
+        if (
+          !message ||
+          typeof message !== "string" ||
+          message.trim().length === 0
+        ) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Review message must be a non-empty string.",
+          });
+        }
+
+        if (typeof rating !== "number" || rating < 1 || rating > 5) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Rating must be a number between 1 and 5.",
+          });
+        }
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Review not found.",
+          });
+        }
+
+        if (review.userId.toString() !== userId) {
+          return socket.emit("review:edit-update-failed", {
+            message: "You are not authorized to edit this review.",
+          });
+        }
+
+        const updatedReview = await Review.findByIdAndUpdate(
+          reviewId,
+          {
+            message: message.trim(),
+            rating,
+          },
+          { new: true }
+        );
+
+        if (!updatedReview) {
+          return socket.emit("review:edit-update-failed", {
+            message: "Failed to update review.",
+          });
+        }
+
+        socket.emit("review:edit-update-success", {
+          message: "Review updated successfully.",
+        });
+
+        io.emit("review:edit-success", {
+          reviewId: reviewId,
+          message,
+          rating,
+          productId,
+        });
+      } catch (error) {
+        socket.emit("review:edit-update-failed", {
+          message:
+            error.message ||
+            "An unexpected error occurred while editing the review.",
+        });
+      }
+    });
+
+    socket.on("review:like", async (data) => {
+      const { userId, productId, reviewId } = data;
+
+      try {
+        if (!userId || !productId || !reviewId) {
+          return socket.emit("review:like-update", {
+            success: false,
+            message: "userId, productId, and reviewId are required.",
+          });
+        }
+
+        const product = await Product.findById(productId).populate("reviews");
+        if (!product) {
+          return socket.emit("review:like-update", {
+            success: false,
+            message: "Product not found.",
+          });
+        }
+
+        const review = product.reviews.find(
+          (r) => r._id.toString() === reviewId
+        );
+
+        if (!review) {
+          return socket.emit("review:like-update", {
+            success: false,
+            message: "Review not found.",
+          });
+        }
+
+        const alreadyLiked = review.likes.some(
+          (id) => id.toString() === userId
+        );
+
+        if (alreadyLiked) {
+          return socket.emit("review:like-update", {
+            success: false,
+            message: "You already liked this review.",
+          });
+        }
+
+        review.likes.push(userId);
+        await review.save();
+
+        socket.emit("review:like-update", {
+          success: true,
+          message: "Review liked successfully.",
+        });
+
+        io.emit("review:like-success", {
+          userId,
+          productId,
+          reviewId,
+        });
+      } catch (error) {
+        socket.emit("review:like-update", {
+          success: false,
+          message:
+            error.message || "Something went wrong while liking the review.",
         });
       }
     });

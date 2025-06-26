@@ -13,7 +13,6 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import { UserAuthContext } from "../../context/AuthProvider";
 import { CartContext } from "../../context/CartProvider";
 import { productLike } from "../../services/productServices";

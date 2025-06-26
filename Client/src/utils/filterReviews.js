@@ -7,7 +7,7 @@ export const filterReviews = (reviews, filterType) => {
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
     case "recent":
-      return [...reviews].sort((a, b) => new Date(b.date) - new Date(a.date));
+      return [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     case "all":
     default:
       return reviews;

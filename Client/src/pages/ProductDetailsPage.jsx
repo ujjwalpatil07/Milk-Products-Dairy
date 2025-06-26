@@ -172,7 +172,7 @@ export default function ProductDetailsPage() {
                 (selectedProduct) && <section className="px-3 md:px-6 py-6 md:py-10 md:max-w-6xl mx-auto">
                     <h1 className="border-t border-dashed border-gray-500/50 pb-2 pt-5 text-xl font-semibold">Product Reviews</h1>
 
-                    <ReviewSection reviews={selectedProduct?.reviews || []} productId={selectedProduct?._id} />
+                    <ReviewSection productId={selectedProduct?._id} />
                 </section>
             }
         </>
