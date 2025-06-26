@@ -1,14 +1,36 @@
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PercentIcon from "@mui/icons-material/Percent";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import { formatNumberWithCommas } from "../../../utils/format";
+import PropTypes from "prop-types"
 
-import { formatNumberWithCommas } from "../../../utils/format"
+// Animation variants
+const containerVariants = {
+    hidden: {},
+    visible: {
+        transition: {
+            staggerChildren: 0.1,
+        },
+    },
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.4,
+            ease: "easeOut",
+        },
+    },
+};
 
 export default function SalesOverview({ totalRevenue, totalProfit }) {
-
-
     const salesData = [
         {
             name: "Revenue",
@@ -36,33 +58,48 @@ export default function SalesOverview({ totalRevenue, totalProfit }) {
         },
         {
             name: "Expenses",
-            value: (totalProfit / 100 * 10),
+            value: (totalProfit / 100) * 10,
             icon: <ListAltIcon className="text-red-600" />,
             bg: "bg-red-100 dark:bg-red-800/30",
         },
     ];
+
     return (
-        <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
+        <motion.div
+            className="bg-white dark:bg-gray-500/20 rounded-sm p-4"
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+        >
             <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>
 
-            <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
+            <motion.div
+                className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide"
+                variants={containerVariants}
+            >
                 {salesData.map((item, index) => (
-                    <div
+                    <motion.div
                         key={index * 0.9}
                         className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+                        variants={cardVariants}
                     >
                         <div className="text-2xl shrink-0">{item.icon}</div>
                         <div className="flex flex-col">
-                            <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{item.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                {item.name}
+                            </div>
                             <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
-                                &#8377; {formatNumberWithCommas(item.value)}
+                                ₹ {formatNumberWithCommas(item.value)}
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
-            </div>
-        </div>
-
+            </motion.div>
+        </motion.div>
     );
 }
 
+SalesOverview.propTypes = {
+    totalRevenue: PropTypes.number.isRequired,
+    totalProfit: PropTypes.number.isRequired,
+};

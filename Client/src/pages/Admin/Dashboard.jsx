@@ -11,6 +11,9 @@ import OrdersOverview from "../../components/AdminComponents/DashboardComponents
 import { getAllOrders, totalActiveOrders } from "../../services/orderService";
 import { toast } from "react-toastify";
 import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../services/dashboardServices";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+
 
 export default function Dashboard() {
 
@@ -46,55 +49,83 @@ export default function Dashboard() {
         fetchAllOrders();
     }, []);
 
-    // if(allOrders.length > 0) {
-    //     console.log(allOrders)
-    // }
 
     const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
+    const fadeUpVariant = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    };
+
+    const fadeInVariant = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.4 } }
+    };
+
 
     return (
         <>
             <section className="p-3">
-                <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} />
+                <motion.div
+                    variants={fadeUpVariant}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} />
+                </motion.div>
             </section>
 
-            <section className="w-full flex flex-col md:flex-row gap-4 p-3">
-                <section className="flex-1 flex flex-col gap-4">
-                    <InventorySummary
-                        totalProducts={fetchedProducts?.length}
-                        totalStock={totalStock(fetchedProducts)}
-                        lowStockCount={lowStockCount(fetchedProducts)}
-                        outOfStockProducts={outOfStockProducts(fetchedProducts)}
-                        expiringSoonCount={expiringSoonCount}
-                        expiredCount={expiredCount}
-                    />
 
-                    <div className="w-full">
+            <motion.section
+                variants={fadeInVariant}
+                initial="hidden"
+                animate="visible"
+                className="w-full flex flex-col md:flex-row gap-4 p-3"
+            >
+                <motion.section
+                    className="flex-1 flex flex-col gap-4"
+                    variants={fadeInVariant}
+                >
+                    <motion.div variants={fadeUpVariant} className="w-full">
+                        <InventorySummary
+                            totalProducts={fetchedProducts?.length}
+                            totalStock={totalStock(fetchedProducts)}
+                            lowStockCount={lowStockCount(fetchedProducts)}
+                            outOfStockProducts={outOfStockProducts(fetchedProducts)}
+                            expiringSoonCount={expiringSoonCount}
+                            expiredCount={expiredCount}
+                        />
+                    </motion.div>
+
+
+                    <motion.div variants={fadeUpVariant} className="w-full">
                         <OrdersOverview
                             totalOrdersRecieved={allOrders?.length}
                             totalPendingOrders={totalActiveOrders(allOrders)}
                         />
-                    </div>
+                    </motion.div>
 
-                    <div className="w-full">
+                    <motion.div variants={fadeUpVariant} className="w-full">
                         <Statistics />
-                    </div>
+                    </motion.div>
 
-                    <div className="w-full">
+                    <motion.div variants={fadeUpVariant} className="w-full">
                         <TopSellingStock topSellingStocks={topSellingStocks(fetchedProducts)} />
-                    </div>
-                </section>
+                    </motion.div>
+                </motion.section>
 
-                <section className="flex flex-col gap-4 md:w-80">
-                    <div className="w-full">
+                <motion.section
+                    className="flex flex-col gap-4 md:w-80"
+                    variants={fadeInVariant}
+                >
+                    <motion.div variants={fadeUpVariant} className="w-full">
                         <ProductsStock fetchedProducts={fetchedProducts} />
-                    </div>
+                    </motion.div>
 
-                    <div className="w-full">
+                    <motion.div variants={fadeUpVariant} className="w-full">
                         <LowQuantityStock fetchedProducts={fetchedProducts} />
-                    </div>
-                </section>
-            </section>
+                    </motion.div>
+                </motion.section>
+            </motion.section>
 
         </>
     )

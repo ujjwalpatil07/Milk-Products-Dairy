@@ -1,10 +1,38 @@
 import React from "react";
-import { ShoppingCart, BookCheck, Undo2, NotepadTextDashedIcon, Ban } from "lucide-react";
-import PropTypes from 'prop-types';
+import {
+  ShoppingCart,
+  BookCheck,
+  Undo2,
+  NotepadTextDashedIcon,
+  Ban,
+} from "lucide-react";
+import PropTypes from "prop-types";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+// Motion variants
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalCanceledOrders }) {
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+};
 
-
+export default function OrdersSummary({
+  totalOrders,
+  totalRecievedOrders,
+  totalCanceledOrders,
+}) {
   const orderSummaryData = [
     {
       name: "Total Orders",
@@ -39,33 +67,39 @@ export default function OrdersSummary({ totalOrders, totalRecievedOrders, totalC
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
+    <motion.div
+      className="bg-white dark:bg-gray-500/20 rounded-sm p-4"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <h2 className="text-lg font-semibold mb-4">Orders Overview</h2>
 
       <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
         {orderSummaryData.map((item, index) => (
-          <div
-            key={index * 0.9}
+          <motion.div
+            key={index}
+            variants={cardVariants}
             className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
           >
             <div className="text-2xl shrink-0">{item.icon}</div>
             <div className="flex flex-col">
-
-              <div className="text-sm text-gray-500 dark:text-gray-300 break-words">{item.name}</div>
+              <div className="text-sm text-gray-500 dark:text-gray-300 break-words">
+                {item.name}
+              </div>
               <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
                 {item.value}
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 OrdersSummary.propTypes = {
-  totalOrders : PropTypes.number.isRequired,
+  totalOrders: PropTypes.number.isRequired,
   totalRecievedOrders: PropTypes.number.isRequired,
-  totalCanceledOrders: PropTypes.number.isRequired
-}
-
+  totalCanceledOrders: PropTypes.number.isRequired,
+};

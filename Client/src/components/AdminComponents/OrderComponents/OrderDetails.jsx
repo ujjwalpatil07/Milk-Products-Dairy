@@ -8,6 +8,9 @@ import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterOrdersBySearch } from "../../../utils/filterOrders";
 import { useDebounce } from "use-debounce";
 
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+
 export default function OrderDetails({ orders, loading }) {
 
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
@@ -209,6 +212,8 @@ export default function OrderDetails({ orders, loading }) {
         </div>
       );
     });
+
+    
   }
 
   return (

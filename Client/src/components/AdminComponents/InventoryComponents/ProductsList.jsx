@@ -6,8 +6,27 @@ import AddProductModel from "./Models/AddProductModel"
 import RemoveModel from './Models/RemoveModel';
 import { SidebarContext } from '../../../context/SidebarProvider';
 import { FilterIcon } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion, AnimatePresence } from "framer-motion";
 
+// Animation variants
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: 'easeOut' },
+  },
+};
 
 export default function ProductsList({ fetchProducts, fetchedProducts, loading }) {
 
@@ -111,15 +130,20 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
                   <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-                <tbody>
+                <motion.tbody
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                   {productList.map((product, index) => {
                     const isLowStock = product.stock < product.thresholdVal;
 
                     return (
-                      <tr
+                      <motion.tr
                         key={product._id || index}
-                        className={`border-b hover:bg-gray-50 dark:hover:bg-gray-700 
-          ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""}`}
+                        variants={rowVariants}
+                        className={`border-b hover:bg-gray-50 dark:hover:bg-gray-700 ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
+                          }`}
                       >
                         <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
                           {highlightMatch(product.name, navbarInput)}
@@ -154,10 +178,10 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
                             </button>
                           </div>
                         </td>
-                      </tr>
+                      </motion.tr>
                     );
                   })}
-                </tbody>
+                </motion.tbody>
 
             </table>
           )}
