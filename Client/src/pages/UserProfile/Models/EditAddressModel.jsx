@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import {
   User, Phone, Building2, Mail,
   X, MapPin, Locate,
+  Check,
 } from "lucide-react";
 
 

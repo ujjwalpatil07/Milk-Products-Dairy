@@ -27,25 +27,28 @@ import MyWishlist from "../pages/UserProfile/MyWishlist";
 import Payments from "../pages/UserProfile/Payments";
 import Stores from "../pages/Admin/Stores";
 import StoreOrdersHistory from "../pages/Admin/StoreOrdersHistory";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { socket } from "../socket/socket";
-import { toast } from "react-toastify";
 import AdminProfile from "../pages/Admin/AdminProfile";
+import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider";
 
 export default function Routers() {
 
-    const handleErrorMessage = (data) => {
-        toast.error(data?.message);
-    }
+    const { authUser } = useContext(UserAuthContext);
+    const { authAdmin } = useContext(AdminAuthContext);
 
     useEffect(() =>{
-        socket.on("server-error", handleErrorMessage);
+        if(!authUser?._id) return;
 
-        return () =>{
-            socket.off("server-error", handleErrorMessage);
-        }
-    }, []);
+        socket.emit("user:register", { userId: authUser?._id});
+    }, [authUser]);
 
+    useEffect(() =>{
+        if(!authAdmin?._id) return;
+
+        socket.emit("admin:register", { userId: authAdmin?._id});
+    }, [authAdmin]);
+ 
     return (
         <Routes>
             <Route path="/" element={<Layout><LandingPage /></Layout>} />
@@ -54,7 +57,7 @@ export default function Routers() {
             <Route path="/login" element={<UserLogin />} />
             <Route path="/signup" element={<UserSignUp />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-
+ 
             <Route path="/signup/otp-verification" element={<OtpVerification />} />
             <Route path="/signup/info-input" element={<ProfileInfoInput />} />
             <Route path="/user-profile" element={<UserProfileLayout><AccountInfo /></UserProfileLayout>} />
