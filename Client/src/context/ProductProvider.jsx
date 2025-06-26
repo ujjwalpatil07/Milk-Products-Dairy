@@ -57,24 +57,45 @@ export const ProductProvider = ({ children }) => {
 
         setProducts((prevProducts) => {
             return prevProducts.map((p) => {
-                if(p._id === productId) {
+                if (p._id === productId) {
                     return {
                         ...p,
                         reviews: [...(p.reviews || []), review],
                     }
-                } 
+                }
                 return p;
             })
         });
     }
 
+    const removeReviewFromProduct = (product, productId, reviewId) => {
+        if (product._id !== productId) return product;
+
+        const updatedReviews = (product.reviews || []).filter(
+            (review) => review._id !== reviewId
+        );
+
+        return { ...product, reviews: updatedReviews };
+    };
+
+    const handleRemoveReviewSuccess = ({ productId, reviewId }) => {
+        setProducts((prevProducts) => {
+            return prevProducts.map((product) =>
+                removeReviewFromProduct(product, productId, reviewId)
+            );
+        });
+    };
+
     useEffect(() => {
         socket.on("product-stock-update", updateProducts);
         socket.on("review:add-success", handleAddReviewSuccess);
+        socket.on("review:remove-success", handleRemoveReviewSuccess);
 
         return () => {
             socket.off("product-stock-update", updateProducts);
             socket.off("review:add-success", handleAddReviewSuccess);
+            socket.off("review:remove-success", handleRemoveReviewSuccess);
+
         }
     }, []);
 
