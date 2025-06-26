@@ -63,7 +63,7 @@ export default function UserProfileLayout({ children }) {
                     </button>
                 </div>
 
-                <main className="max-sm:w-full flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 md:mx-auto h-full md:h-[calc(100vh-64px)]">
+                <main className="w-full sm:w-auto md:mx-10 lg:mx-52 flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 h-full md:h-[calc(100vh-64px)]">
                     <div className="hidden md:block">
                         <UserProfileSidebar />
                     </div>

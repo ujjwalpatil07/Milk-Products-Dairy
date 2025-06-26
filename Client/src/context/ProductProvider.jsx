@@ -41,18 +41,40 @@ export const ProductProvider = ({ children }) => {
                 const change = updateMap.get(product?._id)
                 if (change !== undefined) {
                     const updatedStock = Math.max(product.stock + change, 0);
-                    return { ...product, stock: updatedStock };
+                    const updatedSoldQuantity = product.totalQuantitySold + (-1 * change)
+                    return {
+                        ...product,
+                        stock: updatedStock,
+                        totalQuantitySold: updatedSoldQuantity
+                    };
                 }
                 return product;
             })
         );
     }
 
+    const handleAddReviewSuccess = ({ review, productId }) => {
+
+        setProducts((prevProducts) => {
+            return prevProducts.map((p) => {
+                if(p._id === productId) {
+                    return {
+                        ...p,
+                        reviews: [...(p.reviews || []), review],
+                    }
+                } 
+                return p;
+            })
+        });
+    }
+
     useEffect(() => {
         socket.on("product-stock-update", updateProducts);
+        socket.on("review:add-success", handleAddReviewSuccess);
 
         return () => {
             socket.off("product-stock-update", updateProducts);
+            socket.off("review:add-success", handleAddReviewSuccess);
         }
     }, []);
 

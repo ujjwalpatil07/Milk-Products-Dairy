@@ -99,50 +99,6 @@ export const productReviewLike = async (req, res) => {
   });
 };
 
-export const addNewReview = async (req, res) => {
-  const { productId, userId, message, rating } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(productId)) {
-    return res.status(400).json({ error: "Invalid productId." });
-  }
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).json({ error: "Invalid userId." });
-  }
-
-  if (!message || typeof message !== "string" || message.trim().length === 0) {
-    return res.status(400).json({ error: "Review message is required." });
-  }
-
-  if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    return res.status(400).json({ error: "Rating must be between 1 and 5." });
-  }
-
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ error: "User not found." });
-  }
-
-  const product = await Product.findById(productId);
-  if (!product) {
-    return res.status(404).json({ error: "Product not found." });
-  }
-
-  const newReview = await Review.create({
-    userId,
-    message: message.trim(),
-    rating,
-  });
-
-  product.reviews.push(newReview._id);
-  await product.save();
-
-  return res.status(201).json({
-    success: true,
-    message: "Review added successfully.",
-  });
-};
-
 export const editReview = async (req, res) => {
   const { reviewId } = req.params;
   const { message, rating } = req.body;

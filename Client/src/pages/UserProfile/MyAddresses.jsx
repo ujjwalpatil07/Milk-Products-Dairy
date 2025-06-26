@@ -225,10 +225,9 @@ export default function MyAddresses() {
     )
   }
 
-
   return (
     <>
-      <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
+      <div className="w-full !h-fit md:h-full mx-auto flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold">Manage Addresses</h3>
 
         <button

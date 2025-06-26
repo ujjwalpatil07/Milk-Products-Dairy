@@ -4,8 +4,10 @@ import Admin from "../models/AdminSchema.js";
 import User from "../models/UserSchema.js";
 import Address from "../models/AddressShema.js";
 import Product from "../models/ProductSchema.js";
+import Review from "../models/ReviewSchema.js";
 
 import { validateOrderData, validateAndProcessProducts } from "./helper.js";
+import mongoose from "mongoose";
 
 export const connectToSocket = (server) => {
   const io = new Server(server, {
@@ -119,6 +121,87 @@ export const connectToSocket = (server) => {
         socket.emit("new-order-place-failed", {
           message:
             error?.message || "Something went wrong while placing the order.",
+        });
+      }
+    });
+
+
+
+
+    socket.on("review:add-new", async (data) => {
+      const { productId, userId, message, rating, username, photo } = data;
+
+      try {
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return socket.emit("review:add-failed", {
+            message: "Invalid product ID.",
+          });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return socket.emit("review:add-failed", {
+            message: "Invalid user ID.",
+          });
+        }
+
+        if (
+          !message ||
+          typeof message !== "string" ||
+          message.trim().length === 0
+        ) {
+          return socket.emit("review:add-failed", {
+            message: "Review message must be a non-empty string.",
+          });
+        }
+
+        if (typeof rating !== "number" || rating < 1 || rating > 5) {
+          return socket.emit("review:add-failed", {
+            message: "Rating must be a number between 1 and 5.",
+          });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return socket.emit("review:add-failed", {
+            message: "User not found.",
+          });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+          return socket.emit("review:add-failed", {
+            message: "Product not found.",
+          });
+        }
+
+        const newReview = await Review.create({
+          userId,
+          message: message.trim(),
+          rating,
+        });
+
+        product.reviews.push(newReview._id);
+        await product.save();
+
+        const newCreatedReview = {
+          ...newReview.toObject(),
+          userId: {
+            _id: userId,
+            username,
+            photo,
+          },
+        };
+
+        io.emit("review:add-success", {
+          review: newCreatedReview,
+          productId,
+        });
+
+        socket.emit("new-review-add-success", { message: "Review added successfully."});
+      } catch (error) {
+        return socket.emit("review:add-failed", {
+          message:
+            error.message || "Something went wrong while adding the review.",
         });
       }
     });

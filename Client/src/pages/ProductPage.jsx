@@ -49,7 +49,7 @@ export default function ProductPage() {
         <>
             <SearchProducts query={query} handleInputChange={handleInputChange} />
 
-            <div className="w-full px-3 lg:px-8 py-3 flex flex-col sm:flex-row md:gap-5">
+            <div className="w-full p-3 lg:px-8 flex flex-col sm:flex-row md:gap-5">
 
                 <motion.div
                     initial={{ opacity: 0, x: -30 }}
@@ -71,7 +71,7 @@ export default function ProductPage() {
                     ) : (
                         <>
                             <section
-                                className="w-full lg:px-6"
+                                className="w-full"
                             >
                                 {(sortedFilteredProducts?.length ?? 0) === 0 ? (
                                     <div className="py-20 text-center">No products found matching your search/filter.</div>
@@ -99,7 +99,7 @@ export default function ProductPage() {
 
                             {recommendedProducts?.length > 0 && (
                                 <section
-                                    className="pt-5 lg:px-6"
+                                    className="pt-5"
                                 >
                                     <h2 className="text-lg font-semibold py-2">Recommended</h2>
 
@@ -131,9 +131,7 @@ export default function ProductPage() {
                             )}
 
                             {topProducts?.length > 0 && (
-                                <section
-                                    className="lg:px-6"
-                                >
+                                <section>
                                     <h2 className={`text-lg font-semibold ${recommendedProducts?.length > 0 && "border-t border-dashed border-gray-500/50 pt-5"}`}>
                                         Most Reviews & Likes
                                     </h2>

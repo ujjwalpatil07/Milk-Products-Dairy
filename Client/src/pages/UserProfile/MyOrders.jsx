@@ -212,8 +212,8 @@ export default function MyOrders() {
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <h2 className="w-full !h-fit lg:w-xl md:h-full mx-auto flex justify-between items-center mb-4 text-xl font-bold">My Orders</h2>
+      <div className="flex justify-between items-center sticky top-0 mb-4">
+        <h2 className="w-fit !h-fit flex justify-between items-centertext-xl font-bold backdrop-blur-md px-2 py-1 rounded">My Orders</h2>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <Button

@@ -9,6 +9,8 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { Tooltip } from "@mui/material";
 import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -55,8 +57,8 @@ export default function ProductDetails({ productId }) {
 
     const minQty = Number(selectedProduct?.minQuantity) || 1;
     const existing = cartItems?.find(item => item?.productId === productId);
-    const stock = selectedProduct?.stock;
-    const avgRating = getAverageRating(selectedProduct?.reviews);
+    const stock = selectedProduct?.stock || 0;
+    const avgRating = getAverageRating(selectedProduct?.reviews) || 0;
 
     const priceNumber = Number(selectedProduct?.price) || 0;
     const discountPercent = Number(selectedProduct?.discount) || 0;
@@ -276,7 +278,7 @@ export default function ProductDetails({ productId }) {
                             <button
                                 onClick={() => handleAddProductInWishlist(productId)}
                                 disabled={isWishlisted}
-                                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all duration-300
+                                className={`flex items-center gap-1 px-3 py-1.5 rounded transition-all duration-300
                                      ${isWishlisted
                                         ? "bg-red-100 text-red-600 dark:bg-red-800/20 dark:text-red-300"
                                         : "bg-white text-gray-700 hover:bg-red-50 dark:bg-gray-500/20 dark:text-gray-100 dark:hover:bg-red-900/30"
@@ -284,15 +286,15 @@ export default function ProductDetails({ productId }) {
                                  disabled:cursor-not-allowed`}
                             >
                                 {isWishlisted ? (
-                                    <FavoriteIcon sx={{ fontSize: "1.3rem" }} />
+                                    <BookmarkIcon sx={{ fontSize: "1.3rem" }} />
                                 ) : (
-                                    <FavoriteBorderIcon sx={{ fontSize: "1.3rem" }} />
+                                    <BookmarkBorderIcon sx={{ fontSize: "1.3rem" }} />
                                 )}
                                 <span className="text-sm">{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
                             </button>
                         ) : (
                             <button
-                                className={`flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-300
+                                className={`flex items-center gap-3 px-3 py-1.5 rounded transition-all duration-300
         bg-white text-gray-700 dark:bg-gray-500/20 dark:text-gray-100`}
                                 disabled
                             >
@@ -391,14 +393,14 @@ export default function ProductDetails({ productId }) {
                 <div className="py-5 grid grid-cols-2 gap-2">
                     <button
                         onClick={() => handleBuyProductNow(productId)}
-                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded bg-[#843E71] hover:bg-[#843E71] text-white cursor-pointer"
                     >
                         <span>Buy Now</span>
                     </button>
                     <button
                         onClick={() => handleAddProduct(productId)}
                         disabled={quantity === 0 || quantity > stock}
-                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded-lg text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex items-center justify-center gap-1 px-3 py-1.5 md:px-6 md:py-2 rounded text-[#843E71] border hover:bg-[#843E7120] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         <ShoppingCartIcon sx={{ fontSize: "1.2rem" }} />
                         <span>Add to Cart</span>
