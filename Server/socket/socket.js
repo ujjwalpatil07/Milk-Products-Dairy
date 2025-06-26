@@ -23,7 +23,7 @@ export const connectToSocket = (server) => {
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);
 
-    socket.on("user:register", (userId) => {
+    socket.on("user:register", ({ userId }) => {
       if (!userId) return;
 
       socket.data.userId = userId;
@@ -34,7 +34,7 @@ export const connectToSocket = (server) => {
       userSocketMap.get(userId).add(socket.id);
     });
 
-    socket.on("admin:register", (adminId) => {
+    socket.on("admin:register", ({ adminId }) => {
       if (!adminId) return;
 
       socket.data.adminId = adminId;
@@ -114,6 +114,20 @@ export const connectToSocket = (server) => {
 
         const savedOrder = await newOrder.save();
 
+        await savedOrder.populate([
+          {
+            path: "address",
+            populate: {
+              path: "owner",
+              model: "User",
+            },
+          },
+          {
+            path: "productsData.productId",
+            model: "Product",
+          },
+        ]);
+
         admin.pendingOrders.push(savedOrder._id);
         await admin.save();
 
@@ -139,9 +153,17 @@ export const connectToSocket = (server) => {
           change: -item.productQuantity,
         }));
 
-        io.emit("product-stock-update", { updatedData });
+        for (const [_, socketSet] of adminSocketMap) {
+          for (const socketId of socketSet) {
+            io.to(socketId).emit("order:new-pending-order", {
+              order: savedOrder,
+            });
+          }
+        }
 
         socket.emit("new-order-place-success", { message: "Order confirmed" });
+
+        io.emit("product-stock-update", { updatedData });
       } catch (error) {
         socket.emit("new-order-place-failed", {
           message:

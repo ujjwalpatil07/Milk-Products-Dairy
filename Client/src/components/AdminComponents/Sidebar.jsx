@@ -11,11 +11,12 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { ThemeContext } from "../../context/ThemeProvider";
-import { AdminAuthContext } from "../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../context/AuthProvider";
 
 import logoDarkMode from "../../assets/logoDarkMode.png";
 import logoLightMode from "../../assets/logoLightMode.png";
 import { SidebarContext } from "../../context/SidebarProvider";
+import { AdminOrderContext } from "../../context/AdminOrderProvider";
 
 export default function Sidebar() {
 
@@ -24,12 +25,14 @@ export default function Sidebar() {
 
     const { isSidebarOpen, setIsSidebarOpen } = useContext(SidebarContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { handleAdminLogout, authAdmin } = useContext(AdminAuthContext);
+    const { handleAdminLogout } = useContext(AdminAuthContext);
+    const { setOpenLoginDialog } = useContext(UserAuthContext);
+    const { adminOrders, orderLoading } = useContext(AdminOrderContext);
 
     const navItems = [
         { label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/dashboard" },
         { label: "Inventory", icon: <InventoryIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/inventory" },
-        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: authAdmin?.pendingOrders?.length || 0 },
+        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: adminOrders?.length || 0 },
         { label: "Manage Store", icon: <StoreIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/store" },
     ];
 
@@ -40,7 +43,8 @@ export default function Sidebar() {
     const handleLogout = () => {
         handleAdminLogout();
         closeSidebar();
-        navigate("/admin/login");
+        setOpenLoginDialog(true);
+        navigate("/");
     }
 
     const renderSidebarContent = () => (
@@ -80,6 +84,11 @@ export default function Sidebar() {
                                     {item?.orderCount}
                                 </div>
                             }
+
+                            {orderLoading && item.label === "Orders" && (
+                                <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                            )}
+
                         </Link>
                     );
                 })}

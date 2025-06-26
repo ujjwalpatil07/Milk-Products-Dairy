@@ -46,7 +46,7 @@ export default function Routers() {
     useEffect(() =>{
         if(!authAdmin?._id) return;
 
-        socket.emit("admin:register", { userId: authAdmin?._id});
+        socket.emit("admin:register", { adminId: authAdmin?._id});
     }, [authAdmin]);
  
     return (
