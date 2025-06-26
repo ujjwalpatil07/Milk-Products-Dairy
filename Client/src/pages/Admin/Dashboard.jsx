@@ -5,33 +5,21 @@ import Statistics from "../../components/AdminComponents/DashboardComponents/Sta
 import LowQuantityStock from "../../components/AdminComponents/DashboardComponents/LowQuantityStock";
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
 import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../services/inventoryServices";
-import { getProducts } from "../../services/productServices";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import OrdersOverview from "../../components/AdminComponents/DashboardComponents/PurchaseOverview";
 import { getAllOrders, totalActiveOrders } from "../../services/orderService";
 import { toast } from "react-toastify";
 import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../services/dashboardServices";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { ProductContext } from "../../context/ProductProvider";
 
 
 export default function Dashboard() {
 
-    const [fetchedProducts, setFetchedProducts] = useState([])
     const [allOrders, setAllOrders] = useState([]);
+    const { products } = useContext(ProductContext)
 
-    const fetchProducts = async () => {
-        try {
-            const dbProducts = await getProducts();
-            setFetchedProducts(dbProducts?.products);
-        } catch (err) {
-            console.error("Error fetching products:", err);
-        }
-    };
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
 
     useEffect(() => {
         const fetchAllOrders = async () => {
@@ -50,7 +38,7 @@ export default function Dashboard() {
     }, []);
 
 
-    const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
+    const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
     const fadeUpVariant = {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
@@ -87,10 +75,10 @@ export default function Dashboard() {
                 >
                     <motion.div variants={fadeUpVariant} className="w-full">
                         <InventorySummary
-                            totalProducts={fetchedProducts?.length}
-                            totalStock={totalStock(fetchedProducts)}
-                            lowStockCount={lowStockCount(fetchedProducts)}
-                            outOfStockProducts={outOfStockProducts(fetchedProducts)}
+                            totalProducts={products?.length}
+                            totalStock={totalStock(products)}
+                            lowStockCount={lowStockCount(products)}
+                            outOfStockProducts={outOfStockProducts(products)}
                             expiringSoonCount={expiringSoonCount}
                             expiredCount={expiredCount}
                         />
@@ -109,7 +97,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     <motion.div variants={fadeUpVariant} className="w-full">
-                        <TopSellingStock topSellingStocks={topSellingStocks(fetchedProducts)} />
+                        <TopSellingStock topSellingStocks={topSellingStocks(products)} />
                     </motion.div>
                 </motion.section>
 
@@ -118,11 +106,11 @@ export default function Dashboard() {
                     variants={fadeInVariant}
                 >
                     <motion.div variants={fadeUpVariant} className="w-full">
-                        <ProductsStock fetchedProducts={fetchedProducts} />
+                        <ProductsStock fetchedProducts={products} />
                     </motion.div>
 
                     <motion.div variants={fadeUpVariant} className="w-full">
-                        <LowQuantityStock fetchedProducts={fetchedProducts} />
+                        <LowQuantityStock fetchedProducts={products} />
                     </motion.div>
                 </motion.section>
             </motion.section>

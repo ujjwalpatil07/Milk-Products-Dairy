@@ -21,10 +21,11 @@ export const connectToSocket = (server) => {
     console.log(`A user connected: ${socket.id}`);
 
     socket.on("place-new-order", async (data) => {
+      
       const { address, productsData, paymentMode, totalAmount, userId } =
         data.orderData;
 
-      const { paymentInfo } = data.paymentInfo;
+      const { paymentInfo } = data;
 
       try {
         const validationError = validateOrderData(data);

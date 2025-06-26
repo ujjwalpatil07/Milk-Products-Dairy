@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import UpdateProductModel from "../InventoryComponents/Models/UpdateProductModel";
 
 export default function LowQuantityStock({ fetchedProducts }) {
@@ -35,7 +36,7 @@ export default function LowQuantityStock({ fetchedProducts }) {
         ) : (
           products.map((product, index) => (
             <div
-              key={index}
+              key={index * 0.9}
               className="relative group flex items-center bg-white shadow-md rounded p-3 space-x-4 dark:bg-gray-500/30"
             >
               <img
@@ -83,3 +84,7 @@ export default function LowQuantityStock({ fetchedProducts }) {
 
   );
 }
+
+LowQuantityStock.propTypes = {
+  fetchedProducts: PropTypes.array
+};

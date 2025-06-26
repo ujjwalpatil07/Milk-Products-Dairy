@@ -224,7 +224,7 @@ export default function AddProductModal({ setAddModel }) {
                   Select a category
                 </option>
                 {categories.map((cat, index) => (
-                  <option key={index} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                  <option key={index * 0.9} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
                   >
                     {cat}
                   </option>
@@ -235,13 +235,14 @@ export default function AddProductModal({ setAddModel }) {
 
           {/* Product Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Description
             </label>
             <div className="flex items-start gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
               <DescriptionIcon className="text-gray-500" />
               <textarea
                 type="text"
+                id="description"
                 name="description"
                 rows={5}
                 cols={40}
@@ -329,7 +330,7 @@ export default function AddProductModal({ setAddModel }) {
 
                   {quantityUnits.map((unit, index) => (
                     <option
-                      key={index}
+                      key={index * 0.9}
                       value={unit}
                       className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
                     >
