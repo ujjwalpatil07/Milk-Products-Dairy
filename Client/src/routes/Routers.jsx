@@ -9,7 +9,6 @@ import OtpVerification from "../pages/Auth/User/OtpVerification";
 import ProfileInfoInput from "../pages/Auth/User/ProfileInfoInput";
 
 import HomePage from "../pages/HomePage"
-import NotFound from "../components/NotFound"
 import LandingPage from "../pages/LandingPage"
 import AboutPage from "../pages/AboutPage"
 import ProductPage from "../pages/ProductPage"
@@ -28,10 +27,10 @@ import MyWishlist from "../pages/UserProfile/MyWishlist";
 import Payments from "../pages/UserProfile/Payments";
 import Stores from "../pages/Admin/Stores";
 import StoreOrdersHistory from "../pages/Admin/StoreOrdersHistory";
-import Profile from "../pages/Admin/Profile";
 import { useEffect } from "react";
 import { socket } from "../socket/socket";
 import { toast } from "react-toastify";
+import AdminProfile from "../pages/Admin/AdminProfile";
 
 export default function Routers() {
 
@@ -65,7 +64,7 @@ export default function Routers() {
             <Route path="/user-profile/payments" element={<UserProfileLayout><Payments /></UserProfileLayout>} />
 
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
-            <Route path="/admin/profile" element={<Profile />} />
+            <Route path="/admin/profile" element={ <AdminProfile />} />
             <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
             <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
             <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />

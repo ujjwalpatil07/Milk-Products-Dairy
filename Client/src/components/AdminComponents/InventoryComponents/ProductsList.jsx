@@ -28,24 +28,21 @@ const rowVariants = {
   },
 };
 
-export default function ProductsList({ fetchProducts, fetchedProducts, loading }) {
+export default function ProductsList({ products, loading }) {
 
   const { navbarInput, highlightMatch } = useContext(SidebarContext)
   const [addModel, setAddModel] = useState(false);
   const [updateModel, setUpdateModel] = useState(false);
   const [removeModel, setRemoveModel] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({});
-  const [productList, setProductList] = useState(fetchedProducts || []);
+  const [productList, setProductList] = useState(products || []);
   const [filterType, setFilterType] = useState('priceLowToHigh');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
-  useEffect(() => {
-    if (!addModel || !removeModel || !updateModel) fetchProducts();
-  }, [addModel, removeModel, updateModel]);
 
   useEffect(() => {
-    setProductList(fetchedProducts || []);
-  }, [fetchedProducts]);
+    setProductList(products || []);
+  }, [products]);
 
   const filterOptions = [
     { label: "Price: Low to High", value: "priceLowToHigh" },
@@ -61,7 +58,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
   const handleFilter = (type) => {
     setFilterType(type);
 
-    let sortedProducts = [...fetchedProducts];
+    let sortedProducts = [...products];
 
     switch (type) {
       case 'priceLowToHigh':
@@ -89,7 +86,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
         sortedProducts.sort((a, b) => (b.totalQuantitySold || 0) - (a.totalQuantitySold || 0));
         break;
       default:
-        sortedProducts = fetchedProducts;
+        sortedProducts = products;
     }
 
     setProductList(sortedProducts);
@@ -103,7 +100,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
         <span className="text-xl">Loading products...</span>
       </div>
     );
-  } else if (!fetchedProducts || fetchedProducts.length === 0) {
+  } else if (!products || products.length === 0) {
     content = (
       <div className="text-center text-gray-500 dark:text-gray-300 py-4">
         No products found.
@@ -113,7 +110,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
     content = (
       <>
         <div className="overflow-x-auto">
-          {fetchedProducts.length === 0 ? (
+          {products.length === 0 ? (
             <div className="text-center py-10 text-gray-600 dark:text-gray-300">
               <p className="text-lg font-medium">No products found.</p>
               <p className="text-sm mt-2">Add a new product to get started.</p>
@@ -269,8 +266,7 @@ export default function ProductsList({ fetchProducts, fetchedProducts, loading }
 }
 
 ProductsList.propTypes = {
-  fetchProducts: PropTypes.func.isRequired,
-  fetchedProducts: PropTypes.array.isRequired,
+  products: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
 
 };

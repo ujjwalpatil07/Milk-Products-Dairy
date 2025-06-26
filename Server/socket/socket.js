@@ -21,6 +21,7 @@ export const connectToSocket = (server) => {
     console.log(`A user connected: ${socket.id}`);
 
     socket.on("place-new-order", async (data) => {
+      
       const { address, productsData, paymentMode, totalAmount, userId } =
         data.orderData;
 

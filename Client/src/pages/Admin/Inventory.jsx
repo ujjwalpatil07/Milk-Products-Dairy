@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
 import OverallInventory from "../../components/AdminComponents/InventoryComponents/OverallInventory";
 import ProductsList from "../../components/AdminComponents/InventoryComponents/ProductsList";
-import { getProducts } from "../../services/productServices";
+
 import {
   getExpiryStatusCounts,
   lowStockCount,
@@ -12,6 +12,7 @@ import {
 
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { ProductContext } from "../../context/ProductProvider";
 // Animation Variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -23,26 +24,10 @@ const fadeInUp = {
 };
 
 export default function Inventory() {
-  const [fetchedProducts, setFetchedProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { products, productLoading } = useContext(ProductContext)
+  // console.log(products)
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const dbProducts = await getProducts();
-      setFetchedProducts(dbProducts?.products);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(fetchedProducts);
+  const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
 
   return (
     <>
@@ -54,10 +39,10 @@ export default function Inventory() {
         custom={0.1}
       >
         <OverallInventory
-          totalCategories={totalCategories(fetchedProducts)}
-          totalStock={totalStock(fetchedProducts)}
-          lowStockCount={lowStockCount(fetchedProducts)}
-          outOfStockProducts={outOfStockProducts(fetchedProducts)}
+          totalCategories={totalCategories(products)}
+          totalStock={totalStock(products)}
+          lowStockCount={lowStockCount(products)}
+          outOfStockProducts={outOfStockProducts(products)}
           expiringSoonCount={expiringSoonCount}
           expiredCount={expiredCount}
         />
@@ -71,9 +56,8 @@ export default function Inventory() {
         custom={0.3}
       >
         <ProductsList
-          fetchProducts={fetchProducts}
-          fetchedProducts={fetchedProducts}
-          loading={loading}
+          products={products}
+          loading={productLoading}
         />
       </motion.div>
     </>
