@@ -200,14 +200,14 @@ export default function AccountInfo() {
               type="button"
               onClick={handleSave}
               disabled={isLoading}
-              className={`mt-4 px-6 py-2 text-white rounded transition ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-[#843E71] hover:bg-[#b3549a]"}`}
+              className={`mt - 4 px-6 py-2 text-white rounded transition ${isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-[#843E71] hover:bg-[#b3549a]"}`}
             >
-              {isLoading ? "Saving..." : "Save Account Info"}
-            </button>
+          {isLoading ? "Saving..." : "Save Account Info"}
+        </button>
           )}
-        </form>
+      </form >
 
-        {showAddressModal && (
+        { showAddressModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 transition-all duration-300">
             <div className="bg-white dark:bg-gray-500/50 p-6 rounded-lg shadow-xl w-full max-w-lg relative animate-fade-in">
               <button
@@ -222,84 +222,86 @@ export default function AccountInfo() {
               <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {["streetAddress", "city", "pincode"].map((field, i) => (
                   <div key={i * 0.9} className={`${["streetAddress"].includes(field) ? "md:col-span-2" : ""}`}>
-                    {(() => {
-                      let icon;
-                      if (field === "streetAddress") icon = <FaRoad />;
-                      else if (field === "city") icon = <FaCity />;
-                      else icon = <FaMapPin />;
-                      return (
-                        <label className="text-sm font-medium capitalize flex items-center gap-2">
-                          {icon} {field.replace(/([A-Z])/g, ' $1')}
-                        </label>
-                      );
-                    })()}
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded transition focus:ring-2 focus:ring-indigo-300  dark:bg-gray-500/20 dark:border-gray-600"
-                      value={editData.address[field] || ""}
-                      onChange={(e) =>
-                        setEditData((prev) => ({
-                          ...prev,
-                          address: { ...prev.address, [field]: e.target.value },
-                        }))
-                      }
-                    />
-                  </div>
-                ))}
-                <div className="md:col-span-2 flex justify-end gap-4 mt-4">
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-gray-300 dark:bg-gray-500/50 dark:text-white rounded hover:bg-gray-500/60 transition"
-                    onClick={() => setShowAddressModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E71] transition"
-                    onClick={() => {
-                      const { streetAddress, city, pincode } = editData.address;
-                      if (!streetAddress || !city || !pincode) {
-                        toast.error("Please fill out all address fields");
-                        return;
-                      }
-                      setShowAddressModal(false);
-                    }}
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
+                {(() => {
+                  let icon;
+                  if (field === "streetAddress") icon = <FaRoad />;
+                  else if (field === "city") icon = <FaCity />;
+                  else icon = <FaMapPin />;
+                  return (
+                    <label className="text-sm font-medium capitalize flex items-center gap-2">
+                      {icon} {field.replace(/([A-Z])/g, ' $1')}
+                    </label>
+                  );
+                })()}
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded transition focus:ring-2 focus:ring-indigo-300  dark:bg-gray-500/20 dark:border-gray-600"
+                  value={editData.address[field] || ""}
+                  onChange={(e) =>
+                    setEditData((prev) => ({
+                      ...prev,
+                      address: { ...prev.address, [field]: e.target.value },
+                    }))
+                  }
+                />
             </div>
-          </div>
-        )}
+                ))}
+            <div className="md:col-span-2 flex justify-end gap-4 mt-4">
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-500/50 dark:text-white rounded hover:bg-gray-500/60 transition"
+                onClick={() => setShowAddressModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E71] transition"
+                onClick={() => {
+                  const { streetAddress, city, pincode } = editData.address;
+                  if (!streetAddress || !city || !pincode) {
+                    toast.error("Please fill out all address fields");
+                    return;
+                  }
+                  setShowAddressModal(false);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </form>
+            </div >
+          </div >
+        )
+  }
       </>
     )
-  }
+}
 
-  if (!dbData) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-gray-500">Unable to fetch user data, please try again.</div>
-    )
-  }
-
+if (!dbData) {
   return (
-    <>
-      <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
-        <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
-          <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
-        </h3>
-        <button
-          type="button"
-          onClick={() => setEdit(!edit)}
-          className="px-4 py-2 text-sm bg-[#414141] text-white rounded transition duration-300 flex items-center gap-2"
-        >
-          <FaEdit />
-          {edit ? "Cancel" : "Edit Profile"}
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center py-20 text-gray-500">Unable to fetch user data, please try again.</div>
+  )
+}
 
-      {content}
-    </>
-  );
+return (
+  <>
+    <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
+      <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
+        <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
+      </h3>
+      <button
+        type="button"
+        onClick={() => setEdit(!edit)}
+        className="px-4 py-2 text-sm bg-[#414141] text-white rounded transition duration-300 flex items-center gap-2"
+      >
+        <FaEdit />
+        {edit ? "Cancel" : "Edit Profile"}
+      </button>
+    </div>
+
+    {content}
+  </>
+);
+
 }

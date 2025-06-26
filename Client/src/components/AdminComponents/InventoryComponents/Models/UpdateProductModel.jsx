@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { updateProduct } from "../../../../services/productServices";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
@@ -33,7 +33,6 @@ const categories = [
 
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
-
 export default function UpdateProductModel({ setUpdateModel, selectedProduct }) {
 
   const [productDetails, setProductDetails] = useState({
@@ -57,6 +56,30 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       ? productDetails.image
       : productDetails?.image?.[0]?.url || ""
   );
+  const modelRef = useRef()
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modelRef.current && !modelRef.current.contains(event.target)) {
+        setUpdateModel(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setUpdateModel]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setUpdateModel(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [setUpdateModel]);
 
 
   useEffect(() => {
@@ -153,20 +176,21 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
   return (
     <motion.div
+
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      onClick={() => {
-        setUpdateModel(false)
-      }} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
 
       <motion.div
+        ref={modelRef}
         initial={{ scale: 0.9, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 50 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4">
+        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4"
+      >
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Update the Product
         </h2>

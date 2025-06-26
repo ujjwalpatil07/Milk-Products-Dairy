@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { addNewProduct } from "../../../../services/productServices";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
@@ -7,6 +7,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import PropTypes from "prop-types";
 
 const categories = [
   "Milk",
@@ -51,6 +52,31 @@ export default function AddProductModal({ setAddModel }) {
   const [selectedFile, setSelectedFile] = useState(null)
   const [isAdding, setIsAdding] = useState(false);
 
+  const modelRef = useRef()
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modelRef.current && !modelRef.current.contains(event.target)) {
+        setAddModel(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setAddModel]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setAddModel(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [setAddModel]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -78,7 +104,7 @@ export default function AddProductModal({ setAddModel }) {
       toast.error("Please fill all fields and select an image.");
       return false;
     }
-    if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife) ) {
+    if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
       toast.error("Price, Stock, Discount, Shelflife and Threshold should be numbers.");
       return false;
     }
@@ -125,6 +151,7 @@ export default function AddProductModal({ setAddModel }) {
       className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto"
     >
       <motion.div
+        ref={modelRef}
         initial={{ scale: 0.9, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 50 }}
@@ -360,6 +387,10 @@ export default function AddProductModal({ setAddModel }) {
   );
 }
 
+AddProductModal.propTypes = {
+  setAddModel: PropTypes.func.isRequired,
+};
+
 function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) {
   return (
     <div>
@@ -379,3 +410,12 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) 
     </div>
   );
 }
+
+InputWithLabel.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  icon: PropTypes.node,
+  onChange: PropTypes.func.isRequired,
+  isAdding: PropTypes.bool
+};

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { removeProduct } from "../../../../services/productServices"
 import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
@@ -9,9 +9,30 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
 
   const [isRemoving, setIsRemoving] = useState(false)
 
-  if (!selectedProduct) {
-    return toast.error("Please select a product")
-  }
+  const modelRef = useRef()
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modelRef.current && !modelRef.current.contains(event.target)) {
+        setRemoveModel(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setRemoveModel]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setRemoveModel(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [setRemoveModel]);
 
   const handleRemoveProduct = async () => {
     setIsRemoving(true);
@@ -40,6 +61,7 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center justify-center overflow-auto">
       <motion.div
+        ref={modelRef}
         initial={{ scale: 0.9, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 50 }}

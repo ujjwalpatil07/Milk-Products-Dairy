@@ -1,6 +1,6 @@
-// components/Statistics.jsx
 import React from 'react';
-import {
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion"; import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -12,6 +12,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
 const theme = localStorage.getItem("theme");
 
 const options = {
@@ -67,13 +68,23 @@ const data = {
 
 const Statistics = () => {
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-sm p-4">
+    <motion.div
+      className="bg-white dark:bg-gray-500/20 rounded-sm p-4"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>
 
-      <div className="w-full h-[450px] sm:h-[400px] md:h-[450px] lg:h-[600px]">
+      <motion.div
+        className="w-full h-[450px] sm:h-[400px] md:h-[450px] lg:h-[600px]"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+      >
         <Bar options={options} data={data} />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
