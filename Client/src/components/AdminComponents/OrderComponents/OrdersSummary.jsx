@@ -78,7 +78,7 @@ export default function OrdersSummary({
       <div className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide">
         {orderSummaryData.map((item, index) => (
           <motion.div
-            key={index}
+            key={index * 0.9}
             variants={cardVariants}
             className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
           >

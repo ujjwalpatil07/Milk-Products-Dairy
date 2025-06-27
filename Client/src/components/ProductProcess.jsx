@@ -75,7 +75,7 @@ export default function ProductProcess() {
                 >
                     {productWorkflow.map(({ icon, title, description }, i) => (
                         <motion.div
-                            key={i}
+                            key={i * 0.9}
                             className="flex flex-col items-center text-center p-3"
                             variants={{
                                 hidden: { opacity: 0, y: 20 },

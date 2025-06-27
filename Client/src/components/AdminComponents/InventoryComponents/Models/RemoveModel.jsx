@@ -3,6 +3,7 @@ import { removeProduct } from "../../../../services/productServices"
 import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import PropTypes from "prop-types"
 
 
 export default function RemoveModel({ setRemoveModel, selectedProduct }) {
@@ -48,8 +49,8 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
     } catch (error) {
       console.log(error);
     } finally {
-      setIsRemoving(false),
-        setRemoveModel(false)
+      setIsRemoving(false);
+      setRemoveModel(false);
     }
 
   }
@@ -101,3 +102,14 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
     </motion.div>
   );
 }
+
+RemoveModel.propTypes = {
+  setRemoveModel: PropTypes.func.isRequired,
+  selectedProduct: PropTypes.shape({
+    _id: PropTypes.string,
+    name: PropTypes.string,
+    category: PropTypes.string,
+    stock: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
+};

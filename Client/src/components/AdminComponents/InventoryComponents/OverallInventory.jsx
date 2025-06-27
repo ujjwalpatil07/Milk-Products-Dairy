@@ -91,7 +91,7 @@ export default function OverallInventory({
       >
         {inventorySummaryData.map((item, index) => (
           <motion.div
-            key={index}
+            key={index * 0.9}
             className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
             variants={itemVariants}
           >

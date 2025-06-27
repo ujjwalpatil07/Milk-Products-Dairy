@@ -8,7 +8,7 @@ import {
 
 export default function NewAddressModel({ setNewAddressModel, addAddress, newAddress, setNewAddress }) {
   return (
-    <div className="min-h-screen overflow-auto fixed inset-0 backdrop-blur-sm bg-black/10 flex flex-col items-center z-50 p-3">
+    <div className="min-h-screen overflow-auto fixed inset-0 backdrop-blur-sm bg-black/10 flex flex-col items-center z-100 p-3">
       <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-xl w-full max-w-xl relative">
         <button
           onClick={() => setNewAddressModel(false)}

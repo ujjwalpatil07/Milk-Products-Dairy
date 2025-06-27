@@ -17,7 +17,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
-import { UserAuthContext } from '../context/AuthProvider';
+import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from '../context/CartProvider';
 
 export default function Navbar() {

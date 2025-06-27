@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            
+
             try {
                 setAuthUserLoading(true);
                 const localUser = JSON.parse(localStorage.getItem("User"));

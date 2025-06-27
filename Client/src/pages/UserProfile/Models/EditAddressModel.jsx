@@ -3,12 +3,13 @@ import PropTypes from "prop-types";
 import {
   User, Phone, Building2, Mail,
   X, MapPin, Locate,
+  Check,
 } from "lucide-react";
 
 
 export default function EditAddressModel({ selectedAddress, editAddress, setEditModal, setSelectedAddress }) {
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto">
+    <div className="fixed inset-0 z-100 bg-black/40 backdrop-blur-sm p-4 flex flex-col justify-center items-center overflow-auto">
       <div className="bg-white dark:bg-gray-500/50 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-lg animate-fadeIn animate-scaleIn">
 
         <h2 className="text-xl sm:text-2xl font-semibold text-center mb-6 text-gray-800 dark:text-gray-100">

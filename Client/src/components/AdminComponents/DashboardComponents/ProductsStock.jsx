@@ -6,6 +6,7 @@ import {
   Legend
 } from 'chart.js';
 import { useEffect, useState } from 'react';
+import PropTypes from "prop-types"
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -64,4 +65,14 @@ export const ProductsStock = ({ fetchedProducts }) => {
       )}
     </div>
   );
+};
+
+
+ProductsStock.propTypes = {
+  fetchedProducts: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      stock: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    })
+  ),
 };

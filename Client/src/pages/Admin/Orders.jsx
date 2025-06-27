@@ -61,6 +61,8 @@ export default function Orders() {
     fetchOrders();
   }, [authAdmin?._id]);
 
+  console.log(orders)
+
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {

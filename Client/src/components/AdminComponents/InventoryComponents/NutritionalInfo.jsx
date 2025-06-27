@@ -46,16 +46,17 @@ export default function NutritionInput({ onChange, value }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="text-gray-700 dark:text-white font-medium">Nutrition Info</label>
+      <label htmlFor="key" className="text-gray-700 dark:text-white font-medium">Nutrition Info</label>
 
       {nutrition.map((item, index) => (
         <div key={index * 0.5} className="flex gap-2 items-center">
           <div className="w-1/2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+            <label htmlFor="key" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Key
             </label>
             <input
               type="text"
+              id="key"
               placeholder="e.g. Calories"
               value={item.key}
               onChange={(e) => handleChange(index, "key", e.target.value)}
@@ -63,11 +64,12 @@ export default function NutritionInput({ onChange, value }) {
             />
           </div>
           <div className="w-1/2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+            <label htmlFor="value" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Value
             </label>
             <input
               type="text"
+              id="value"
               placeholder="e.g. 100 kcal"
               value={item.value}
               onChange={(e) => handleChange(index, "value", e.target.value)}
