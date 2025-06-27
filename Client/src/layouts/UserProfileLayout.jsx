@@ -7,7 +7,6 @@ import { UserAuthContext } from "../context/AuthProvider";
 import PropTypes from "prop-types"
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import { KeyboardDoubleArrowUp, KeyboardDoubleArrowDown } from "@mui/icons-material";
-import UserOrderProvider from "../context/UserOrderProvider";
 
 export default function UserProfileLayout({ children }) {
     const [toggleDrawer, setToggleDrawer] = useState(false);
@@ -46,7 +45,7 @@ export default function UserProfileLayout({ children }) {
     }
 
     return (
-        <UserOrderProvider>
+        <>
             <div
                 ref={scrollRef}
                 className="h-screen scroll-smooth flex  flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300"
@@ -97,7 +96,7 @@ export default function UserProfileLayout({ children }) {
                     </div>
                 </div>
             </SwipeableDrawer>
-        </UserOrderProvider>
+        </>
     );
 }
 

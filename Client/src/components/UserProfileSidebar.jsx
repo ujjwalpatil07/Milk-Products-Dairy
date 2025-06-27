@@ -9,10 +9,10 @@ import {
     MdArrowForward,
 } from "react-icons/md";
 import CircularProgress from "@mui/material/CircularProgress";
-import { toast } from "react-toastify";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserAuthContext } from "../context/AuthProvider";
 import { updateUserProfilePhoto } from "../services/userProfileService";
+import { enqueueSnackbar } from "notistack";
 
 export default function UserProfileSidebar() {
 
@@ -57,14 +57,13 @@ export default function UserProfileSidebar() {
             });
 
             if (res?.success) {
-                toast.success("Profile photo updated!");
+                enqueueSnackbar("Profile photo updated!", { variant: "success" });
                 setAuthUser((prev) => ({ ...prev, photo: res.updatedPhoto }));
             } else {
-                toast.error("Failed to update photo.");
+                enqueueSnackbar("Failed to update photo.", { variant: "error" });
             }
         } catch (err) {
-            console.error(err);
-            toast.error("Something went wrong.");
+            enqueueSnackbar(err?.response?.data?.message || "Something went wrong.", { variant: "error" });
         } finally {
             setLoading(false);
             setUploadProgress(0);
@@ -75,7 +74,7 @@ export default function UserProfileSidebar() {
     const handleLogout = () => {
         handleUserLogout();
         setOpenLoginDialog(true);
-        toast.success("User Logged Out Successfully");
+        enqueueSnackbar("User Logged Out Successfully", { variant: "success" });
         navigate("/");
     }
 
@@ -92,7 +91,7 @@ export default function UserProfileSidebar() {
             <div className="flex flex-col items-center mb-5 relative group">
                 <div className="relative w-24 h-24">
                     <img
-                        src={photoUrl}
+                        src={photoUrl || null}
                         alt="User"
                         className="rounded-full w-24 h-24 object-cover border"
                     />

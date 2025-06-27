@@ -2,13 +2,14 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { signupUser } from "../../../services/userService";
+import { useSnackbar } from "notistack";
 
 export default function UserSignUp() {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function UserSignUp() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      return toast.error("Passwords do not match");
+      return enqueueSnackbar("Passwords do not match", { variant: "error" });
     }
 
     try {
@@ -36,12 +37,12 @@ export default function UserSignUp() {
 
       const res = await signupUser(formData);
       if (res?.success) {
-        toast.success("OTP sent successfully");
+        enqueueSnackbar("OTP sent successfully", { variant: "success" });
         navigate("/signup/otp-verification", { state: { formData } });
         setFormData({ email: "", password: "", confirmPassword: "" });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Signup failed.");
+      enqueueSnackbar(error?.response?.data?.message || "Signup failed.", { variant: "error" });
     } finally {
       setIsLoading(false);
     }

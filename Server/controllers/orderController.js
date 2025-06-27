@@ -1,7 +1,6 @@
 import Order from "../models/OrderSchema.js";
 import Admin from "../models/AdminSchema.js";
 import User from "../models/UserSchema.js";
-import Product from "../models/ProductSchema.js";
 
 export const getAllUserOrders = async (req, res) => {
   const { userId } = req.body;
@@ -77,12 +76,8 @@ export const getAdminOrders = async (req, res) => {
       .json({ success: false, message: "Admin not found." });
   }
 
-// console.log(admin?.pendingOrders)
-
   res.status(200).json({
     success: true,
     orders: admin.pendingOrders,
   });
 };
-
-

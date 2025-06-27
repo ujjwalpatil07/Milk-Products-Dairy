@@ -1,13 +1,14 @@
-import React, { createContext, useState, useMemo, useEffect, useContext } from "react";
+import React, { createContext, useState, useMemo, useEffect, useContext, useCallback } from "react";
 import { getUserOrders } from "../services/orderService";
 import { UserAuthContext } from "./AuthProvider";
-import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
+import { useSnackbar } from "notistack";
 
 export const UserOrderContext = createContext();
 
 export default function UserOrderProvider({ children }) {
 
+    const { enqueueSnackbar } = useSnackbar();
     const { authUser } = useContext(UserAuthContext);
 
     const [userOrders, setUserOrders] = useState([]);
@@ -22,31 +23,50 @@ export default function UserOrderProvider({ children }) {
                 if (res?.success) {
                     setUserOrders((res.orders || []).reverse());
                 } else {
-                    toast.error(res.message || "Failed to fetch your orders. Please try again.")
+                    enqueueSnackbar(res.message || "Failed to fetch your orders. Please try again.", { variant: "error" });
                 }
             } catch (err) {
-                toast.error(err?.response?.data?.message || "Something went wrong while fetching orders.")
+                enqueueSnackbar(err?.response?.data?.message || "Something went wrong while fetching orders.", { variant: "error" })
             } finally {
                 setOrderLoading(false);
             }
         };
 
         if (authUser?._id) {
+            setNotification(authUser?.notifications || []);
             fetchOrders();
         }
-    }, [authUser?._id]);
+    }, [authUser?._id, authUser?.notifications, enqueueSnackbar]);
 
-    const handleUserNotification = ({ title, description }) => {
-        setNotification(prev => [...prev, { title, description }]);
-    }
+    const handleUserNotification = useCallback(({ title, description, date }) => {
+        setNotification((prev) => [
+            {
+                title,
+                description,
+                date: date || new Date().toISOString(),
+            },
+            ...prev,
+        ]);
+        enqueueSnackbar(description, { variant: "info" });
+    }, [enqueueSnackbar]);
+
+    const handleUserOrderUpdateStatus = ({ orderId, status }) => {
+        setUserOrders((prevOrders) =>
+            prevOrders?.map((order) =>
+                order?._id === orderId ? { ...order, status } : order
+            )
+        );
+    };
 
     useEffect(() => {
         socket.on("user:notification", handleUserNotification);
+        socket.on("user-order:updated-status", handleUserOrderUpdateStatus);
 
         return () => {
             socket.off("user:notification", handleUserNotification);
+            socket.off("user-order:updated-status", handleUserOrderUpdateStatus);
         }
-    }, []);
+    }, [handleUserNotification]);
 
     const value = useMemo(() => ({
         userOrders,

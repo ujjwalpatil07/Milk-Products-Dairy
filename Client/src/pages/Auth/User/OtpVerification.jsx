@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { useSnackbar } from "notistack";
+import { verifyUserOTP } from "../../../services/userService";
 
 export default function OtpVerification() {
+
   const navigate = useNavigate();
   const location = useLocation();
+  const { enqueueSnackbar } = useSnackbar();
 
   const formData = location?.state?.formData;
 
@@ -38,27 +40,23 @@ export default function OtpVerification() {
   const handleVerify = async () => {
     const enteredOtp = otp.join("");
     if (enteredOtp.length !== 5) {
-      toast.error("Please enter a valid 5-digit OTP");
+      enqueueSnackbar("Please enter a valid 5-digit OTP", { variant: "error" });
       return;
     }
 
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:9000/u/signup/otp-verification",
-        formData
-      );
+      const data = await verifyUserOTP(formData);
 
-      if (res?.data?.success) {
-        localStorage.setItem("User", JSON.stringify(res?.data?.user));
-        toast.success("User signed up successfully");
+      if (data?.success) {
+        localStorage.setItem("User", JSON.stringify(data?.user));
+        enqueueSnackbar("User signed up successfully", { variant: "success" });
         navigate("/signup/info-input");
       } else {
-        toast.error("Something went wrong");
+        enqueueSnackbar("Something went wrong", { variant: "error" });
       }
     } catch (error) {
-      console.log(error)
-      toast.error(error?.response?.data?.message || "User already exists or server error.");
+      enqueueSnackbar(error?.response?.data?.message || "User already exists or server error.", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -97,7 +95,7 @@ export default function OtpVerification() {
         <div className="mt-5 text-sm flex justify-center text-gray-600 dark:text-gray-400">
           <p>Didn't receive OTP?&nbsp;</p>
           <button
-            onClick={() => toast.info("Resend OTP functionality not implemented yet.")}
+            onClick={() => enqueueSnackbar("Resend OTP functionality not implemented yet.", { variant: "info" })}
             className="text-[#FF8682] font-semibold hover:underline hover:text-[#e2595b]"
           >
             Resend OTP

@@ -1,17 +1,19 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { useDebounce } from "use-debounce";
+import { useSnackbar } from "notistack";
+
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { confirmUerOrder, rejectUserOrder } from "../../../services/orderService";
-import { toast } from "react-toastify";
 import { AdminAuthContext } from "../../../context/AuthProvider";
 import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterOrdersBySearch } from "../../../utils/filterOrders";
-import { useDebounce } from "use-debounce";
+import { socket } from "../../../socket/socket";
 
 export default function OrderDetails({ orders, loading }) {
 
+  const { enqueueSnackbar } = useSnackbar();
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
-  const { setAuthAdmin } = useContext(AdminAuthContext);
+  const { authAdmin } = useContext(AdminAuthContext);
 
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
 
@@ -23,6 +25,82 @@ export default function OrderDetails({ orders, loading }) {
     setLocalOrders(orders);
   }, [orders]);
 
+  const handleOrderUpdateFailed = useCallback(({ message, status }) => {
+    const action = status === "Cancelled" ? "cancel" : "accept";
+    enqueueSnackbar(message || `Failed to ${action} order.`, { variant: "error" });
+    setProcessingId(null);
+  }, [enqueueSnackbar]);
+
+  const handleOrderUpdateSuccess = useCallback(({ message, status }) => {
+    const action = status === "Cancelled" ? "cancelled" : "accepted";
+    enqueueSnackbar(message || `Order ${action} successfully.`, { variant: "success" });
+    setProcessingId(null);
+  }, [enqueueSnackbar]);
+
+  useEffect(() => {
+    socket.on("order:update-status-failed", handleOrderUpdateFailed);
+    socket.on("order:update-status-success", handleOrderUpdateSuccess);
+
+    return () => {
+      socket.off("order:update-status-failed", handleOrderUpdateFailed);
+      socket.off("order:update-status-success", handleOrderUpdateSuccess);
+    };
+  }, [handleOrderUpdateFailed, handleOrderUpdateSuccess]);
+
+  const handleAcceptOrders = async (orderId, userId) => {
+
+    if (!authAdmin?._id) {
+      enqueueSnackbar("Unauthorized: Please login as admin.", { variant: "error" });
+      return;
+    }
+
+    if (!orderId) {
+      enqueueSnackbar("Invalid order ID.", { variant: "error" });
+      return;
+    }
+
+    if (!userId) {
+      enqueueSnackbar("Invalid user ID.", { variant: "error" });
+      return;
+    }
+
+    setProcessingId({ orderId, status: "Accept" });
+
+    socket.emit("order:accept", {
+      orderId,
+      status: "Confirmed",
+      userId,
+      date: new Date().toISOString(),
+    });
+  };
+
+  const handleRejectOrders = async (orderId, userId) => {
+
+    if (!authAdmin?._id) {
+      enqueueSnackbar("Unauthorized: Please login as admin.", { variant: "error" });
+      return;
+    }
+
+    if (!orderId) {
+      enqueueSnackbar("Invalid order ID.", { variant: "error" });
+      return;
+    }
+
+    if (!userId) {
+      enqueueSnackbar("Invalid user ID.", { variant: "error" });
+      return;
+    }
+
+    setProcessingId({ orderId, status: "Reject" });
+
+    socket.emit("order:reject", {
+      orderId,
+      userId,
+      status: "Cancelled",
+      date: new Date().toISOString(),
+    });
+  };
+  
   const handleSortOrders = useCallback(() => {
     const sorted = [...orders];
     if (sortOption === "latest") {
@@ -37,59 +115,11 @@ export default function OrderDetails({ orders, loading }) {
 
   useEffect(() => {
     handleSortOrders();
-  }, [sortOption, orders, handleSortOrders]);
+  }, [orders, handleSortOrders]);
 
-  const handleAcceptOrders = async (orderId) => {
-    setProcessingId(orderId);
-    const toastId = toast.loading("Accepting order...");
-    try {
-      const data = await confirmUerOrder(orderId, "Confirmed");
-      if (data.success) {
-        toast.update(toastId, { render: "Order confirmed!", type: "success", isLoading: false, autoClose: 3000 });
-        setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
-        setAuthAdmin((prevAdmin) => ({
-          ...prevAdmin,
-          pendingOrders: prevAdmin.pendingOrders.filter(
-            (id) => id !== orderId && id !== orderId.toString()
-          ),
-        }));
-      } else {
-        toast.update(toastId, { render: "Failed to confirm order.", type: "error", isLoading: false, autoClose: 3000 });
-      }
-    } catch (error) {
-      toast.update(toastId, { render: error?.response?.data?.message || "Error confirming order!", type: "error", isLoading: false, autoClose: 3000 });
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const handleRejectOrders = async (orderId) => {
-    setProcessingId(orderId);
-    const toastId = toast.loading("Rejecting order...");
-    try {
-      const data = await rejectUserOrder(orderId);
-
-      if (data.success) {
-        toast.update(toastId, { render: "Order rejected.", type: "info", isLoading: false, autoClose: 3000 });
-        setLocalOrders((prev) => prev.filter((order) => order._id !== orderId));
-        setAuthAdmin((prevAdmin) => ({
-          ...prevAdmin,
-          pendingOrders: prevAdmin.pendingOrders.filter(
-            (id) => id !== orderId && id !== orderId.toString()
-          ),
-        }));
-      } else {
-        toast.update(toastId, { render: (data.error || "Failed to reject order."), type: "error", isLoading: false, autoClose: 3000 });
-      }
-    } catch (error) {
-      toast.update(toastId, { render: (error?.response?.data?.message || "Error rejecting order."), type: "error", isLoading: false, autoClose: 3000 });
-    } finally {
-      setProcessingId(null);
-    }
-  };
 
   const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
-  
+
   const filterOptions = [
     { value: "latest", label: "Order Date: Newest First" },
     { value: "oldest", label: "Order Date: Oldest First" },
@@ -98,7 +128,6 @@ export default function OrderDetails({ orders, loading }) {
   ];
 
   let content;
-
   if (loading) {
     content = (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
@@ -185,32 +214,35 @@ export default function OrderDetails({ orders, loading }) {
             </div>
             <div className="space-x-4">
               <button
-                onClick={() => handleAcceptOrders(order._id)}
-                disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
-                  ? "bg-green-400 cursor-not-allowed"
+                onClick={() => handleAcceptOrders(order?._id, owner?._id)}
+                disabled={!!processingId}
+                className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order?._id
+                  ? "bg-green-400"
                   : "bg-green-600 hover:bg-green-700"
                   }`}
               >
-                Accept
+                {(processingId?.orderId === order?._id && processingId?.status === "Accept")
+                  ? "Loading..."
+                  : "Accept"}
               </button>
+
               <button
-                onClick={() => handleRejectOrders(order._id)}
-                disabled={processingId === order._id}
-                className={`px-4 py-2 rounded transition text-white ${processingId === order._id
-                  ? "bg-red-400 cursor-not-allowed"
+                onClick={() => handleRejectOrders(order?._id, owner?._id)}
+                disabled={!!processingId}
+                className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order._id
+                  ? "bg-red-400"
                   : "bg-red-600 hover:bg-red-700"
                   }`}
               >
-                Reject
+                {(processingId?.orderId === order._id && processingId?.status === "Reject")
+                  ? "Loading..."
+                  : "Reject"}
               </button>
             </div>
           </div>
         </div>
       );
     });
-
-    
   }
 
   return (

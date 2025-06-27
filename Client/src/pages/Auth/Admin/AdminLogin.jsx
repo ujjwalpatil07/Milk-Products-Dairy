@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginAdmin } from "../../../services/adminService";
 import { UserAuthContext } from "../../../context/AuthProvider";
+import { useSnackbar } from "notistack";
 
 const getTextFieldStyles = (theme) => ({
   input: {
@@ -32,6 +32,7 @@ const getTextFieldStyles = (theme) => ({
 export default function AdminLogin() {
 
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { handleUserLogout } = useContext(UserAuthContext);
   const { theme } = useContext(ThemeContext);
 
@@ -60,11 +61,11 @@ export default function AdminLogin() {
       if (data) {
         localStorage.setItem("Admin", JSON.stringify(data.admin));
         handleUserLogout();
-        toast.success("Logged in successfully as Admin");
+        enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
         navigate("/admin/dashboard");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Login failed, try again");
+      enqueueSnackbar(err?.response?.data?.message || "Login failed, try again", { variant: "error" });
     } finally {
       setIsLoading(false);
     }

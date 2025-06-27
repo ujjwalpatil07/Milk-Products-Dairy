@@ -15,6 +15,7 @@ import { ThemeProvider } from './context/ThemeProvider.jsx'
 import { AuthProvider } from "./context/AuthProvider.jsx"
 import { ProductProvider } from './context/ProductProvider.jsx'
 import { CartProvider } from './context/CartProvider.jsx'
+import UserOrderProvider from './context/UserOrderProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,7 +24,9 @@ createRoot(document.getElementById('root')).render(
         <ProductProvider>
           <ThemeProvider>
             <CartProvider>
-              <App />
+              <UserOrderProvider>
+                <App />
+              </UserOrderProvider>
             </CartProvider>
           </ThemeProvider>
         </ProductProvider>

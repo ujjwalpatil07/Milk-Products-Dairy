@@ -37,3 +37,4 @@ export const getExpiryStatusCounts = (fetchedProducts) => {
 
   return { expiredCount, expiringSoonCount };
 };
+

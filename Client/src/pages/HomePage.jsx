@@ -36,7 +36,7 @@ export default function HomePage() {
                     transition={{ duration: 0.7, ease: "easeOut" }}
                     className="relative max-w-7xl mx-auto overflow-hidden rounded-xl shadow-lg"
                 >
-                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-10" />
+                    <div className="absolute inset-0 bg-black/50 z-10" />
 
                     <img
                         src={heroImage}

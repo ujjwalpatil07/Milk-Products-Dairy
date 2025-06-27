@@ -4,8 +4,8 @@ import Slide from '@mui/material/Slide';
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
-import { toast } from "react-toastify";
 import { loginAdmin } from "../../../services/adminService";
+import { useSnackbar } from "notistack";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -15,6 +15,7 @@ export default function LoginDialog() {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const { enqueueSnackbar } = useSnackbar();
 
     const { openLoginDialog, setOpenLoginDialog, handleUserLogout } = useContext(UserAuthContext);
     const { handleAdminLogout } = useContext(AdminAuthContext);
@@ -34,19 +35,19 @@ export default function LoginDialog() {
                 if (data?.user) {
                     localStorage.setItem("User", JSON.stringify(data.user));
                     handleAdminLogout();
-                    toast.success("Login Successful!");
+                    enqueueSnackbar("Login Successful!", { variant: "success" });
                     setOpenLoginDialog(false);
                     setEmail("");
                     setPassword("");
                 } else {
-                    toast.error("User login failed.");
+                    enqueueSnackbar("User login failed.", { variant: "error" });
                 }
             } else {
                 const data = await loginAdmin(email, password);
                 if (data?.admin) {
                     localStorage.setItem("Admin", JSON.stringify(data.admin));
                     handleUserLogout();
-                    toast.success("Logged in successfully as Admin");
+                    enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
                     setEmail("");
                     setPassword("");
                     setOpenLoginDialog(false);
@@ -54,12 +55,12 @@ export default function LoginDialog() {
                         navigate("/admin/dashboard");
                     }
                 } else {
-                    toast.error("Admin login failed.");
+                    enqueueSnackbar("Admin login failed.", { variant: "error" });
                 }
             }
 
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Server error or invalid credentials.");
+            enqueueSnackbar(error?.response?.data?.message || "Server error or invalid credentials.", { variant: "error" });
         } finally {
             setLoading(false);
         }

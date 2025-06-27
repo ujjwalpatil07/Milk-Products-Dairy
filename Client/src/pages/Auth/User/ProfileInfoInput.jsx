@@ -1,16 +1,17 @@
 // Updated ProfileInfoInput with dark/light theme support, responsive design, toasts, and more
 import React, { useContext, useState } from "react";
 import { TextField, Button } from "@mui/material";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { maharashtraCities } from "../../../data/cities";
 import { AdminAuthContext } from "../../../context/AuthProvider";
+import { useSnackbar } from "notistack";
+import { submitSignupForm } from "../../../services/userProfileService";
 
 export default function ProfileInfoInput() {
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
@@ -86,7 +87,7 @@ export default function ProfileInfoInput() {
     try {
       const userId = JSON.parse(localStorage.getItem("User"))?._id;
       if (!userId) {
-        toast.error("User not logged in, please login!");
+        enqueueSnackbar("User not logged in, please login!", { variant: "error" });
         navigate("/login");
         return;
       }
@@ -96,21 +97,18 @@ export default function ProfileInfoInput() {
       formData.append("profileInfo", JSON.stringify(profileInfo));
       if (selectedFile) formData.append("photo", selectedFile);
 
-      const res = await axios.post("http://localhost:9000/u/signup/info-input", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const data = await submitSignupForm(formData);
 
-      if (res?.data?.success) {
-        localStorage.setItem("User", JSON.stringify(res?.data?.user));
+      if (data?.success) {
+        localStorage.setItem("User", JSON.stringify(data?.user));
         handleAdminLogout();
-        toast.success("Profile created successfully!");
+        enqueueSnackbar("Profile created successfully!", { variant: "success" });
         navigate("/home");
       } else {
-        toast.error("Something went wrong!");
+        enqueueSnackbar("Something went wrong!", { variant: "error" });
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Server error occurred!");
-      // console.log(err)
+      enqueueSnackbar(err?.response?.data?.message || "Server error occurred!", { variant: "error" });
     } finally {
       setIsLoading(false);
     }

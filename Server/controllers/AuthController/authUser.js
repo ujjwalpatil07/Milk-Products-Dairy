@@ -6,16 +6,20 @@ export const signUpUser = async (req, res) => {
   const { email, password, confirmPassword } = req.body;
 
   if (!email || !password || !confirmPassword) {
-    return res.status(400).json({ success:false, message: "All fields are required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return res.status(400).json({ success:false, message: "User already exists" });
+    return res
+      .status(400)
+      .json({ success: false, message: "User already exists" });
   }
 
   res.status(201).json({
-    success : true,
+    success: true,
     message: "User info is Correct",
   });
 };
@@ -25,13 +29,17 @@ export const loginUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(400).json({ message: "Invalid Email, Please Enter Valid Email." });
+    return res
+      .status(400)
+      .json({ message: "Invalid Email, Please Enter Valid Email." });
   }
 
   const isMatched = await bcryptjs.compare(password, user.password);
 
   if (!isMatched) {
-    return res.status(400).json({ message: "Wrong Password, Please Enter Correct Password" });
+    return res
+      .status(400)
+      .json({ message: "Wrong Password, Please Enter Correct Password" });
   }
 
   res.status(200).json({
@@ -87,7 +95,7 @@ export const handleInfoInput = async (req, res) => {
   res.status(201).json({
     success: true,
     message: "User updated",
-    user: { _id: updatedUser?._id, email : updatedUser?.email },
+    user: { _id: updatedUser?._id, email: updatedUser?.email },
   });
 };
 
@@ -108,4 +116,46 @@ export const getUser = async (req, res) => {
   }
 
   return res.status(200).json({ success: true, user });
+};
+
+export const removeUserNotification = async (req, res) => {
+  const { userId, mode, index } = req.body;
+
+  if (!userId || !mode) {
+    return res
+      .status(400)
+      .json({ success: false, message: "userId and mode are required." });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found." });
+  }
+
+  switch (mode) {
+    case "index":
+      if (
+        typeof index !== "number" ||
+        index < 0 ||
+        index >= user.notifications.length
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid index." });
+      }
+      user.notifications.splice(index, 1);
+      break;
+
+    case "all":
+      user.notifications = [];
+      break;
+
+    default:
+      return res.status(400).json({ success: false, message: "Invalid mode." });
+  }
+
+  await user.save();
+  return res
+    .status(200)
+    .json({ success: true, message: "Notification(s) deleted successfully." });
 };

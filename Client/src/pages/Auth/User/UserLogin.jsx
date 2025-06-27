@@ -2,13 +2,15 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { toast } from "react-toastify";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginUser } from "../../../services/userService";
 import { AdminAuthContext } from "../../../context/AuthProvider";
+import { useSnackbar } from "notistack";
 
 export default function UserLogin() {
+
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
@@ -40,13 +42,13 @@ export default function UserLogin() {
       if (data?.user) {
         localStorage.setItem("User", JSON.stringify(data.user));
         handleAdminLogout();
-        toast.success("Login Successful!");
+        enqueueSnackbar("Login Successful!", { variant: "success" });
         navigate("/home");
       } else {
-        toast.error("Login failed, please try again.");
+        enqueueSnackbar("Login failed, please try again.", { variant: "error" });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Server error or invalid credentials.");
+      enqueueSnackbar(error?.response?.data?.message || "Server error or invalid credentials.", { variant: "error" });
     } finally {
       setIsLoading(false);
       setFormData({ email: "", password: "" });

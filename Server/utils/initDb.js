@@ -52,9 +52,6 @@ const initDB = async () => {
     );
 
     const product = await Product.findById(id);
-
-    console.log(product);
-
     
   } catch (error) {
     console.error("Error during DB initialization:", error);
