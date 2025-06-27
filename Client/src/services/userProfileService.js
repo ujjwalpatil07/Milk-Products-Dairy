@@ -1,4 +1,4 @@
-import api from "./api"; 
+import api from "./api";
 export const updateUserProfilePhoto = async (formData, onUploadProgress) => {
   const res = await api.post("/user-profile/edit-profilePhoto", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -47,17 +47,33 @@ export const updateAddress = async (addressId, updatedData) => {
 };
 
 export const addToWishlist = async (userId, productId) => {
-  const res = await api.put("/user-profile/add-to-wishlist", { userId, productId });
+  const res = await api.put("/user-profile/add-to-wishlist", {
+    userId,
+    productId,
+  });
   return res.data;
 };
 
 export const getWishlistedProducts = async (userId) => {
-  const res = await api.post("/user-profile/get-wishlisted", {userId});
-  return res?.data
-}
+  const res = await api.post("/user-profile/get-wishlisted", { userId });
+  return res?.data;
+};
 
 export const removeProductFromWishList = async (userId, productId) => {
-  const res = await api.post("/user-profile/remove-from-wishlist", { userId, productId});
+  const res = await api.post("/user-profile/remove-from-wishlist", {
+    userId,
+    productId,
+  });
   return res?.data;
-}
+};
 
+export const removeUserNotification = async (userId, mode, index) => {
+  const res = await api.delete("/u/delete-notification", {
+    data: {
+      userId,
+      mode,
+      index,
+    },
+  });
+  return res?.data;
+};

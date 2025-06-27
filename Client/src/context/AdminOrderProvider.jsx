@@ -35,13 +35,25 @@ export default function AdminOrderProvider({ children }) {
 
     const handleNewPendingOrder = ({ order }) => {
         setAdminOrders((prevOrders) => [...prevOrders, order]);
-    }
+    };
+
+    const handleRemoveOrder = ({ orderId }) => {
+        if (!orderId) return;
+
+        setAdminOrders((prevOrders) =>
+            prevOrders?.filter((order) => order?._id !== orderId)
+        );
+    };
 
     useEffect(() => {
         socket.on("order:new-pending-order", handleNewPendingOrder);
+        socket.on("order:accept-success", handleRemoveOrder);
+        socket.on("order:reject-success", handleRemoveOrder);
 
         return () => {
             socket.off("order:new-pending-order", handleNewPendingOrder);
+            socket.off("order:accept-success", handleRemoveOrder);
+            socket.off("order:reject-success", handleRemoveOrder);
         }
     }, []);
 

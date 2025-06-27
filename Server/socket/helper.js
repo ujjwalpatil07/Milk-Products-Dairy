@@ -5,7 +5,8 @@ import Address from "../models/AddressShema.js";
 import Product from "../models/ProductSchema.js";
 
 export const validateOrderData = (data) => {
-  const { address, productsData, paymentMode, totalAmount, userId } = data.orderData;
+  const { address, productsData, paymentMode, totalAmount, userId } =
+    data.orderData;
   if (
     !address ||
     !Array.isArray(productsData) ||
@@ -55,4 +56,13 @@ export const validateAndProcessProducts = async (productsData, socket) => {
   }
 
   return { validatedProducts, serverTotal };
+};
+
+export const addUserNotification = async (
+  user,
+  { title, description, date }
+) => {
+  user.notifications.unshift({ title, description, date });
+  user.notifications = user.notifications.slice(0, 50);
+  await user.save();
 };

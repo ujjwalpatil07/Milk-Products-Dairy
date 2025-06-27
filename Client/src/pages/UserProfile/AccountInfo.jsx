@@ -287,7 +287,7 @@ export default function AccountInfo() {
 
   return (
     <>
-      <div className="w-full !h-fit md:max-w-2xl lg:w-3xl md:h-full mx-auto flex justify-between items-center mb-4">
+      <div className="w-full !h-fit md:h-full mx-auto flex justify-between items-center mb-4">
         <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
           <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
         </h3>
@@ -304,5 +304,4 @@ export default function AccountInfo() {
       {content}
     </>
   );
-
 }

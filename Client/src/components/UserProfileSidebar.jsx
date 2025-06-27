@@ -92,7 +92,7 @@ export default function UserProfileSidebar() {
             <div className="flex flex-col items-center mb-5 relative group">
                 <div className="relative w-24 h-24">
                     <img
-                        src={photoUrl}
+                        src={photoUrl || null}
                         alt="User"
                         className="rounded-full w-24 h-24 object-cover border"
                     />

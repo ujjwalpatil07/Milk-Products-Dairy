@@ -39,8 +39,6 @@ export default function Orders() {
   const [allOrders, setAllOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log(orders)
-
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {

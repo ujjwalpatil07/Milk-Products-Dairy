@@ -45,6 +45,7 @@ export default function OrderCheckoutPage() {
     enqueueSnackbar(data.message || 'Order placed successfully!', { variant: 'success' });
     clearCart();
     setOpen(false);
+    setOrderLoading(false);
     navigate(`/user-profile/orders`);
   }, [clearCart, navigate, enqueueSnackbar]);
 
@@ -74,7 +75,7 @@ export default function OrderCheckoutPage() {
 
   const handlePaymentMode = () => {
     if (!deliveryAddress) {
-      
+
       enqueueSnackbar("Please select a delivery address before proceeding to checkout.", { variant: "error" });
       return;
     }
@@ -146,7 +147,9 @@ export default function OrderCheckoutPage() {
     } catch (error) {
       enqueueSnackbar(error?.response?.data?.message || "An error occurred while placing the order.", { variant: "error" });
     } finally {
-      setOrderLoading(false);
+      if (selectedMode === "Online") {
+        setOrderLoading(false);
+      }
     }
   };
 
@@ -306,8 +309,9 @@ export default function OrderCheckoutPage() {
             Back to Cart
           </Link>
           <button
+            disabled={orderLoading}
             onClick={handlePaymentMode}
-            className="bg-[#843E71] text-white px-6 py-2 rounded hover:bg-[#843e71d4]"
+            className="bg-[#843E71] text-white px-6 py-2 rounded hover:bg-[#843e71d4] disabled:cursor-not-allowed"
           >
             Place Order
           </button>

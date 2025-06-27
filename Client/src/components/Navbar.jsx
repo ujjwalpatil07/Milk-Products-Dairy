@@ -24,6 +24,8 @@ import { CartContext } from '../context/CartProvider';
 import { UserOrderContext } from '../context/UserOrderProvider';
 import { Bell, X } from 'lucide-react';
 import Slide from '@mui/material/Slide';
+import { removeUserNotification } from '../services/userProfileService';
+import { useSnackbar } from 'notistack';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -31,6 +33,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function Navbar() {
 
+    const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -40,7 +43,7 @@ export default function Navbar() {
     const { notification, setNotification } = useContext(UserOrderContext);
 
     const [open, setOpen] = useState(false);
-
+    const [notificationLoadingIndex, setNotificationLoadingIndex] = useState(null);
     const [animate, setAnimate] = useState(false);
     const [notificationDialog, setNotificationDialog] = useState(false);
     const prevCountRef = useRef(notification.length);
@@ -48,7 +51,7 @@ export default function Navbar() {
     useEffect(() => {
         if (notification.length > prevCountRef.current) {
             setAnimate(true);
-            setTimeout(() => setAnimate(false), 500);
+            setTimeout(() => setAnimate(false), 2600);
         }
         prevCountRef.current = notification.length;
     }, [notification.length]);
@@ -80,12 +83,35 @@ export default function Navbar() {
         navigate("/cart");
     }
 
-    const handleClearAll = () => {
-        setNotification([]);
-    };
+    const handleRemoveNotification = async (index, mode) => {
 
-    const handleClearOne = (index) => {
-        setNotification((prev) => prev.filter((_, i) => i !== index));
+        if (!authUser?._id) {
+            enqueueSnackbar("Please login to manage notifications.", { variant: "warning" });
+            return;
+        }
+
+        if (mode === "all") {
+            setNotificationLoadingIndex("all");
+        } else {
+            setNotificationLoadingIndex(index);
+        }
+
+        try {
+            const res = await removeUserNotification(authUser?._id, mode, index);
+            if (res?.success) {
+                if (mode === "all") {
+                    setNotification([]);
+                } else if (mode === "index") {
+                    setNotification((prev) => prev.filter((_, i) => i !== index));
+                }
+            } else {
+                enqueueSnackbar(res?.message || "Failed to remove notification.", { variant: "error" });
+            }
+        } catch (error) {
+            enqueueSnackbar(error?.response?.data?.message || "Server error while removing notification.", { variant: "error" });
+        } finally {
+            setNotificationLoadingIndex(null);
+        }
     };
 
     return (
@@ -134,7 +160,7 @@ export default function Navbar() {
                             <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                             {notification?.length > 0 && (
                                 <span
-                                    className={`absolute top-0 right-0 font-bold px-1 h-fit bg-[#833E7110] dark:bg-[#833E7150] text-[#b3549a] rounded-full text-[12px] transition-all duration-300 ${animate ? "animate-bounce" : ""}`}
+                                    className={`absolute top-0 right-0 font-bold px-1.5 h-fit bg-red-500 text-white rounded-md text-[12px] transition-all duration-300 ${animate ? "animate-bounce" : ""}`}
                                 >
                                     {notification.length}
                                 </span>
@@ -226,7 +252,7 @@ export default function Navbar() {
                         m: 0,
                         width: '350px',
                         maxHeight: "300px",
-                        backgroundColor: theme === "dark" ? "#2f2f2f" : "#ffffff",
+                        backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
                     },
                 }}
                 fullWidth
@@ -236,8 +262,9 @@ export default function Navbar() {
                         <h2 className="text-lg font-semibold">Notifications</h2>
                         {notification.length > 0 && (
                             <button
-                                onClick={handleClearAll}
-                                className="text-xs text-red-500 hover:underline"
+                                disabled={notificationLoadingIndex}
+                                onClick={() => handleRemoveNotification(-1, "all")}
+                                className="text-xs text-red-500 hover:underline disabled:cursor-not-allowed"
                             >
                                 Clear All
                             </button>
@@ -260,17 +287,23 @@ export default function Navbar() {
                                         <p className="font-medium text-sm pr-5">{item?.title}</p>
 
                                         <button
-                                            onClick={() => handleClearOne(idx)}
-                                            className="text-gray-400 hover:text-red-500 text-sm"
+                                            disabled={notificationLoadingIndex !== null}
+                                            onClick={() => handleRemoveNotification(idx, "index")}
+                                            className="text-gray-400 hover:text-red-500 text-sm disabled:cursor-not-allowed"
                                             title="Clear"
                                         >
-                                            <X size={14} />
+                                            {notificationLoadingIndex === idx ? (
+                                                <div className="w-3 h-3 border-[2px] border-t-transparent border-gray-500 rounded-full animate-spin" />
+                                            ) : (
+                                                <X size={14} />
+                                            )}
                                         </button>
+
                                     </div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                    <p className="text-xs text-gray-600 dark:text-gray-300">
                                         {item?.description}
                                     </p>
-                                    <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-1 text-right">
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 text-right">
                                         {formatDistanceToNow(new Date(item?.date), { addSuffix: true })}
                                     </p>
                                 </li>

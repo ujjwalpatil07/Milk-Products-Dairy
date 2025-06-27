@@ -6,7 +6,11 @@ import Address from "../models/AddressShema.js";
 import Product from "../models/ProductSchema.js";
 import Review from "../models/ReviewSchema.js";
 
-import { validateOrderData, validateAndProcessProducts } from "./helper.js";
+import {
+  validateOrderData,
+  validateAndProcessProducts,
+  addUserNotification,
+} from "./helper.js";
 import mongoose from "mongoose";
 
 export const connectToSocket = (server) => {
@@ -168,6 +172,197 @@ export const connectToSocket = (server) => {
         socket.emit("new-order-place-failed", {
           message:
             error?.message || "Something went wrong while placing the order.",
+        });
+      }
+    });
+
+    socket.on("order:accept", async ({ orderId, status, date, userId }) => {
+      try {
+        if (!orderId || !status) {
+          return socket.emit("order:update-status-failed", {
+            message: "Order ID and status are required.",
+            status,
+          });
+        }
+
+        const validStatuses = [
+          "Pending",
+          "Processing",
+          "Shipped",
+          "Delivered",
+          "Cancelled",
+          "Confirmed",
+        ];
+
+        if (!validStatuses.includes(status)) {
+          return socket.emit("order:update-status-failed", {
+            message: "Invalid status value.",
+            status,
+          });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return socket.emit("order:update-status-failed", {
+            message: "User not found.",
+            status,
+          });
+        }
+
+        const order = await Order.findByIdAndUpdate(
+          orderId,
+          { status },
+          { new: true }
+        );
+
+        if (!order) {
+          return socket.emit("order:update-status-failed", {
+            message: "Order not found.",
+            status,
+          });
+        }
+
+        await Admin.updateMany(
+          { pendingOrders: order._id },
+          { $pull: { pendingOrders: order._id } }
+        );
+
+        await addUserNotification(user, {
+          title: "Order Confirmed",
+          description: "Your order has been confirmed and is being processed.",
+          date,
+        });
+
+        socket.emit("order:update-status-success", {
+          message: `Order accepted successfully.`,
+          status,
+        });
+
+        for (const [_, socketSet] of adminSocketMap) {
+          for (const socketId of socketSet) {
+            io.to(socketId).emit("order:accept-success", {
+              orderId,
+            });
+          }
+        }
+
+        if (userId && userSocketMap.has(userId)) {
+          for (const socketId of userSocketMap.get(userId)) {
+            io.to(socketId).emit("user-order:updated-status", {
+              orderId,
+              status,
+            });
+
+            io.to(socketId).emit("user:notification", {
+              title: "Order Confirmed",
+              description:
+                "Your order has been confirmed and is being processed.",
+              date,
+            });
+          }
+        }
+      } catch (error) {
+        socket.emit("order:update-status-failed", {
+          message:
+            error?.message ||
+            "Internal server error while accepting the order.",
+          status,
+        });
+      }
+    });
+
+    socket.on("order:reject", async ({ orderId, status, date, userId }) => {
+      try {
+        if (!orderId || !status || !userId) {
+          return socket.emit("order:update-status-failed", {
+            message: "Missing required fields.",
+            status: "Cancelled",
+          });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+          return socket.emit("order:update-status-failed", {
+            message: "Order not found.",
+            status: "Cancelled",
+          });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return socket.emit("order:update-status-failed", {
+            message: "User not found.",
+            status: "Cancelled",
+          });
+        }
+
+        if (order.status === "Cancelled") {
+          return socket.emit("order:update-status-failed", {
+            message: "Order is already cancelled.",
+            status: "Cancelled",
+          });
+        }
+
+        const bulkOperations = order.productsData.map((item) => ({
+          updateOne: {
+            filter: { _id: item.productId },
+            update: { $inc: { stock: item.productQuantity } },
+          },
+        }));
+
+        await Product.bulkWrite(bulkOperations);
+
+        order.status = "Cancelled";
+        await order.save();
+
+        await addUserNotification(user, {
+          title: "Order Cancelled",
+          description:
+            "Your order has been cancelled and stock has been restored.",
+          date,
+        });
+
+        await Admin.findOneAndUpdate(
+          {},
+          { $pull: { pendingOrders: order._id } },
+          { new: true }
+        );
+
+        socket.emit("order:update-status-success", {
+          message: "Order cancelled and stock restored successfully.",
+          status: "Cancelled",
+          orderId,
+        });
+
+        for (const [_, socketSet] of adminSocketMap) {
+          for (const socketId of socketSet) {
+            io.to(socketId).emit("order:reject-success", {
+              orderId,
+            });
+          }
+        }
+
+        if (userId && userSocketMap.has(userId)) {
+          for (const socketId of userSocketMap.get(userId)) {
+            io.to(socketId).emit("user-order:updated-status", {
+              orderId,
+              status,
+            });
+
+            io.to(socketId).emit("user:notification", {
+              title: "Order Cancelled",
+              description:
+                "Your order has been cancelled and stock has been restored.",
+              date,
+            });
+          }
+        }
+      } catch (error) {
+        socket.emit("order:update-status-failed", {
+          message:
+            error?.message || "Failed to cancel order due to server error.",
+          status: "Cancelled",
+          orderId,
         });
       }
     });

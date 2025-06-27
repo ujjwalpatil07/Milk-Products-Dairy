@@ -15,17 +15,6 @@ export const getAdminOrders = async () => {
   return res.data;
 }
 
-export const confirmUerOrder = async (orderId, status) => {
-  const res = await api.put("/order/confirm-order", { orderId, status });
-  return res.data;
-}
-
-export const rejectUserOrder = async (orderId) => {
-   const res = await api.put("/order/reject-order", { orderId });
-  return res.data;
-}
-
-
 
 
 
