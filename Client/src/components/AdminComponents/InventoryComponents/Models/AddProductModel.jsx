@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-toastify";
-import { addNewProduct } from "../../../../services/productServices";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -8,6 +6,9 @@ import NutritionInput from "../NutritionalInfo";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
+import { socket } from "../../../../socket/socket";
+import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
+import { useSnackbar } from "notistack";
 
 const categories = [
   "Milk",
@@ -34,6 +35,7 @@ const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
 
 export default function AddProductModal({ setAddModel }) {
+  const { enqueueSnackbar } = useSnackbar();
 
   const [productDetails, setProductDetails] = useState({
     name: "",
@@ -101,46 +103,49 @@ export default function AddProductModal({ setAddModel }) {
   const validateInputs = () => {
     const { name, category, price, stock, quantityUnit, thresholdVal, shelfLife, nutrition, discount, description } = productDetails;
     if (!name || !category || !price || !stock || !quantityUnit || !thresholdVal || !selectedFile || !shelfLife || !nutrition || !discount || !description) {
-      toast.error("Please fill all fields and select an image.");
+      enqueueSnackbar("Please fill all fields and select an image.");
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      toast.error("Price, Stock, Discount, Shelflife and Threshold should be numbers.");
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant : "info"});
       return false;
     }
     return true;
   };
 
+
+  useEffect(() => {
+    socket.on("add-new-product:failed", (data) => {
+      enqueueSnackbar(data?.message, {variant: "error"});
+      setIsAdding(false);
+    })
+
+    socket.on("added-new-product:to-inventory", (data) => {
+      enqueueSnackbar(data?.message, {variant: "success"});
+      setAddModel(false);
+      setIsAdding(false)
+    })
+
+    return  () => {
+      socket.off("add-new-product:failed")
+      socket.off("added-new-product:to-inventory")
+    }
+  }, [setAddModel, enqueueSnackbar])
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
 
-    try {
-      setIsAdding(true)
-      e.preventDefault()
+    setIsAdding(true)
+    const base64Image = await convertToBase64(selectedFile);
 
-      const productData = new FormData();
+    const productData = {
+      image: base64Image,
+      productDetails,
+    };
 
-      productData.append("image", selectedFile)
-      productData.append("productDetails", JSON.stringify(productDetails))
-
-      const res = await addNewProduct(productData);
-
-      if (res?.success) {
-        toast.success("Product Added successfully");
-      } else {
-        toast.error(res.message);
-      }
-
-    } catch (error) {
-      console.log(error)
-      toast.error("Product already exist. Add other product")
-    } finally {
-      setAddModel(false)
-      setIsAdding(false)
-    }
+    socket.emit("add-new-product", productData);
   }
-
 
   return (
     <motion.div

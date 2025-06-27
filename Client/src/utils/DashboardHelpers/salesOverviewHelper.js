@@ -17,7 +17,7 @@ export const calculateOrderProfit = (order) => {
 
   const totalManufacturingCost = order.productsData.reduce((sum, item) => {
     const cost = item.productId?.manufacturingCost || 0;
-    const qty  = item.productQuantity   || 0;
+    const qty = item.productQuantity || 0;
     return sum + cost * qty;
   }, 0);
 
@@ -45,4 +45,3 @@ export const topSellingStocks = (products) => {
 
   return sorted;
 };
-
