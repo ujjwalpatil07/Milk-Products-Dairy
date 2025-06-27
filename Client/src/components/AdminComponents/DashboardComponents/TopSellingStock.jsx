@@ -1,6 +1,7 @@
 import React from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import PropTypes from "prop-types"
 // Animation Variants
 const containerVariants = {
   hidden: {},
@@ -54,7 +55,7 @@ export default function TopSellingStock({ topSellingStocks }) {
               const isLowStock = product.stock < product.thresholdVal;
               return (
                 <motion.tr
-                  key={index}
+                  key={index * 0.9}
                   variants={rowVariants}
                   className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
                     } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
@@ -77,3 +78,18 @@ export default function TopSellingStock({ topSellingStocks }) {
     </motion.div>
   );
 }
+
+
+TopSellingStock.propTypes = {
+  topSellingStocks: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      totalQuantitySold: PropTypes.number,
+      quantityUnit: PropTypes.string,
+      stock: PropTypes.number,
+      thresholdVal: PropTypes.number,
+      price: PropTypes.number,
+      discount: PropTypes.number,
+    })
+  ).isRequired,
+};

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 export default function RemoveAddressModel({selectedAddress, setRemoveModal, removeAddress}) {
   return (
-            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center overflow-auto">
+            <div className="fixed inset-0 z-100 bg-black/40 backdrop-blur-sm px-4  flex flex-col items-center overflow-auto">
               <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fadeIn scale-95 animate-scaleIn">
   
                 <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 text-gray-800 dark:text-gray-100">

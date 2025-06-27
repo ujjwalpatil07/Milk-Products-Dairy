@@ -39,7 +39,7 @@ export default function AccountInfo() {
       setDataLoading(true);
       const data = await getUserProfile(authUser?._id);
       if (data?.success) {
-        setDbData(data.userData);
+        setDbData(data?.userData);
       }
     } catch (error) {
       enqueueSnackbar(error?.message || "Error fetching user data", { variant: "error" });
@@ -57,13 +57,13 @@ export default function AccountInfo() {
   useEffect(() => {
     if (dbData) {
       setEditData({
-        firstName: dbData.firstName,
-        lastName: dbData.lastName,
-        address: dbData.address,
-        gender: dbData.gender,
-        mobileNo: dbData.mobileNo,
-        photo: dbData.photo,
-        username: dbData.username,
+        firstName: dbData?.firstName,
+        lastName: dbData?.lastName,
+        address: dbData?.address,
+        gender: dbData?.gender,
+        mobileNo: dbData?.mobileNo,
+        photo: dbData?.photo,
+        username: dbData?.username,
       });
     }
   }, [dbData]);
@@ -112,14 +112,14 @@ export default function AccountInfo() {
         <form className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { label: "First Name", name: "firstName", value: editData.firstName, display: dbData.firstName },
-              { label: "Last Name", name: "lastName", value: editData.lastName, display: dbData.lastName },
-              { label: "Username", name: "username", value: editData.username, display: dbData.username, icon: <FaUser /> },
+              { label: "First Name", name: "firstName", value: editData?.firstName, display: dbData?.firstName },
+              { label: "Last Name", name: "lastName", value: editData?.lastName, display: dbData?.lastName },
+              { label: "Username", name: "username", value: editData?.username, display: dbData?.username, icon: <FaUser /> },
               {
                 label: "Phone Number",
                 name: "mobileNo",
-                value: editData.mobileNo,
-                display: dbData.mobileNo,
+                value: editData?.mobileNo,
+                display: dbData?.mobileNo,
                 icon: <FaPhone />,
                 inputProps: {
                   type: "tel",
@@ -132,15 +132,15 @@ export default function AccountInfo() {
             ].map((field, index) => (
               <div key={index * 0.5}>
                 <label className="mb-1 font-medium flex items-center gap-1">
-                  {field.icon} {field.label}
+                  {field?.icon} {field?.label}
                 </label>
                 {edit ? (
                   <input
                     type="text"
                     className="w-full p-2 border rounded transition focus:ring-2 focus:ring-blue-300 dark:bg-gray-500/50 dark:border-gray-600"
-                    name={field.name}
-                    value={field.value}
-                    {...(field.inputProps || { onChange: handleInputChange })}
+                    name={field?.name}
+                    value={field?.value}
+                    {...(field?.inputProps || { onChange: handleInputChange })}
                   />
                 ) : (
                   <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{field.display}</p>
@@ -156,7 +156,7 @@ export default function AccountInfo() {
                 <select
                   className="w-full p-2 border rounded transition dark:bg-gray-500/50 dark:border-gray-600"
                   name="gender"
-                  value={editData.gender}
+                  value={editData?.gender}
                   onChange={handleInputChange}
                 >
                   <option value="">Select</option>
@@ -237,7 +237,7 @@ export default function AccountInfo() {
                     <input
                       type="text"
                       className="w-full p-2 border rounded transition focus:ring-2 focus:ring-indigo-300  dark:bg-gray-500/20 dark:border-gray-600"
-                      value={editData.address[field] || ""}
+                      value={editData?.address[field] || ""}
                       onChange={(e) =>
                         setEditData((prev) => ({
                           ...prev,

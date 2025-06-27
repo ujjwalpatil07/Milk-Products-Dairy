@@ -2,7 +2,7 @@ import { useMemo, useState, createContext, useEffect, useCallback } from "react"
 import { getProducts } from "../services/productServices";
 import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
-
+import PropTypes from "prop-types"
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
@@ -181,3 +181,7 @@ export const ProductProvider = ({ children }) => {
         </ProductContext.Provider>
     )
 }
+
+ProductProvider.propTypes = {
+    children: PropTypes.node.isRequired
+};  

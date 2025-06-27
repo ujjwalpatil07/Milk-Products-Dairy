@@ -77,6 +77,8 @@ export const getAdminOrders = async (req, res) => {
       .json({ success: false, message: "Admin not found." });
   }
 
+console.log(admin?.pendingOrders)
+
   res.status(200).json({
     success: true,
     orders: admin.pendingOrders,
