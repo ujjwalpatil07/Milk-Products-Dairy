@@ -7,8 +7,6 @@ import {
 
 const router = express.Router();
 
-// router.put("/add-product", upload.single("image"), wrapAsync(addNewProduct));
 router.put("/update-product", upload.single("image"), wrapAsync(updateProduct));
-// router.post("/remove-product", wrapAsync(removeProduct));
 
 export default router;
