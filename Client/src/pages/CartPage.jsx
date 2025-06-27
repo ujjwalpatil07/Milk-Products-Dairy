@@ -12,11 +12,12 @@ import { getDiscountedPrice } from "../utils/helper";
 import { formatNumberWithCommas } from "../utils/format";
 import ProductCard from "../components/CartComponents/ProductCard";
 import SavedAddressList from "../components/CartComponents/SavedAddressList";
-import { toast } from "react-toastify";
 import { ProductContext } from "../context/ProductProvider";
+import { useSnackbar } from "notistack";
 
 export default function CartPage() {
 
+    const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const { authUser, deliveryAddress } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
@@ -40,7 +41,7 @@ export default function CartPage() {
 
     const handleProceedCheckout = () => {
         if (!deliveryAddress) {
-            toast.error("Please select a delivery address before proceeding to checkout.");
+            enqueueSnackbar("Please select a delivery address before proceeding to checkout.", { variant: "error" })
             return;
         }
 

@@ -4,10 +4,11 @@ import { getWishlistedProducts, removeProductFromWishList } from "../../services
 import { Link } from "react-router-dom";
 import { FaGlassWhiskey } from "react-icons/fa";
 import { getDiscountedPrice } from "../../utils/helper";
-import { toast } from "react-toastify";
 import { slugify } from "../../utils/slugify";
+import { useSnackbar } from "notistack";
 
 export default function MyWishlist() {
+  const { enqueueSnackbar } = useSnackbar();
   const { authUser, setAuthUser } = useContext(UserAuthContext);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export default function MyWishlist() {
   const handleRemove = async (productId) => {
 
     if (deleteLoading) {
-      toast.info("Please wait, removing item...");
+      enqueueSnackbar("Please wait, removing item...", { variant: "info" });
       return;
     }
 
@@ -41,7 +42,7 @@ export default function MyWishlist() {
       const data = await removeProductFromWishList(authUser._id, productId);
       if (data?.success) {
         setWishlist((prev) => prev.filter((item) => item._id !== productId));
-        toast.success("Removed from wishlist");
+        enqueueSnackbar("Removed from wishlist", { variant: "success" });
         setAuthUser((prev) => ({
           ...prev,
           wishlistedProducts: (prev?.wishlistedProducts || []).filter(
@@ -50,7 +51,7 @@ export default function MyWishlist() {
         }));
       }
     } catch {
-      toast.error("Failed to remove from wishlist");
+      enqueueSnackbar("Failed to remove from wishlist", { variant: "error" });
     } finally {
       setDeleteLoading(null);
     }

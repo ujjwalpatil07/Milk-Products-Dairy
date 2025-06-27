@@ -34,7 +34,7 @@ export default function AdminOrderProvider({ children }) {
     }, [authAdmin?._id]);
 
     const handleNewPendingOrder = ({ order }) => {
-        setAdminOrders((prevOrders) => [order, ...prevOrders]);
+        setAdminOrders((prevOrders) => [...prevOrders, order]);
     }
 
     useEffect(() => {

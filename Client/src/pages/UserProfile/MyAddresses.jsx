@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { HiPlus } from "react-icons/hi";
-import { toast } from "react-toastify";
 import {
   MapPin, Plus, Trash2, Edit2
 } from "lucide-react";
@@ -10,11 +9,13 @@ import { getSavedAddresses, addNewAddress, deleteAddress, updateAddress } from "
 import RemoveAddressModel from "./Models/RemoveAddressModel.";
 import EditAddressModel from "./Models/EditAddressModel";
 import NewAddressModel from "./Models/NewAddressModel";
+import { useSnackbar } from "notistack";
 
 
 
 export default function MyAddresses() {
 
+  const { enqueueSnackbar } = useSnackbar();
   const { authUser } = useContext(UserAuthContext);
 
   const [addresses, setAddresses] = useState([]);
@@ -41,14 +42,14 @@ export default function MyAddresses() {
       if (data?.success) {
         setAddresses(data.userAddresses);
       } else {
-        toast.error("Failed to fetch addresses");
+        enqueueSnackbar("Failed to fetch addresses", { variant: "error" });
       }
     } catch {
-      toast.error("Error fetching addresses");
+      enqueueSnackbar("Error fetching addresses", { variant: "error" });
     } finally {
       setLoading(false);
     }
-  }, [authUser]);
+  }, [authUser, enqueueSnackbar]);
 
 
   useEffect(() => {
@@ -71,10 +72,10 @@ export default function MyAddresses() {
           state: "",
           pincode: "",
         });
-        toast.success("New address added successfully");
+        enqueueSnackbar("New address added successfully", { variant: "success" });
       }
     } catch {
-      toast.error("Failed to add address");
+      enqueueSnackbar("Failed to add address", { variant: "error" });
     } finally {
       setNewAddressModel(false);
       setLoading(false);
@@ -87,10 +88,10 @@ export default function MyAddresses() {
       const data = await deleteAddress(address._id, address.owner);
       if (data?.success) {
         getAddresses();
-        toast.success("Address removed successfully");
+        enqueueSnackbar("Address removed successfully", { variant: "success" });
       }
     } catch {
-      toast.error("Failed to remove address");
+      enqueueSnackbar("Failed to remove address", { variant: "error" });
     } finally {
       setRemoveModal(false);
       setLoading(false);
@@ -103,14 +104,14 @@ export default function MyAddresses() {
     try {
       const data = await updateAddress(selectedAddress._id, selectedAddress);
       if (data?.success) {
-        toast.success("Address updated successfully");
+        enqueueSnackbar("Address updated successfully", { variant: "success" });
         setEditModal(false);
         getAddresses();
       } else {
-        toast.error("Failed to update address");
+        enqueueSnackbar("Failed to update address", { variant: "error" });
       }
     } catch {
-      toast.error("Error updating address");
+      enqueueSnackbar("Error updating address", { variant: "error" });
     } finally {
       setLoading(false);
     }
