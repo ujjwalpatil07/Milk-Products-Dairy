@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -21,9 +20,10 @@ import { productLike } from "../../services/productServices";
 import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
 import { addToWishlist } from "../../services/userProfileService";
-
+import { useSnackbar } from 'notistack';
 
 export default function ProductVarietyCard({ id, image, name, discount, rating, likes, price, minQuantity, stock, quantityUnit }) {
+const { enqueueSnackbar } = useSnackbar();
 
     const { authUser, setAuthUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
@@ -47,27 +47,27 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
 
     const handleAddProduct = (productId, price) => {
         if (quantity <= 0) {
-            toast.error("Please select quantity.");
+            enqueueSnackbar("Please select quantity.", {variant: "error"});
             return;
         }
         if (quantity > stock) {
-            toast.error("Stock not available!");
+            enqueueSnackbar("Stock not available!", { variant: "error" });
             return;
         }
 
         addToCart(productId, quantity, price);
         setQuantity(0);
-        toast.success("Product added to cart!");
+        enqueueSnackbar("Product added to cart!", {variant: "success"});
     }
 
     const handleLikeProduct = async (productId) => {
         if (!authUser?._id) {
-            toast.error("Please log in to like products.");
+            enqueueSnackbar("Please log in to like products.", { variant: "error" });
             return;
         }
 
         if (localLikes.includes(authUser._id)) {
-            toast.info("You already liked this product.");
+            enqueueSnackbar("You already liked this product.", {variant: "info"});
             return;
         }
 
@@ -76,9 +76,9 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
         try {
             const { message, updatedLikes } = await productLike(productId, authUser._id);
             setLocalLikes(updatedLikes);
-            toast.success(message || "You liked the product!");
+            enqueueSnackbar(message || "You liked the product!", { variant: "success" });
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to like product.");
+            enqueueSnackbar(error?.response?.data?.message || "Failed to like product.", { variant: "error" });
         } finally {
             setLikeLoading(false);
         }
@@ -86,17 +86,17 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
 
     const handleAddProductInWishlist = async (productId) => {
         if (!authUser?._id) {
-            toast.info("Please log in to add items to your wishlist.");
+            enqueueSnackbar("Please log in to add items to your wishlist.", { variant: "info" });
             return;
         }
 
         if (isWishlisted) {
-            toast.info("This product is already in your wishlist.");
+            enqueueSnackbar("This product is already in your wishlist.", { variant: "info" });
             return;
         }
 
         if (wishlistLoading) {
-            toast.info("Please wait, adding to wishlist...");
+            enqueueSnackbar("Please wait, adding to wishlist...", { variant: "info" });
             return;
         }
 
@@ -105,7 +105,7 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
             const data = await addToWishlist(authUser._id, productId);
 
             if (data?.success) {
-                toast.success("Product added to wishlist!");
+                enqueueSnackbar("Product added to wishlist!", { variant: "success" });
                 setAuthUser((prev) => ({
                     ...prev,
                     wishlistedProducts: Array.isArray(prev?.wishlistedProducts)
@@ -113,10 +113,10 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
                         : [productId],
                 }));
             } else {
-                toast.error(data?.error || "Something went wrong.");
+                enqueueSnackbar(data?.error || "Something went wrong.", { variant: "error" });
             }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to add to wishlist.");
+            enqueueSnackbar(error?.response?.data?.message || "Failed to add to wishlist.", { variant: "error" });
         } finally {
             setWishlistLoading(false);
         }

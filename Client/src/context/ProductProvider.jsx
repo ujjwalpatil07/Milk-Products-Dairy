@@ -144,12 +144,28 @@ export const ProductProvider = ({ children }) => {
         });
     }, []);
 
+    const handleAddNewProduct = useCallback((data) => {
+        const { newProduct } = data;
+        setProducts((prev) => [...prev, newProduct]);
+    }, []);
+
+    const handleRemoveProduct = useCallback((data) => {
+        const { deletedProduct } = data;
+
+        setProducts((prevProducts) =>
+            prevProducts.filter((product) => product._id !== deletedProduct._id)
+        );
+    }, []);
+    
+
     useEffect(() => {
         socket.on("product-stock-update", updateProducts);
         socket.on("review:add-success", handleAddReviewSuccess);
         socket.on("review:remove-success", handleRemoveReviewSuccess);
         socket.on("review:edit-success", handleReviewEditSuccess);
         socket.on("review:like-success", handleReviewLikeSuccess);
+        socket.on("add-new-product:success", handleAddNewProduct);
+        socket.on("remove-product:success", handleRemoveProduct);
 
         return () => {
             socket.off("product-stock-update", updateProducts);
@@ -157,12 +173,18 @@ export const ProductProvider = ({ children }) => {
             socket.off("review:remove-success", handleRemoveReviewSuccess);
             socket.off("review:edit-success", handleReviewEditSuccess);
             socket.off("review:like-success", handleReviewLikeSuccess);
+            socket.off("add-new-product:success", handleAddNewProduct);
+            socket.off("remove-product:success", handleRemoveProduct);
+
         }
     }, [updateProducts,
         handleAddReviewSuccess,
         handleRemoveReviewSuccess,
         handleReviewEditSuccess,
-        handleReviewLikeSuccess]);
+        handleReviewLikeSuccess,
+        handleAddNewProduct,
+        handleRemoveProduct
+    ]);
 
     const contextValue = useMemo(() => ({
         filter,

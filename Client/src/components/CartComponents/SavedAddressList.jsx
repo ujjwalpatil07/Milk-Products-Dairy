@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
@@ -8,13 +7,14 @@ import { getSavedAddresses } from "../../services/userProfileService";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { Close } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-
+import { useSnackbar } from 'notistack';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 
 export default function SavedAddressList({ open, handleDialogStatus }) {
+const { enqueueSnackbar } = useSnackbar();
 
   const { authUser, setDeliveryAddress } = useContext(UserAuthContext);
 
@@ -33,14 +33,14 @@ export default function SavedAddressList({ open, handleDialogStatus }) {
         const data = await getSavedAddresses(authUser?._id);
         setAddresses(data?.userAddresses || []);
       } catch (err) {
-        toast.error(err?.response?.message || "Failed to fetch addresses");
+        enqueueSnackbar(err?.response?.message || "Failed to fetch addresses", {variant: "error"});
       } finally {
         setLoading(false);
       }
     };
 
     if (authUser) fetchAddresses();
-  }, [authUser]);
+  }, [authUser, enqueueSnackbar]);
 
   let addressContent;
   if (loading) {

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-toastify";
 import { updateProduct } from "../../../../services/productServices";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
@@ -8,7 +7,7 @@ import NutritionInput from "../NutritionalInfo";
 import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-
+import { useSnackbar } from 'notistack';
 
 const categories = [
   "Milk",
@@ -34,6 +33,7 @@ const categories = [
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
 export default function UpdateProductModel({ setUpdateModel, selectedProduct }) {
+  const { enqueueSnackbar } = useSnackbar();
 
   const [productDetails, setProductDetails] = useState({
     _id: selectedProduct._id,
@@ -132,11 +132,11 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
     const { name, category, price, image, stock, quantityUnit, thresholdVal, shelfLife, discount, description, nutrition } = productDetails;
     if (!name || !category || !price || !image || !stock || !quantityUnit || !thresholdVal || !shelfLife || !nutrition || !discount || !description) {
       // console.log()
-      toast.error("Please fill all fields and select an image.");
+      enqueueSnackbar("Please fill all fields and select an image.", {variant: "error"});
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      toast.error("Price, Stock, Discount, Shelflife and Threshold should be numbers.");
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant: "error"});
       return false;
     }
     return true;
@@ -158,16 +158,16 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       const res = await updateProduct(updatedProductData);
 
       if (res?.success) {
-        toast.success("Product Updated Successfully");
+        enqueueSnackbar("Product Updated Successfully", {variant: "success"});
         console.log(res?.product)
       } else {
-        console.log(res)
-        toast.error(res.message);
+        console.log(res?.message)
+        enqueueSnackbar(res?.message, {variant: "error"});
       }
 
     } catch (error) {
       console.log(error)
-      toast.error("Product already exist. Add other product")
+      enqueueSnackbar("Product already exist. Add other product", {variant: "error"})
     } finally {
       setUpdateModel(false)
       setIsAdding(false)

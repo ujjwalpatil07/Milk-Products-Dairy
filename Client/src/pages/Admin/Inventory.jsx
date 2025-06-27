@@ -25,8 +25,6 @@ const fadeInUp = {
 
 export default function Inventory() {
   const { products, productLoading } = useContext(ProductContext)
-  // console.log(products)
-
   const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
 
   return (

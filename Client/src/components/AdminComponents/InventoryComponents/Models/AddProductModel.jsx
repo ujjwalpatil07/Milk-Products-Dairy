@@ -100,6 +100,8 @@ export default function AddProductModal({ setAddModel }) {
     }
   };
 
+  console.log("hii")
+
   const validateInputs = () => {
     const { name, category, price, stock, quantityUnit, thresholdVal, shelfLife, nutrition, discount, description } = productDetails;
     if (!name || !category || !price || !stock || !quantityUnit || !thresholdVal || !selectedFile || !shelfLife || !nutrition || !discount || !description) {
