@@ -10,6 +10,9 @@ import { validateOrderData, validateAndProcessProducts } from "./helper.js";
 import mongoose from "mongoose";
 
 export const connectToSocket = (server) => {
+  const userSocketMap = new Map();
+  const adminSocketMap = new Map();
+
   const io = new Server(server, {
     cors: {
       origin: ["http://localhost:5173"],
@@ -20,8 +23,29 @@ export const connectToSocket = (server) => {
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);
 
+    socket.on("user:register", ({ userId }) => {
+      if (!userId) return;
+
+      socket.data.userId = userId;
+
+      if (!userSocketMap.has(userId)) {
+        userSocketMap.set(userId, new Set());
+      }
+      userSocketMap.get(userId).add(socket.id);
+    });
+
+    socket.on("admin:register", ({ adminId }) => {
+      if (!adminId) return;
+
+      socket.data.adminId = adminId;
+
+      if (!adminSocketMap.has(adminId)) {
+        adminSocketMap.set(adminId, new Set());
+      }
+      adminSocketMap.get(adminId).add(socket.id);
+    });
+
     socket.on("place-new-order", async (data) => {
-      
       const { address, productsData, paymentMode, totalAmount, userId } =
         data.orderData;
 
@@ -90,6 +114,20 @@ export const connectToSocket = (server) => {
 
         const savedOrder = await newOrder.save();
 
+        await savedOrder.populate([
+          {
+            path: "address",
+            populate: {
+              path: "owner",
+              model: "User",
+            },
+          },
+          {
+            path: "productsData.productId",
+            model: "Product",
+          },
+        ]);
+
         admin.pendingOrders.push(savedOrder._id);
         await admin.save();
 
@@ -115,9 +153,17 @@ export const connectToSocket = (server) => {
           change: -item.productQuantity,
         }));
 
-        io.emit("product-stock-update", { updatedData });
+        for (const [_, socketSet] of adminSocketMap) {
+          for (const socketId of socketSet) {
+            io.to(socketId).emit("order:new-pending-order", {
+              order: savedOrder,
+            });
+          }
+        }
 
         socket.emit("new-order-place-success", { message: "Order confirmed" });
+
+        io.emit("product-stock-update", { updatedData });
       } catch (error) {
         socket.emit("new-order-place-failed", {
           message:
@@ -414,6 +460,25 @@ export const connectToSocket = (server) => {
     });
 
     socket.on("disconnect", () => {
+      const userId = socket.data.userId;
+      const adminId = socket.data.adminId;
+
+      if (userId && userSocketMap.has(userId)) {
+        const sockets = userSocketMap.get(userId);
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          userSocketMap.delete(userId);
+        }
+      }
+
+      if (adminId && adminSocketMap.has(adminId)) {
+        const sockets = adminSocketMap.get(adminId);
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          adminSocketMap.delete(adminId);
+        }
+      }
+
       console.log("Socket disconnected:", socket.id);
     });
   });

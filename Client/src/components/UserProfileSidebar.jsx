@@ -10,14 +10,15 @@ import {
 } from "react-icons/md";
 import CircularProgress from "@mui/material/CircularProgress";
 import { toast } from "react-toastify";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserAuthContext } from "../context/AuthProvider";
 import { updateUserProfilePhoto } from "../services/userProfileService";
 
 export default function UserProfileSidebar() {
 
     const location = useLocation();
-    const { authUser, setAuthUser, handleUserLogout } = useContext(UserAuthContext);
+    const navigate = useNavigate();
+    const { authUser, setAuthUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [photoUrl, setPhotoUrl] = useState(authUser?.photo || "");
@@ -70,6 +71,13 @@ export default function UserProfileSidebar() {
             setShowUpdateButton(false);
         }
     };
+
+    const handleLogout = () => {
+        handleUserLogout();
+        setOpenLoginDialog(true);
+        toast.success("User Logged Out Successfully");
+        navigate("/");
+    }
 
     const navigationLinks = [
         { key: "/user-profile", icon: <MdOutlineAccountCircle />, label: "Account" },
@@ -159,10 +167,7 @@ export default function UserProfileSidebar() {
                 </button>
 
                 <button
-                    onClick={() => {
-                        handleUserLogout();
-                        toast.success("User Logged Out Successfully");
-                    }}
+                    onClick={handleLogout}
                     className={`w-full flex items-center gap-2 mt-2 px-4 py-2 text-left rounded text-gray-800 dark:text-white transition duration-300 hover:bg-[#D595C3] dark:hover:bg-[#843E71]`}
                 >
                     Log out <MdArrowForward />

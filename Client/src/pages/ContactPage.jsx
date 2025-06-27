@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { LocationOn, Phone, Email } from "@mui/icons-material";
-import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useSnackbar } from "notistack";
 
 export default function ContactPage() {
+
+    const { enqueueSnackbar } = useSnackbar();
+
     const [formData, setFormData] = useState({
         fullName: "",
         phone: "",
@@ -20,24 +23,24 @@ export default function ContactPage() {
 
         const { fullName, phone, email, message } = formData;
         if (!fullName.trim()) {
-            toast.error("Please enter your full name.");
+            enqueueSnackbar("Please enter your full name.", { variant: "error" });
             return;
         }
 
         const phoneRegex = /^[6-9]\d{9}$/;
         if (!phoneRegex.test(phone)) {
-            toast.error("Please enter a valid 10-digit mobile number.");
+            enqueueSnackbar("Please enter a valid 10-digit mobile number.", { variant: "error" });
             return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            toast.error("Please enter a valid email address.");
+            enqueueSnackbar("Please enter a valid email address.", { variant: "error" });
             return;
         }
 
         if (!message.trim()) {
-            toast.error("Please enter your message.");
+            enqueueSnackbar("Please enter your message.", { variant: "error"} );
             return;
         }
 

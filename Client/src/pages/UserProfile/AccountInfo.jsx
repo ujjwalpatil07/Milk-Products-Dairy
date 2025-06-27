@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext, useCallback } from "react";
-import { toast } from "react-toastify";
 import {
   FaUser, FaPhone, FaVenusMars, FaMapMarkerAlt, FaEdit,
   FaRoad, FaCity, FaMapPin,
@@ -7,8 +6,10 @@ import {
 import { Close } from "@mui/icons-material";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { getUserProfile, updateUserProfile } from "../../services/userProfileService";
+import { useSnackbar } from "notistack";
 
 export default function AccountInfo() {
+  const { enqueueSnackbar } = useSnackbar();
   const { authUser } = useContext(UserAuthContext);
 
   const [edit, setEdit] = useState(false);
@@ -41,11 +42,11 @@ export default function AccountInfo() {
         setDbData(data?.userData);
       }
     } catch (error) {
-      toast.error(error?.message || "Error fetching user data");
+      enqueueSnackbar(error?.message || "Error fetching user data", { variant: "error" });
     } finally {
       setDataLoading(false);
     }
-  }, [authUser?._id]);
+  }, [authUser?._id, enqueueSnackbar]);
 
   useEffect(() => {
     if (authUser?._id) {
@@ -75,8 +76,8 @@ export default function AccountInfo() {
   const handleSave = async () => {
     try {
       const phoneRegex = /^\d{10}$/;
-      if (!phoneRegex.test(editData?.mobileNo)) {
-        toast.error("Enter a valid 10-digit phone number");
+      if (!phoneRegex.test(editData.mobileNo)) {
+        enqueueSnackbar("Enter a valid 10-digit phone number", {variant: "error"});
         return;
       }
 
@@ -85,12 +86,12 @@ export default function AccountInfo() {
       if (res?.success) {
         await handleUserProfileData();
         setEdit(false);
-        toast.success("Profile edited successfully");
+        enqueueSnackbar("Profile edited successfully", { variant: "success" });
       } else {
-        toast.error("Update failed");
+        enqueueSnackbar("Update failed", { variant: "error" });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong.");
+      enqueueSnackbar(error?.response?.data?.message || "Something went wrong.", { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -260,7 +261,7 @@ export default function AccountInfo() {
                     onClick={() => {
                       const { streetAddress, city, pincode } = editData.address;
                       if (!streetAddress || !city || !pincode) {
-                        toast.error("Please fill out all address fields");
+                        enqueueSnackbar("Please fill out all address fields", { variant: "error" });
                         return;
                       }
                       setShowAddressModal(false);

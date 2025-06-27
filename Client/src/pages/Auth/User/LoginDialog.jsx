@@ -1,12 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 import Slide from '@mui/material/Slide';
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { toast } from "react-toastify";
+import { loginAdmin } from "../../../services/adminService";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -14,11 +13,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function LoginDialog() {
 
-    const { openLoginDialog, setOpenLoginDialog } = useContext(UserAuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const { openLoginDialog, setOpenLoginDialog, handleUserLogout } = useContext(UserAuthContext);
     const { handleAdminLogout } = useContext(AdminAuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [loginType, setLoginType] = useState("user");
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
@@ -26,21 +29,39 @@ export default function LoginDialog() {
         setLoading(true);
 
         try {
-            const data = await loginUser(email, password);
-            if (data?.user) {
-                localStorage.setItem("User", JSON.stringify(data.user));
-                handleAdminLogout();
-                toast.success("Login Successful!");
-                setOpenLoginDialog(false);
+            if (loginType === "user") {
+                const data = await loginUser(email, password);
+                if (data?.user) {
+                    localStorage.setItem("User", JSON.stringify(data.user));
+                    handleAdminLogout();
+                    toast.success("Login Successful!");
+                    setOpenLoginDialog(false);
+                    setEmail("");
+                    setPassword("");
+                } else {
+                    toast.error("User login failed.");
+                }
             } else {
-                toast.error("Login failed, please try again.");
+                const data = await loginAdmin(email, password);
+                if (data?.admin) {
+                    localStorage.setItem("Admin", JSON.stringify(data.admin));
+                    handleUserLogout();
+                    toast.success("Logged in successfully as Admin");
+                    setEmail("");
+                    setPassword("");
+                    setOpenLoginDialog(false);
+                    if (!location.pathname.startsWith("/admin")) {
+                        navigate("/admin/dashboard");
+                    }
+                } else {
+                    toast.error("Admin login failed.");
+                }
             }
+
         } catch (error) {
             toast.error(error?.response?.data?.message || "Server error or invalid credentials.");
         } finally {
             setLoading(false);
-            setEmail("");
-            setPassword("");
         }
     }
 
@@ -57,9 +78,35 @@ export default function LoginDialog() {
                 <h2 className="text-lg font-semibold text-center text-gray-800 dark:text-gray-200">
                     Welcome to
                 </h2>
-                <h1 className="text-lg mb-4 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
                     Madhur Dairy & Daily Needs
                 </h1>
+
+                <div className="mb-4 flex justify-center">
+                    <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-600">
+                        <button
+                            type="button"
+                            onClick={() => setLoginType("user")}
+                            className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "user"
+                                ? "bg-[#843E71] text-white"
+                                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                }`}
+                        >
+                            User
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setLoginType("admin")}
+                            className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "admin"
+                                ? "bg-[#843E71] text-white"
+                                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                }`}
+                        >
+                            Admin
+                        </button>
+                    </div>
+                </div>
+
 
                 <form onSubmit={handleLoginSubmit} className="space-y-3">
                     <input

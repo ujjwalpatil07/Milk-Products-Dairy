@@ -1,14 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { MenuItem, Button, Menu, Badge } from "@mui/material";
+import React, { useContext, useState } from "react";
+import { MenuItem, Button, Menu } from "@mui/material";
 import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey } from "react-icons/fa";
-import { getUserOrders } from "../../services/orderService";
-import { UserAuthContext } from "../../context/AuthProvider";
+import { UserOrderContext } from "../../context/UserOrderProvider";
 
 export default function MyOrders() {
-  const { authUser } = useContext(UserAuthContext);
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const { userOrders, orderLoading } = useContext(UserOrderContext);
 
   const orderStats = {
     Pending: 0,
@@ -19,14 +16,14 @@ export default function MyOrders() {
     Confirmed: 0,
   };
 
-  orders.forEach(order => {
+  userOrders.forEach(order => {
     if (orderStats[order.status] !== undefined) {
       orderStats[order.status]++;
     }
   });
 
   const statCards = [
-    { title: "All", count: orders.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
+    { title: "All", count: userOrders.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
     { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600", icon: <FaCheckCircle /> },
     { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500", icon: <FaHourglassHalf /> },
     { title: "Processing", count: orderStats.Processing, color: "bg-blue-400", icon: <FaBoxOpen /> },
@@ -39,27 +36,10 @@ export default function MyOrders() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (authUser?._id) {
-          const res = await getUserOrders(authUser._id);
-          setOrders((res.orders || []).reverse());
-        }
-      } catch (err) {
-        console.error("Failed to fetch orders:", err);
-        setError("Something went wrong while fetching orders.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [authUser?._id]);
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -89,11 +69,11 @@ export default function MyOrders() {
   };
 
   const filteredOrders = (selectedStatus.title === "All")
-    ? orders
-    : orders.filter((order) => order.status === selectedStatus.title);
+    ? userOrders
+    : userOrders.filter((order) => order.status === selectedStatus.title);
 
   let content;
-  if (loading) {
+  if (orderLoading) {
     content = (
       <div className="flex items-center justify-center py-20 text-gray-500 max-sm:max-w-xl min-w-xl space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
@@ -204,10 +184,6 @@ export default function MyOrders() {
         ))}
       </div>
     )
-  }
-
-  if (error) {
-    return <p className="text-red-500 text-center mt-6">{error}</p>;
   }
 
   return (

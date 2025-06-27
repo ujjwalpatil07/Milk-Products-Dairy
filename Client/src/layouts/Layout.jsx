@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import LoginDialog from "../pages/Auth/User/LoginDialog";
 import { ProductContext } from "../context/ProductProvider";
+import UserOrderProvider from "../context/UserOrderProvider";
 
 export default function Layout({ children }) {
 
@@ -43,7 +44,7 @@ export default function Layout({ children }) {
     }, [setShowHeaderExtras]);
 
     return (
-        <>
+        <UserOrderProvider>
             <div ref={scrollRef} className="h-screen scroll-smooth flex flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
                 <Navbar />
                 <main className="flex-1">
@@ -53,7 +54,7 @@ export default function Layout({ children }) {
             </div>
 
             <LoginDialog />
-        </>
+        </UserOrderProvider>
     )
 }
 

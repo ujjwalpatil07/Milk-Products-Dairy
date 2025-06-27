@@ -2,9 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import OrdersSummary from "../../components/AdminComponents/OrderComponents/OrdersSummary";
 import OrderDetails from "../../components/AdminComponents/OrderComponents/OrderDetails";
 import { toast } from "react-toastify";
-import { AdminAuthContext } from "../../context/AuthProvider";
 import {
-  getAdminOrders,
   getAllOrders,
   totalActiveOrders,
   totalCanceledOrders,
@@ -13,6 +11,7 @@ import {
 
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { AdminOrderContext } from "../../context/AdminOrderProvider";
 
 // Animation Variants
 const fadeUpVariants = {
@@ -34,32 +33,11 @@ const containerVariants = {
 };
 
 export default function Orders() {
-  const [orders, setOrders] = useState([]);
+
+  const { adminOrders, orderLoading } = useContext(AdminOrderContext);
+
   const [allOrders, setAllOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const { authAdmin } = useContext(AdminAuthContext);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const res = await getAdminOrders();
-        if (res?.success) {
-          setOrders(res?.orders);
-        } else {
-          console.log(res);
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to fetch orders, please try again!");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [authAdmin?._id]);
+  const [loading, setLoading] = useState(true);
 
   console.log(orders)
 
@@ -93,15 +71,15 @@ export default function Orders() {
     >
       <motion.div variants={fadeUpVariants}>
         <OrdersSummary
-          orders={orders}
-          totalOrders={totalActiveOrders(orders)}
+          orders={adminOrders}
+          totalOrders={totalActiveOrders(adminOrders)}
           totalRecievedOrders={totalOrdersCount(allOrders)}
           totalCanceledOrders={totalCanceledOrders(allOrders)}
         />
       </motion.div>
 
       <motion.div variants={fadeUpVariants} className="mt-6">
-        <OrderDetails orders={orders} loading={loading} />
+        <OrderDetails orders={adminOrders} loading={orderLoading || loading} />
       </motion.div>
     </motion.div>
   );

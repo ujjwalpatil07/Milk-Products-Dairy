@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useSnackbar } from 'notistack';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
@@ -29,7 +29,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function OrderCheckoutPage() {
 
+  const { enqueueSnackbar } = useSnackbar();
   const { theme } = useContext(ThemeContext);
+
   const { authUser, deliveryAddress } = useContext(UserAuthContext);
   const { cartItems, clearCart } = useContext(CartContext);
   const { products, productLoading } = useContext(ProductContext);
@@ -40,16 +42,16 @@ export default function OrderCheckoutPage() {
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
 
   const orderPlaceConfirmation = useCallback((data) => {
-    toast.success(data.message || "Order placed successfully!");
+    enqueueSnackbar(data.message || 'Order placed successfully!', { variant: 'success' });
     clearCart();
     setOpen(false);
     navigate(`/user-profile/orders`);
-  }, [clearCart, navigate]);
+  }, [clearCart, navigate, enqueueSnackbar]);
 
-  const orderPlaceFailed = (error) => {
+  const orderPlaceFailed = useCallback((error) => {
     setOrderLoading(false);
-    toast.error(error?.message || "Something went wrong while placing the order.");
-  }
+    enqueueSnackbar(error?.message || "Something went wrong while placing the order.", { variant: 'error' });
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     socket.on("new-order-place-success", orderPlaceConfirmation);
@@ -59,7 +61,7 @@ export default function OrderCheckoutPage() {
       socket.off("new-order-place-success", orderPlaceConfirmation);
       socket.off("new-order-place-failed", orderPlaceFailed);
     }
-  }, [orderPlaceConfirmation]);
+  }, [orderPlaceConfirmation, orderPlaceFailed]);
 
   const cartDetails = useMemo(
     () => getCartProductDetails(cartItems, products),
@@ -72,7 +74,8 @@ export default function OrderCheckoutPage() {
 
   const handlePaymentMode = () => {
     if (!deliveryAddress) {
-      toast.error("Please select a delivery address before proceeding to checkout.");
+      
+      enqueueSnackbar("Please select a delivery address before proceeding to checkout.", { variant: "error" });
       return;
     }
 
@@ -141,7 +144,7 @@ export default function OrderCheckoutPage() {
         rzp.open();
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "An error occurred while placing the order.");
+      enqueueSnackbar(error?.response?.data?.message || "An error occurred while placing the order.", { variant: "error" });
     } finally {
       setOrderLoading(false);
     }
@@ -326,7 +329,7 @@ export default function OrderCheckoutPage() {
       >
         <div className="bg-white dark:bg-black/80 text-gray-900 dark:text-white">
 
-          <header className="sticky top-0 left-0 flex justify-between items-center px-4 py-3 border-b border-gray-300 dark:border-gray-600 backdrop-blur-md bg-white/70 dark:bg-gray-700/30 z-10">
+          <header className="sticky top-0 left-0 flex justify-between items-center px-4 py-3 border-b border-gray-300 dark:border-gray-600 backdrop-blur-md bg-white/70 dark:bg-gray-700/80 z-10">
             <span className="text-xl font-semibold">Choose Payment Mode</span>
             <button onClick={() => setOpen(false)} className="text-gray-600 dark:text-gray-300">
               <CloseIcon fontSize="small" />

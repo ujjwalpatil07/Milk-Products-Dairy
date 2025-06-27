@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Drawer from '@mui/material/Drawer';
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -11,29 +11,41 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { ThemeContext } from "../../context/ThemeProvider";
-import { AdminAuthContext } from "../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../context/AuthProvider";
 
 import logoDarkMode from "../../assets/logoDarkMode.png";
 import logoLightMode from "../../assets/logoLightMode.png";
 import { SidebarContext } from "../../context/SidebarProvider";
+import { AdminOrderContext } from "../../context/AdminOrderProvider";
 
 export default function Sidebar() {
 
+    const location = useLocation();
+    const navigate = useNavigate();
+
     const { isSidebarOpen, setIsSidebarOpen } = useContext(SidebarContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { handleAdminLogout, authAdmin } = useContext(AdminAuthContext);
-    const location = useLocation();
+    const { handleAdminLogout } = useContext(AdminAuthContext);
+    const { setOpenLoginDialog } = useContext(UserAuthContext);
+    const { adminOrders, orderLoading } = useContext(AdminOrderContext);
 
     const navItems = [
         { label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/dashboard" },
-        { label: "Inventory", icon: <InventoryIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/inventory"},
-        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: authAdmin?.pendingOrders?.length || 0  },
+        { label: "Inventory", icon: <InventoryIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/inventory" },
+        { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: adminOrders?.length || 0 },
         { label: "Manage Store", icon: <StoreIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/store" },
     ];
 
     const closeSidebar = () => {
         if (isSidebarOpen) setIsSidebarOpen(false);
     };
+
+    const handleLogout = () => {
+        handleAdminLogout();
+        closeSidebar();
+        setOpenLoginDialog(true);
+        navigate("/");
+    }
 
     const renderSidebarContent = () => (
         <div className="h-full w-64 flex flex-col justify-between">
@@ -72,6 +84,11 @@ export default function Sidebar() {
                                     {item?.orderCount}
                                 </div>
                             }
+
+                            {orderLoading && item.label === "Orders" && (
+                                <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                            )}
+
                         </Link>
                     );
                 })}
@@ -90,10 +107,7 @@ export default function Sidebar() {
                 </button>
 
                 <button
-                    onClick={() => {
-                        handleAdminLogout();
-                        closeSidebar();
-                    }}
+                    onClick={handleLogout}
                     className="flex items-center gap-4 w-full p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition"
                 >
                     <LogoutIcon sx={{ fontSize: "1.2rem" }} />

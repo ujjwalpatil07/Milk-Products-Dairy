@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from "date-fns";
 import {
     Box, Drawer, Avatar, IconButton, Badge, Tooltip,
+    Dialog,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -19,17 +21,37 @@ import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
 import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from '../context/CartProvider';
+import { UserOrderContext } from '../context/UserOrderProvider';
+import { Bell, X } from 'lucide-react';
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function Navbar() {
 
     const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
+    const location = useLocation();
 
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
+    const { notification, setNotification } = useContext(UserOrderContext);
 
-    const location = useLocation();
+    const [open, setOpen] = useState(false);
+
+    const [animate, setAnimate] = useState(false);
+    const [notificationDialog, setNotificationDialog] = useState(false);
+    const prevCountRef = useRef(notification.length);
+
+    useEffect(() => {
+        if (notification.length > prevCountRef.current) {
+            setAnimate(true);
+            setTimeout(() => setAnimate(false), 500);
+        }
+        prevCountRef.current = notification.length;
+    }, [notification.length]);
 
     const toggleDrawer = (newOpen) => () => setOpen(newOpen);
 
@@ -50,13 +72,21 @@ export default function Navbar() {
 
     const handleUserCart = () => {
         setOpen(false);
-        if(!authUser) {
+        if (!authUser) {
             setOpenLoginDialog(true);
             return;
         }
 
         navigate("/cart");
     }
+
+    const handleClearAll = () => {
+        setNotification([]);
+    };
+
+    const handleClearOne = (index) => {
+        setNotification((prev) => prev.filter((_, i) => i !== index));
+    };
 
     return (
         <>
@@ -95,6 +125,22 @@ export default function Navbar() {
                             </div>
                         </button>
                     </Tooltip>
+
+                    <div className="relative inline-block">
+                        <button
+                            onClick={() => setNotificationDialog(true)}
+                            className="p-2.5 rounded-full hover:bg-gray-500/20 dark:hover:bg-[#00000090] transition relative"
+                        >
+                            <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                            {notification?.length > 0 && (
+                                <span
+                                    className={`absolute top-0 right-0 font-bold px-1 h-fit bg-[#833E7110] dark:bg-[#833E7150] text-[#b3549a] rounded-full text-[12px] transition-all duration-300 ${animate ? "animate-bounce" : ""}`}
+                                >
+                                    {notification.length}
+                                </span>
+                            )}
+                        </button>
+                    </div>
 
                     <div className='hidden sm:flex bg-gray-500/10 hover:bg-gray-500/20 dark:bg-[#00000050] dark:hover:bg-[#00000090] rounded-full'>
                         <IconButton onClick={toggleTheme}>
@@ -163,6 +209,77 @@ export default function Navbar() {
                     </div>
                 </Box>
             </Drawer>
+
+            <Dialog
+                open={notificationDialog}
+                onClose={() => setNotificationDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                slots={{
+                    transition: Transition,
+                }}
+                PaperProps={{
+                    sx: {
+                        position: 'absolute',
+                        top: 75,
+                        right: 50,
+                        m: 0,
+                        width: '350px',
+                        maxHeight: "300px",
+                        backgroundColor: theme === "dark" ? "#2f2f2f" : "#ffffff",
+                    },
+                }}
+                fullWidth
+            >
+                <div className="text-black dark:text-white">
+                    <div className="sticky top-0 z-10 backdrop-blur bg-white/30 dark:bg-[#2f2f2f]/30 px-3 py-2 flex items-center justify-between rounded-t">
+                        <h2 className="text-lg font-semibold">Notifications</h2>
+                        {notification.length > 0 && (
+                            <button
+                                onClick={handleClearAll}
+                                className="text-xs text-red-500 hover:underline"
+                            >
+                                Clear All
+                            </button>
+                        )}
+                    </div>
+
+                    {notification.length === 0 ? (
+                        <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 px-3">
+                            🎉 You're all caught up! No new notifications.
+                        </div>
+                    ) : (
+                        <ul className="space-y-3 px-3 py-3">
+                            {notification.map((item, idx) => (
+                                <li
+                                    key={idx + item.title}
+                                    className="bg-gray-100 dark:bg-gray-500/20 p-3 rounded-md shadow-sm relative"
+                                >
+
+                                    <div className='flex justify-between items-center'>
+                                        <p className="font-medium text-sm pr-5">{item?.title}</p>
+
+                                        <button
+                                            onClick={() => handleClearOne(idx)}
+                                            className="text-gray-400 hover:text-red-500 text-sm"
+                                            title="Clear"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {item?.description}
+                                    </p>
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-1 text-right">
+                                        {formatDistanceToNow(new Date(item?.date), { addSuffix: true })}
+                                    </p>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </Dialog>
+
         </>
     );
 }
