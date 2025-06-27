@@ -10,7 +10,6 @@ export const getTotalRevenue = (allOrders) => {
   return revenue;
 };
 
-
 export const calculateOrderProfit = (order) => {
   if (order.status !== "Confirmed" || !Array.isArray(order.productsData)) {
     return 0;
@@ -18,7 +17,7 @@ export const calculateOrderProfit = (order) => {
 
   const totalManufacturingCost = order.productsData.reduce((sum, item) => {
     const cost = item.productId?.manufacturingCost || 0;
-    const qty  = item.productQuantity   || 0;
+    const qty = item.productQuantity || 0;
     return sum + cost * qty;
   }, 0);
 
@@ -35,7 +34,6 @@ export const calculateTotalProfit = (orders) => {
   }, 0);
 };
 
-
 export const topSellingStocks = (products) => {
   if (!Array.isArray(products)) return [];
 
@@ -47,4 +45,3 @@ export const topSellingStocks = (products) => {
 
   return sorted;
 };
-

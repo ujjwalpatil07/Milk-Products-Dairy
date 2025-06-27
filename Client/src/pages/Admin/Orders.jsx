@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import OrdersSummary from "../../components/AdminComponents/OrderComponents/OrdersSummary";
 import OrderDetails from "../../components/AdminComponents/OrderComponents/OrderDetails";
-import { toast } from "react-toastify";
 import {
   getAllOrders,
   totalActiveOrders,
   totalCanceledOrders,
   totalOrdersCount,
 } from "../../services/orderService";
-
+import { useSnackbar } from 'notistack';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { AdminOrderContext } from "../../context/AdminOrderProvider";
@@ -33,13 +32,11 @@ const containerVariants = {
 };
 
 export default function Orders() {
-
+  const { enqueueSnackbar } = useSnackbar();
   const { adminOrders, orderLoading } = useContext(AdminOrderContext);
 
   const [allOrders, setAllOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  console.log(orders)
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -50,10 +47,8 @@ export default function Orders() {
           setAllOrders(res?.orders);
         }
       } catch (error) {
-        toast.error(
-          error?.response?.data?.message ||
-          "Failed to fetch orders, please try again!"
-        );
+        console.log(error)
+        enqueueSnackbar("Failed to fetch orders", { variant: "error" });
       } finally {
         setLoading(false);
       }

@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { removeProduct } from "../../../../services/productServices"
-import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import PropTypes from "prop-types"
-
+import { socket } from "../../../../socket/socket";
+  import { useSnackbar } from 'notistack';
 
 export default function RemoveModel({ setRemoveModel, selectedProduct }) {
-
+  const { enqueueSnackbar } = useSnackbar();
   const [isRemoving, setIsRemoving] = useState(false)
 
   const modelRef = useRef()
@@ -35,23 +34,32 @@ export default function RemoveModel({ setRemoveModel, selectedProduct }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [setRemoveModel]);
 
+  useEffect(() => {
+    socket.on("remove-product:failed", (data) => {
+      enqueueSnackbar(data?.message, {variant: "error"});
+      setIsRemoving(false);
+    })
+
+    socket.on("remove-product:from-inventory", (data) => {
+      enqueueSnackbar(data?.message, {variant: "success"});
+      setRemoveModel(false);
+      setIsRemoving(false)
+    })
+
+    return  () => {
+      socket.off("remove-product:failed")
+      socket.off("remove-product:from-inventory")
+    }
+  }, [setRemoveModel, enqueueSnackbar])
+
   const handleRemoveProduct = async () => {
     setIsRemoving(true);
-    try {
 
-      const res = await removeProduct(selectedProduct?._id)
-
-      if (res?.success) {
-        toast.success("Product removed successfully")
-      } else {
-        toast.error("Error while removing product")
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsRemoving(false);
-      setRemoveModel(false);
+    if(!selectedProduct) {
+      return ("No any product selected")
     }
+
+    socket.emit("remove-product", {productId: selectedProduct?._id})
 
   }
   return (

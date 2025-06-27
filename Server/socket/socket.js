@@ -7,6 +7,7 @@ import Product from "../models/ProductSchema.js";
 import Review from "../models/ReviewSchema.js";
 
 import { validateOrderData, validateAndProcessProducts } from "./helper.js";
+import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
 
 export const connectToSocket = (server) => {
@@ -457,6 +458,102 @@ export const connectToSocket = (server) => {
             error.message || "Something went wrong while liking the review.",
         });
       }
+    });
+
+    //For adding new product
+    socket.on("add-new-product", async (data) => {
+      const { image, productDetails } = data;
+      let imageUrl = "";
+
+      try {
+        if (!image || !productDetails) {
+          return socket.emit("add-new-product:failed", {
+            success: false,
+            message: "Fields are missing",
+          });
+        }
+
+        const existingProduct = await Product.findOne({
+          name: productDetails?.name
+            .trim()
+            .replace(/\s+/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (char) => char.toUpperCase()),
+        });
+
+        if (existingProduct) {
+          return socket.emit("add-new-product:failed", {
+            success: false,
+            message: "Product with this name already exists.",
+          });
+        }
+
+        if (image) {
+          const uploadedImage = await cloudinary.uploader.upload(image, {
+            folder: "user-profiles",
+          });
+          imageUrl = uploadedImage.secure_url;
+        }
+
+        const newProduct = new Product({
+          ...productDetails,
+          name: productDetails?.name
+            .trim()
+            .replace(/\s+/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (char) => char.toUpperCase()), // optional normalization
+          image: [imageUrl],
+        });
+
+        await newProduct.save();
+
+        io.emit("add-new-product:success", {
+          success: true,
+          message: "New product added successfully",
+          newProduct,
+        });
+
+        socket.emit("added-new-product:to-inventory", {
+          message: "New product added successfully in inventory",
+        });
+      } catch (error) {
+        socket.emit("add-new-product:failed", {
+          success: false,
+          message:
+            error?.message || "Something went wrong while adding new product",
+        });
+      }
+    });
+
+    //For removing product
+    socket.on("remove-product", async (data) => {
+      let { productId } = data;
+
+      try {
+        if (!productId) {
+          return socket.emit("remove-product:failed", {
+            message: "Product ID is missing",
+          });
+        }
+
+        const deletedProduct = await Product.findByIdAndDelete(productId);
+
+        io.emit("remove-product:success", {
+          message: "Product removed successfully",
+          deletedProduct,
+        });
+
+        socket.emit("remove-product:from-inventory", {
+          message: `${deletedProduct?.name} removed successfully.`,
+        });
+        
+      } catch (error) {
+        socket.emit("remove-product:failed", {
+          message:
+            error?.message || "Something went wrong while deleting product",
+        });
+      }
+      
     });
 
     socket.on("disconnect", () => {

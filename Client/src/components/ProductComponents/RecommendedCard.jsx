@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import { toast } from "react-toastify";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -10,8 +9,9 @@ import { slugify } from "../../utils/slugify";
 import { useContext, useState } from "react";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { productLike } from "../../services/productServices";
-
+import { useSnackbar } from 'notistack';
 export default function RecommendedCard({ id, image, name, description, likes = [], rating }) {
+const { enqueueSnackbar } = useSnackbar();
 
   const { authUser } = useContext(UserAuthContext);
 
@@ -20,12 +20,12 @@ export default function RecommendedCard({ id, image, name, description, likes = 
 
   const handleLikeProduct = async (productId) => {
     if (!authUser?._id) {
-      toast.error("Please log in to like products.");
+      enqueueSnackbar("Please log in to like products.", {variant: "error"});
       return;
     }
 
     if (localLikes.includes(authUser._id)) {
-      toast.info("You already liked this product.");
+      enqueueSnackbar("You already liked this product.", { variant: "info" });
       return;
     }
 
@@ -34,9 +34,9 @@ export default function RecommendedCard({ id, image, name, description, likes = 
     try {
       const { message, updatedLikes } = await productLike(productId, authUser._id);
       setLocalLikes(updatedLikes);
-      toast.success(message || "You liked the product!");
+      enqueueSnackbar(message || "You liked the product!", {variant: "success"});
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to like product.");
+      enqueueSnackbar(error?.response?.data?.message || "Failed to like product.", { variant: "error" });
     } finally {
       setLikeLoading(false);
     }

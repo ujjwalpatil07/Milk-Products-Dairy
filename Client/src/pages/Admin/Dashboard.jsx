@@ -4,22 +4,22 @@ import { ProductsStock } from "../../components/AdminComponents/DashboardCompone
 import Statistics from "../../components/AdminComponents/DashboardComponents/Statastics";
 import LowQuantityStock from "../../components/AdminComponents/DashboardComponents/LowQuantityStock";
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
-import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../services/inventoryServices";
+import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../utils/InventoryHelpers/inventoryOverviewHelper";
 import { useState, useEffect, useContext } from "react";
 import OrdersOverview from "../../components/AdminComponents/DashboardComponents/PurchaseOverview";
 import { getAllOrders, totalActiveOrders } from "../../services/orderService";
-import { toast } from "react-toastify";
-import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../services/dashboardServices";
+import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../utils/DashboardHelpers/salesOverviewHelper";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { ProductContext } from "../../context/ProductProvider";
+import { useSnackbar } from 'notistack';
 
 
 export default function Dashboard() {
 
     const [allOrders, setAllOrders] = useState([]);
     const { products } = useContext(ProductContext)
-
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         const fetchAllOrders = async () => {
@@ -30,13 +30,12 @@ export default function Dashboard() {
                 }
             } catch (error) {
                 console.log(error)
-                toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
+                enqueueSnackbar(error?.response?.data?.message || "Failed to fetch orders, please try again!", {variant: "error"});
             }
         };
 
         fetchAllOrders();
-    }, []);
-
+    }, [enqueueSnackbar]);
 
     const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
     const fadeUpVariant = {

@@ -10,3 +10,6 @@ export const getDiscountedPrice = (price, discountPercent) => {
     saved: parseFloat(discountAmount.toFixed(2)),
   };
 };
+
+
+

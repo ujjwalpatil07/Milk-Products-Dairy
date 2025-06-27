@@ -3,16 +3,16 @@ import { useParams } from "react-router-dom";
 import { getUserOrderHistory } from "../../services/storeServices";
 import { filterOrdersByQuery, filterOrdersByDateRange } from "../../utils/filterStores";
 import { useDebounce } from "use-debounce";
-import { toast } from "react-toastify";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import CallIcon from '@mui/icons-material/Call';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { SidebarContext } from "../../context/SidebarProvider";
+import { useSnackbar } from 'notistack';
 
 
 export default function StoreOrdersHistory() {
-
+    const { enqueueSnackbar } = useSnackbar();
     const { userId } = useParams();
     const { navbarInput } = useContext(SidebarContext);
     const [debouncedSearchText] = useDebounce(navbarInput, 300);
@@ -31,14 +31,14 @@ export default function StoreOrdersHistory() {
                     setUserData(data.orders);
                 }
             } catch (error) {
-                toast.error(error?.response?.data?.message || "Failed to fetch orders.");
+                enqueueSnackbar(error?.response?.data?.message || "Failed to fetch orders.", { variant: "error" });
             } finally {
                 setLoading(false);
             }
         }
 
         handleUserOrdersHistory();
-    }, [userId]);
+    }, [userId, enqueueSnackbar]);
 
     if (loading) {
         return (

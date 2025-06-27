@@ -8,7 +8,7 @@ import {
   outOfStockProducts,
   totalCategories,
   totalStock,
-} from "../../services/inventoryServices";
+} from "../../utils/InventoryHelpers/inventoryOverviewHelper";
 
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -25,8 +25,6 @@ const fadeInUp = {
 
 export default function Inventory() {
   const { products, productLoading } = useContext(ProductContext)
-  // console.log(products)
-
   const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
 
   return (

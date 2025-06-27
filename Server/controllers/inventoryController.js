@@ -1,49 +1,48 @@
 import Product from "../models/ProductSchema.js";
 
-export const addNewProduct = async (req, res) => {
-  const updatedProductData = JSON.parse(req?.body?.productDetails);
+//   const updatedProductData = JSON.parse(req?.body?.productDetails);
 
-  const photoUrl = req.file?.url || req.file?.path;
+//   const photoUrl = req.file?.url || req.file?.path;
 
-  if (!updatedProductData || !photoUrl) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
-  }
+//   if (!updatedProductData || !photoUrl) {
+//     return res.status(400).json({ success: false, message: "Missing fields" });
+//   }
 
-  const existingProduct = await Product.findOne({
-    name: updatedProductData.name
-      .trim()
-      .replace(/\s+/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (char) => char.toUpperCase()),
-  });
+//   const existingProduct = await Product.findOne({
+//     name: updatedProductData.name
+//       .trim()
+//       .replace(/\s+/g, " ")
+//       .toLowerCase()
+//       .replace(/\b\w/g, (char) => char.toUpperCase()),
+//   });
 
-  if (existingProduct) {
-    return res.status(409).json({
-      success: false,
-      message: "Product with this name already exists.",
-    });
-  }
+//   if (existingProduct) {
+//     return res.status(409).json({
+//       success: false,
+//       message: "Product with this name already exists.",
+//     });
+//   }
 
-  const newProduct = new Product({
-    ...updatedProductData,
-    name: updatedProductData.name
-      .trim()
-      .replace(/\s+/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (char) => char.toUpperCase()), // optional normalization
-    image: [photoUrl],
-  });
+//   const newProduct = new Product({
+//     ...updatedProductData,
+//     name: updatedProductData.name
+//       .trim()
+//       .replace(/\s+/g, " ")
+//       .toLowerCase()
+//       .replace(/\b\w/g, (char) => char.toUpperCase()), // optional normalization
+//     image: [photoUrl],
+//   });
 
-  await newProduct.save();
+//   await newProduct.save();
 
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "New Product Created Successfully",
-      product: newProduct,
-    });
-};
+//   res
+//     .status(200)
+//     .json({
+//       success: true,
+//       message: "New Product Created Successfully",
+//       product: newProduct,
+//     });
+// };
 
 export const updateProduct = async (req, res) => {
   const updatedProductData = JSON.parse(req?.body?.updatedProductData);
@@ -91,19 +90,19 @@ export const updateProduct = async (req, res) => {
   });
 };
 
-export const removeProduct = async (req, res) => {
-  let { _id } = req.body;
+// export const removeProduct = async (req, res) => {
+//   let { _id } = req.body;
 
-  if (!_id) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Product id missing" });
-  }
+//   if (!_id) {
+//     return res
+//       .status(400)
+//       .json({ success: false, message: "Product id missing" });
+//   }
 
-  await Product.findByIdAndDelete(_id);
-  console.log("Product removed successfully ")
+//   await Product.findByIdAndDelete(_id);
+//   console.log("Product removed successfully ")
 
-  res
-    .status(200)
-    .json({ success: true, message: "Product removed successfully" });
-};
+//   res
+//     .status(200)
+//     .json({ success: true, message: "Product removed successfully" });
+// };

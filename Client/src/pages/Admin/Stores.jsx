@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import { useDebounce } from "use-debounce";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -8,9 +7,10 @@ import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import { getAllStores } from "../../services/storeServices";
 import { SidebarContext } from "../../context/SidebarProvider";
 import { filterStoresByInput } from "../../utils/filterStores";
-
+import { useSnackbar } from 'notistack';
 
 export default function Stores() {
+const { enqueueSnackbar } = useSnackbar();
 
     const { navbarInput } = useContext(SidebarContext);
     const [debouncedInput] = useDebounce(navbarInput, 300);
@@ -26,14 +26,14 @@ export default function Stores() {
                     setTotalStores(data.stores);
                 }
             } catch (error) {
-                toast.error(error?.response?.data?.message || "");
+                enqueueSnackbar(error?.response?.data?.message || "Error occured while fetching all stores", { variant: "error" });
             } finally {
                 setLoading(false);
             }
         }
 
         handleGetAllStores();
-    }, []);
+    }, [enqueueSnackbar]);
 
     const filteredStores = filterStoresByInput(totalStores, debouncedInput);
 
