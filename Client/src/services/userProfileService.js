@@ -67,6 +67,13 @@ export const removeProductFromWishList = async (userId, productId) => {
   return res?.data;
 };
 
+export const submitSignupForm = async (formData) => {
+  const res = await api.post("/u/signup/info-input", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res?.data;
+};
+
 export const removeUserNotification = async (userId, mode, index) => {
   const res = await api.delete("/u/delete-notification", {
     data: {

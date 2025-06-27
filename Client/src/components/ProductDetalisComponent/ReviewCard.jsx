@@ -15,8 +15,8 @@ import {
 } from "@mui/icons-material";
 import Slide from '@mui/material/Slide';
 
-import { toast } from "react-toastify";
 import { socket } from "../../socket/socket";
+import { enqueueSnackbar } from "notistack";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -35,31 +35,31 @@ export default function ReviewCard({ reviews, productId }) {
     const [likeLoading, setLikeLoading] = useState(null);
 
     const handleRemoveReviewFailed = ({ message }) => {
-        toast.error(message);
+        enqueueSnackbar(message, { variant: "error" });
         setLoading(null);
     }
 
     const handleRemoveReviewSuccess = ({ message }) => {
-        toast.success(message);
+        enqueueSnackbar(message, { variant: "success" });
         setLoading(false);
     }
 
     const handleEditReviewFailed = ({ message }) => {
-        toast.error(message);
+        enqueueSnackbar(message, { variant: "error" });
         setLoading(null);
     }
 
     const handleEditReviewSuccess = ({ message }) => {
-        toast.success(message);
+        enqueueSnackbar(message, { variant: "success" });
         setLoading(null);
         setEditReview(null);
     };
 
     const handleReviewLikeUpdate = ({ success, message }) => {
         if(success) {
-            toast.success(message);
+            enqueueSnackbar(message, { variant: "success" });
         } else {
-            toast.error(message);
+            enqueueSnackbar(message, { variant: "error" });
         }
         setLikeLoading(null);
     }
@@ -83,12 +83,12 @@ export default function ReviewCard({ reviews, productId }) {
     const handleReviewLike = async (reviewId) => {
 
         if (!authUser?._id) {
-            toast.error("Please log in to like review.");
+            enqueueSnackbar("Please log in to like review.", { variant: "error" });
             return;
         }
 
         if ((editReview?.likes || []).includes(authUser?._id)) {
-            toast.info("You already liked this review.");
+            enqueueSnackbar("You already liked this review.");
             return;
         }
 
@@ -102,7 +102,7 @@ export default function ReviewCard({ reviews, productId }) {
 
     const handleDeleteReview = async (productId) => {
         if (!deleteDialogOpen?._id || !productId) {
-            toast.error("Missing review or product ID.");
+            enqueueSnackbar("Missing review or product ID.", { variant: "error" });
             return;
         }
 
@@ -114,17 +114,17 @@ export default function ReviewCard({ reviews, productId }) {
     const handleSaveEdit = async () => {
 
         if (!authUser) {
-            toast.error("You must be logged in to edit a review.");
+            enqueueSnackbar("You must be logged in to edit a review.", { variant: "error" });
             return;
         }
 
         if (!editReview) {
-            toast.error("No review selected for editing.");
+            enqueueSnackbar("No review selected for editing.", { variant: "error" });
             return;
         }
 
         if (!editMessage.trim()) {
-            toast.error("Message cannot be empty.");
+            enqueueSnackbar("Message cannot be empty.", { variant: "error" });
             return;
         }
 

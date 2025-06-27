@@ -1,8 +1,8 @@
 import { useMemo, useState, createContext, useEffect, useCallback } from "react";
 import { getProducts } from "../services/productServices";
-import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
 import PropTypes from "prop-types"
+import { enqueueSnackbar } from "notistack";
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
@@ -20,7 +20,7 @@ export const ProductProvider = ({ children }) => {
                     setProducts(data.products);
                 }
             } catch (error) {
-                toast.error(error?.response?.data?.message || "Error fetching products");
+                enqueueSnackbar(error?.response?.data?.message || "Error fetching products", { variant: "error" });
             } finally {
                 setProductLoading(false);
             }

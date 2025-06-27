@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, createContext } from "react";
-import axios from "axios";
+import { getUserById } from "../services/userService";
+import { getAdminById } from "../services/adminService";
 
 export const UserAuthContext = createContext();
 export const AdminAuthContext = createContext();
@@ -23,8 +24,8 @@ export const AuthProvider = ({ children }) => {
                 const localUser = JSON.parse(localStorage.getItem("User"));
 
                 if (localUser?._id && authUser?._id !== localUser?._id) {
-                    const res = await axios.post(`http://localhost:9000/u/get-user`, { _id: localUser?._id });
-                    const user = res?.data?.user;
+                    const data = await getUserById(localUser?._id)
+                    const user = data?.user;
 
                     if (user) {
                         setAuthUser(user);
@@ -50,8 +51,8 @@ export const AuthProvider = ({ children }) => {
                 setAuthAdminLoading(true);
                 const localAdmin = JSON.parse(localStorage.getItem("Admin"));
                 if (localAdmin?._id && localAdmin?._id !== authAdmin?._id) {
-                    const res = await axios.post(`http://localhost:9000/admin/get-admin`, { _id: localAdmin?._id });
-                    setAuthAdmin(res?.data?.admin);
+                    const data = await getAdminById(localAdmin?._id);
+                    setAuthAdmin(data?.admin);
                 }
             } catch (error) {
                 console.error("Admin fetch failed", error);

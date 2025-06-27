@@ -10,7 +10,6 @@ export const getTotalRevenue = (allOrders) => {
   return revenue;
 };
 
-
 export const calculateOrderProfit = (order) => {
   if (order.status !== "Confirmed" || !Array.isArray(order.productsData)) {
     return 0;
@@ -34,7 +33,6 @@ export const calculateTotalProfit = (orders) => {
     return acc + profit;
   }, 0);
 };
-
 
 export const topSellingStocks = (products) => {
   if (!Array.isArray(products)) return [];

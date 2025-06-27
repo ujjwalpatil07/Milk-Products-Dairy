@@ -1,7 +1,6 @@
 import React, { createContext, useState, useMemo, useEffect, useContext, useCallback } from "react";
 import { getUserOrders } from "../services/orderService";
 import { UserAuthContext } from "./AuthProvider";
-import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
 import { useSnackbar } from "notistack";
 
@@ -24,10 +23,10 @@ export default function UserOrderProvider({ children }) {
                 if (res?.success) {
                     setUserOrders((res.orders || []).reverse());
                 } else {
-                    toast.error(res.message || "Failed to fetch your orders. Please try again.")
+                    enqueueSnackbar(res.message || "Failed to fetch your orders. Please try again.", { variant: "error" });
                 }
             } catch (err) {
-                toast.error(err?.response?.data?.message || "Something went wrong while fetching orders.")
+                enqueueSnackbar(err?.response?.data?.message || "Something went wrong while fetching orders.", { variant: "error" })
             } finally {
                 setOrderLoading(false);
             }
@@ -37,7 +36,7 @@ export default function UserOrderProvider({ children }) {
             setNotification(authUser?.notifications || []);
             fetchOrders();
         }
-    }, [authUser?._id, authUser?.notifications]);
+    }, [authUser?._id, authUser?.notifications, enqueueSnackbar]);
 
     const handleUserNotification = useCallback(({ title, description, date }) => {
         setNotification((prev) => [

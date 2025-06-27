@@ -1,31 +1,32 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Rating } from "@mui/material";
-import { toast } from "react-toastify";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { socket } from "../../socket/socket";
+import { useSnackbar } from "notistack";
 
 const ReviewForm = ({ productId }) => {
 
+    const { enqueueSnackbar } = useSnackbar();
     const { authUser } = useContext(UserAuthContext);
 
     const [message, setMessage] = useState("");
     const [rating, setRating] = useState(5);
     const [loading, setLoading] = useState(false);
 
-    const handleReviewSuccess = (data) => {
-        toast.success(data?.message);
+    const handleReviewSuccess = useCallback((data) => {
+        enqueueSnackbar(data?.message, { variant: "success" });
         setMessage("");
         setRating(5);
         setLoading(false);
-    }
+    }, [enqueueSnackbar]);
 
-    const handleReviewFailed = (data) => {
-        toast.error(data.message);
+    const handleReviewFailed = useCallback((data) => {
+        enqueueSnackbar(data.message, { variant: "error" });
         setLoading(false);
-    }
+    }, [enqueueSnackbar]);
 
     useEffect(() => {
         socket.on("new-review-add-success", handleReviewSuccess);
@@ -35,23 +36,23 @@ const ReviewForm = ({ productId }) => {
             socket.off("new-review-add-success", handleReviewSuccess);
             socket.off("review:add-failed", handleReviewFailed);
         }
-    }, []);
+    }, [handleReviewFailed, handleReviewSuccess]);
 
     const handleSubmitReview = async (e) => {
         e.preventDefault();
 
         if (!authUser?._id) {
-            toast.error("You must be logged in to submit a review.");
+            enqueueSnackbar("You must be logged in to submit a review.", { variant: "error" });
             return;
         }
 
         if (!message.trim()) {
-            toast.error("Please write your review message.");
+            enqueueSnackbar("Please write your review message.", { variant: "error" });
             return;
         }
 
         if (!rating || typeof rating !== "number") {
-            toast.error("Please provide a valid rating.");
+            enqueueSnackbar("Please provide a valid rating.", { variant: "error" });
             return;
         }
 

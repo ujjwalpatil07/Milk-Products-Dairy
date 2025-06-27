@@ -1,13 +1,14 @@
 import React, { createContext, useState, useMemo, useContext, useEffect } from "react";
 import { AdminAuthContext } from "./AuthProvider";
 import { getAdminOrders } from "../services/orderService";
-import { toast } from "react-toastify";
 import { socket } from "../socket/socket";
+import { useSnackbar } from "notistack";
 
 export const AdminOrderContext = createContext();
 
 export default function AdminOrderProvider({ children }) {
 
+    const { enqueueSnackbar } = useSnackbar();
     const { authAdmin } = useContext(AdminAuthContext);
     const [adminOrders, setAdminOrders] = useState([]);
     const [orderLoading, setOrderLoading] = useState(true);
@@ -19,10 +20,10 @@ export default function AdminOrderProvider({ children }) {
                 if (res?.success) {
                     setAdminOrders(res?.orders);
                 } else {
-                    toast.error(res?.message || "Failed to fetch orders, please try again!")
+                    enqueueSnackbar(res?.message || "Failed to fetch orders, please try again!", { variant: "error" })
                 }
             } catch (error) {
-                toast.error(error?.response?.data?.message || "Failed to fetch orders, please try again!");
+                enqueueSnackbar(error?.response?.data?.message || "Failed to fetch orders, please try again!", { variant: "error" });
             } finally {
                 setOrderLoading(false);
             }
@@ -31,7 +32,7 @@ export default function AdminOrderProvider({ children }) {
         if (authAdmin?._id) {
             fetchOrders();
         }
-    }, [authAdmin?._id]);
+    }, [authAdmin?._id, enqueueSnackbar]);
 
     const handleNewPendingOrder = ({ order }) => {
         setAdminOrders((prevOrders) => [...prevOrders, order]);
