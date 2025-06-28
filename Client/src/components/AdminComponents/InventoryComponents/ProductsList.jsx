@@ -168,7 +168,7 @@ export default function ProductsList({ products, loading }) {
                               setSelectedProduct(product);
                               setUpdateModel(true);
                             }}
-                            className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
+                            className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded hover:bg-green-300/80"
                           >
                             Update
                           </button>
@@ -177,7 +177,7 @@ export default function ProductsList({ products, loading }) {
                               setSelectedProduct(product);
                               setRemoveModel(true);
                             }}
-                            className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
+                            className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-3 py-1 rounded hover:bg-red-300/80"
                           >
                             Remove
                           </button>
@@ -197,15 +197,6 @@ export default function ProductsList({ products, loading }) {
           <p className="text-gray-700 dark:text-white">Page 1 of 12</p>
           <button className="border px-4 py-2 rounded-xl">Next</button>
         </div>
-
-
-        {updateModel && (
-          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
-        )}
-
-        {removeModel && (
-          <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
-        )}
       </>
     )
   }
@@ -265,20 +256,52 @@ export default function ProductsList({ products, loading }) {
       </div>
 
 
+      <Dialog
+        open={addModel}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setAddModel(false)}
+        aria-describedby="alert-dialog-slide-description"
+        fullWidth
+        maxWidth="md"
+      >
+        <AddProductModel setAddModel={setAddModel} />
+      </Dialog>
+
       {
-        addModel && <Dialog
-          open={addModel}
+        (updateModel && selectedProduct) && <Dialog
+          open={updateModel}
           slots={{
             transition: Transition,
           }}
           keepMounted
-          onClose={() => setAddModel(false)}
+          onClose={() => setUpdateModel(false)}
           aria-describedby="alert-dialog-slide-description"
           fullWidth
+          maxWidth="md"
         >
-          <AddProductModel setAddModel={setAddModel} />
+          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
         </Dialog>
       }
+
+      {
+        (removeModel && selectedProduct) && <Dialog
+          open={removeModel}
+          slots={{
+            transition: Transition,
+          }}
+          keepMounted
+          onClose={() => setRemoveModel(false)}
+          aria-describedby="alert-dialog-slide-description"
+          fullWidth
+          maxWidth="sm"
+        >
+          <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
+        </Dialog>
+      }
+
     </>
   )
 }

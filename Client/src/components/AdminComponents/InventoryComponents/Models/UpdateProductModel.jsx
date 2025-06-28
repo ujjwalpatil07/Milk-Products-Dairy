@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { updateProduct } from "../../../../services/productServices";
-import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
 import PropTypes from "prop-types";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import { useSnackbar } from 'notistack';
 
 const categories = [
@@ -56,19 +54,6 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       ? productDetails.image
       : productDetails?.image?.[0]?.url || ""
   );
-  const modelRef = useRef()
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modelRef.current && !modelRef.current.contains(event.target)) {
-        setUpdateModel(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setUpdateModel]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -127,7 +112,6 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
     }
   };
 
-
   const validateInputs = () => {
     const { name, category, price, image, stock, quantityUnit, thresholdVal, shelfLife, discount, description, nutrition } = productDetails;
     if (!name || !category || !price || !image || !stock || !quantityUnit || !thresholdVal || !shelfLife || !nutrition || !discount || !description) {
@@ -174,34 +158,23 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   }
 
   return (
-    <motion.div
-
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
-
-      <motion.div
-        ref={modelRef}
-        initial={{ scale: 0.9, opacity: 0, y: 50 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 50 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4"
+      <div
+        className="relative bg-white dark:bg-black/80 p-3"
       >
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-          🧾 Update the Product
+          Update the Product
         </h2>
 
         <button
           onClick={() => {
             setUpdateModel(false);
           }}
-          className="absolute top-3 right-5 text-xl"
-        >X</button>
+          className="absolute top-3 right-5 text-xl text-black dark:text-white"
+        >
+          <X />
+        </button>
 
-        <form onSubmit={handleUpdateProduct} className="space-y-6 text-sm sm:text-base">
+        <form onSubmit={handleUpdateProduct} className="space-y-4 text-sm sm:text-base mt-3">
           {/* Image upload */}
           <div className="relative w-24 h-24 mx-auto">
             <img
@@ -209,7 +182,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 previewImage ||
                 (typeof productDetails.image === "string"
                   ? productDetails.image
-                  : productDetails.image?.url) || // if stored as { url: '...' }
+                  : productDetails.image?.url) ||
                 "https://img.freepik.com/free-vector/dairy-products-poster_1284-18867.jpg?semt=ais_hybrid&w=740"
               }
               alt="Product Preview"
@@ -230,7 +203,6 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
             />
           </div>
 
-          {/* Product Name and Category */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
             <div className="w-1/2">
               <InputWithLabel
@@ -431,8 +403,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
             </button>
           </div>
         </form>
-      </motion.div>
-    </motion.div >
+      </div>
   );
 }
 

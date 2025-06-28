@@ -1,10 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { socket } from "../../../../socket/socket";
 import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
@@ -53,20 +51,6 @@ export default function AddProductModal({ setAddModel }) {
   })
   const [selectedFile, setSelectedFile] = useState(null)
   const [isAdding, setIsAdding] = useState(false);
-
-  const modelRef = useRef()
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modelRef.current && !modelRef.current.contains(event.target)) {
-        setAddModel(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setAddModel]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -149,16 +133,11 @@ export default function AddProductModal({ setAddModel }) {
 
   return (
 
-    <motion.div
-      ref={modelRef}
-      initial={{ scale: 0.9, opacity: 0, y: 50 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 0.9, opacity: 0, y: 50 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl space-y-4"
+    <div
+      className="relative bg-white dark:bg-black/80 p-3"
     >
       <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-        🧾 Add New Product
+        Add New Product
       </h2>
 
       <button
@@ -170,7 +149,7 @@ export default function AddProductModal({ setAddModel }) {
         <X />
       </button>
 
-      <form onSubmit={handleAddProduct} className="space-y-6 text-sm sm:text-base">
+      <form onSubmit={handleAddProduct} className="space-y-4 text-sm sm:text-base mt-3">
         {/* Image upload */}
         <div className="relative w-24 h-24 mx-auto">
           <img
@@ -370,20 +349,20 @@ export default function AddProductModal({ setAddModel }) {
           <button
             type="button"
             onClick={() => setAddModel(false)}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white"
           >
             Cancel
           </button>
           <button
             type="submit"
 
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             {isAdding ? "Adding..." : "Add Product"}
           </button>
         </div>
       </form>
-    </motion.div>
+    </div>
 
   );
 }
