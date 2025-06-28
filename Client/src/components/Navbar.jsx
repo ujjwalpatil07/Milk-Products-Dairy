@@ -41,7 +41,6 @@ export default function Navbar() {
     const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
     const { notification, setNotification } = useContext(UserOrderContext);
-
     const [open, setOpen] = useState(false);
     const [notificationLoadingIndex, setNotificationLoadingIndex] = useState(null);
     const [animate, setAnimate] = useState(false);

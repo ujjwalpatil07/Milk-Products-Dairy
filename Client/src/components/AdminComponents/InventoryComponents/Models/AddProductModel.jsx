@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
-import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { socket } from "../../../../socket/socket";
 import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
@@ -52,6 +54,20 @@ export default function AddProductModal({ setAddModel }) {
   const [selectedFile, setSelectedFile] = useState(null)
   const [isAdding, setIsAdding] = useState(false);
 
+  const modelRef = useRef()
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modelRef.current && !modelRef.current.contains(event.target)) {
+        setAddModel(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setAddModel]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -91,7 +107,7 @@ export default function AddProductModal({ setAddModel }) {
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", { variant: "info" });
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant : "info"});
       return false;
     }
     return true;
@@ -100,17 +116,17 @@ export default function AddProductModal({ setAddModel }) {
 
   useEffect(() => {
     socket.on("add-new-product:failed", (data) => {
-      enqueueSnackbar(data?.message, { variant: "error" });
+      enqueueSnackbar(data?.message, {variant: "error"});
       setIsAdding(false);
     })
 
     socket.on("added-new-product:to-inventory", (data) => {
-      enqueueSnackbar(data?.message, { variant: "success" });
+      enqueueSnackbar(data?.message, {variant: "success"});
       setAddModel(false);
       setIsAdding(false)
     })
 
-    return () => {
+    return  () => {
       socket.off("add-new-product:failed")
       socket.off("added-new-product:to-inventory")
     }
@@ -132,237 +148,247 @@ export default function AddProductModal({ setAddModel }) {
   }
 
   return (
-
-    <div
-      className="relative bg-white dark:bg-black/80 p-3"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto"
     >
-      <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-        Add New Product
-      </h2>
-
-      <button
-        onClick={() => {
-          setAddModel(false);
-        }}
-        className="absolute top-3 right-5 text-xl text-black dark:text-white"
+      <motion.div
+        ref={modelRef}
+        initial={{ scale: 0.9, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 50 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl space-y-4"
       >
-        <X />
-      </button>
+        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+          🧾 Add New Product
+        </h2>
 
-      <form onSubmit={handleAddProduct} className="space-y-4 text-sm sm:text-base mt-3">
-        {/* Image upload */}
-        <div className="relative w-24 h-24 mx-auto">
-          <img
-            src={productDetails?.image || "https://img.freepik.com/free-vector/dairy-products-poster_1284-18867.jpg?semt=ais_hybrid&w=740"}
-            alt="Product Preview"
-            className={`${isAdding ? "cursor-not-allowed" : null} w-24 h-24 rounded-xl object-cover border opacity-50`}
-          />
-          <label htmlFor="photoInput" className="absolute bottom-0 right-0 bg-white border p-1 rounded-full cursor-pointer">
-            <Image className="w-5 h-5 text-blue-600" />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            id="photoInput"
-            name="image"
-            className="hidden"
+        <button
+          onClick={() => {
+            setAddModel(false);
+          }}
+          className="absolute top-3 right-5 text-xl"
+        >X</button>
 
-            onChange={handlePhotoChange}
-          />
-        </div>
-
-        {/* Product Name and Category */}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Product Name"
-              name="name"
-              placeholder="Ex: Milk"
-              icon={<Tag className="text-gray-500" />}
-              onChange={handleInputChange}
-
+        <form onSubmit={handleAddProduct} className="space-y-6 text-sm sm:text-base">
+          {/* Image upload */}
+          <div className="relative w-24 h-24 mx-auto">
+            <img
+              src={productDetails?.image || "https://img.freepik.com/free-vector/dairy-products-poster_1284-18867.jpg?semt=ais_hybrid&w=740"}
+              alt="Product Preview"
+              className={`${isAdding ? "cursor-not-allowed" : null} w-24 h-24 rounded-xl object-cover border opacity-50`}
             />
-          </div>
-          <div className="flex flex-col w-1/2">
-            <label
-              htmlFor="category"
-              className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
-            >
-              <Package className="text-gray-500 text-sm" />
-              Category
+            <label htmlFor="photoInput" className="absolute bottom-0 right-0 bg-white border p-1 rounded-full cursor-pointer">
+              <Image className="w-5 h-5 text-blue-600" />
             </label>
-            <select
-              id="category"
-              name="category"
-              onChange={handleInputChange}
-              defaultValue=""
+            <input
+              type="file"
+              accept="image/*"
+              id="photoInput"
+              name="image"
+              className="hidden"
 
-              className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
-              bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
-              focus:outline-none focus:ring-1 focus:ring-gray-500`}            >
-              <option value="" disabled hidden>
-                Select a category
-              </option>
-              {categories.map((cat, index) => (
-                <option key={index * 0.9} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
-                >
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Product Description */}
-        <div>
-          <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
-            Description
-          </label>
-          <div className="flex items-start gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
-            <DescriptionIcon className="text-gray-500" />
-            <textarea
-              type="text"
-              id="description"
-              name="description"
-              rows={5}
-              cols={40}
-              placeholder="Enter something product"
-              className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
-              onChange={handleInputChange}
+              onChange={handlePhotoChange}
             />
           </div>
-        </div>
 
-        {/* Nutrition Input  */}
-        <NutritionInput
-          onChange={(nutritionData) =>
-            setProductDetails((prev) => ({
-              ...prev,
-              nutrition: nutritionData,
-            }))
-          }
-        />
+          {/* Product Name and Category */}
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
+            <div className="w-full md:w-1/2 ">
+              <InputWithLabel
+                label="Product Name"
+                name="name"
+                placeholder="Ex: Milk"
+                icon={<Tag className="text-gray-500" />}
+                onChange={handleInputChange}
 
-        <InputWithLabel
-          label="Manufacturing Cost for admin"
-          name="manufacturingCost"
-          placeholder="Ex. 20Rs"
-          icon={<CurrencyRupeeIcon className="text-gray-500" />}
-          onChange={handleInputChange}
-        />
-
-        {/* Product"s Shelflife and Selling Price */}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Product's Shelflife"
-              name="shelfLife"
-              placeholder="Ex: 4 Days"
-              icon={<CurrencyRupeeIcon className="text-gray-500" />}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Selling Price (₹)"
-              name="price"
-              placeholder="Ex: 50"
-              icon={<CurrencyRupeeIcon className="text-gray-500" />}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        {/* Stock and Quantity Unit */}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 ">
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Stock"
-              name="stock"
-              placeholder="Ex: 100"
-              isAdding={isAdding}
-              icon={<Archive className="text-gray-500" />}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="w-1/2">
-            <div className="flex flex-col gap-2">
+              />
+            </div>
+            <div className="flex flex-col w-full md:w-1/2">
               <label
-                htmlFor="quantityUnit"
+                htmlFor="category"
                 className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
               >
-                <FlaskConical className="text-gray-500 !text-sm" />
-                Quantity Unit
+                <Package className="text-gray-500 text-sm" />
+                Category
               </label>
               <select
-                id="quantityUnit"
-                name="quantityUnit"
+                id="category"
+                name="category"
                 onChange={handleInputChange}
                 defaultValue=""
 
                 className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
-                 bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
-                 focus:outline-none focus:ring-1 focus:ring-gray-500`}
-              >
+              bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
+              focus:outline-none focus:ring-1 focus:ring-gray-500`}            >
                 <option value="" disabled hidden>
-                  Select unit
+                  Select a category
                 </option>
-
-                {quantityUnits.map((unit, index) => (
-                  <option
-                    key={index * 0.9}
-                    value={unit}
-                    className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                {categories.map((cat, index) => (
+                  <option key={index * 0.9} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
                   >
-                    {unit}
+                    {cat}
                   </option>
                 ))}
               </select>
             </div>
           </div>
-        </div>
 
-        {/* Threshold Value and Discount */}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Threshold Value"
-              name="thresholdVal"
-              placeholder="Ex: 10"
-              icon={<AlertCircle className="text-gray-500" />}
-              onChange={handleInputChange}
-            />
+          {/* Product Description */}
+          <div>
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Description
+            </label>
+            <div className="flex items-start gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
+              <DescriptionIcon className="text-gray-500" />
+              <textarea
+                type="text"
+                id="description"
+                name="description"
+                rows={5}
+                cols={40}
+                placeholder="Enter something product"
+                className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
-          <div className="w-1/2">
-            <InputWithLabel
-              label="Discount (%)"
-              name="discount"
-              placeholder="Ex: 10%"
-              icon={<CurrencyRupeeIcon className="text-gray-500" />}
-              onChange={handleInputChange}
-            />
+
+          {/* Nutrition Input  */}
+          <NutritionInput
+            onChange={(nutritionData) =>
+              setProductDetails((prev) => ({
+                ...prev,
+                nutrition: nutritionData,
+              }))
+            }
+          />
+
+          <InputWithLabel
+            label="Manufacturing Cost for admin"
+            name="manufacturingCost"
+            placeholder="Ex. 20Rs"
+            icon={<CurrencyRupeeIcon className="text-gray-500" />}
+            onChange={handleInputChange}
+          />
+
+          {/* Product"s Shelflife and Selling Price */}
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
+            <div className="w-full md:w-1/2">
+              <InputWithLabel
+                label="Product's Shelflife"
+                name="shelfLife"
+                placeholder="Ex: 4 Days"
+                icon={<CurrencyRupeeIcon className="text-gray-500" />}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+              <InputWithLabel
+                label="Selling Price (₹)"
+                name="price"
+                placeholder="Ex: 50"
+                icon={<CurrencyRupeeIcon className="text-gray-500" />}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Buttons */}
-        <div className="flex justify-between mt-6">
-          <button
-            type="button"
-            onClick={() => setAddModel(false)}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
+          {/* Stock and Quantity Unit */}
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 ">
+            <div className="w-full md:w-1/2">
+              <InputWithLabel
+                label="Stock"
+                name="stock"
+                placeholder="Ex: 100"
+                isAdding={isAdding}
+                icon={<Archive className="text-gray-500" />}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="quantityUnit"
+                  className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
+                >
+                  <FlaskConical className="text-gray-500 !text-sm" />
+                  Quantity Unit
+                </label>
+                <select
+                  id="quantityUnit"
+                  name="quantityUnit"
+                  onChange={handleInputChange}
+                  defaultValue=""
 
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            {isAdding ? "Adding..." : "Add Product"}
-          </button>
-        </div>
-      </form>
-    </div>
+                  className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
+                 bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
+                 focus:outline-none focus:ring-1 focus:ring-gray-500`}
+                >
+                  <option value="" disabled hidden>
+                    Select unit
+                  </option>
+
+                  {quantityUnits.map((unit, index) => (
+                    <option
+                      key={index * 0.9}
+                      value={unit}
+                      className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                    >
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Threshold Value and Discount */}
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
+            <div className="w-full md:w-1/2">
+              <InputWithLabel
+                label="Threshold Value"
+                name="thresholdVal"
+                placeholder="Ex: 10"
+                icon={<AlertCircle className="text-gray-500" />}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="w-full md:w-1/2">
+              <InputWithLabel
+                label="Discount (%)"
+                name="discount"
+                placeholder="Ex: 10%"
+                icon={<CurrencyRupeeIcon className="text-gray-500" />}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
+              onClick={() => setAddModel(false)}
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {isAdding ? "Adding..." : "Add Product"}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
 
   );
 }

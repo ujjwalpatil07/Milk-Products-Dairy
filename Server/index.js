@@ -7,7 +7,6 @@ import AuthAdminRoute from "./routes/AuthRoutes/authAdminRoute.mjs";
 import AuthUserRoute from "./routes/AuthRoutes/authUserRoute.mjs";
 import ProfileEditRoute from "./routes/profileEditRoutes.mjs";
 import ProductsRoutes from "./routes/productRoutes.mjs"
-import InventoryRoutes from "./routes/inventoryRoutes.mjs"
 import OrderRoute from "./routes/orderRoutes.js";
 import PaymentRoute from "./routes/paymentRoutes.js";
 import StoreRoute from "./routes/storeRoutes.js";
@@ -41,8 +40,6 @@ app.use("/u", AuthUserRoute);
 app.use("/user-profile", ProfileEditRoute);
 
 app.use("/products", ProductsRoutes);
-
-app.use("/inventory", InventoryRoutes);
 
 app.use("/order", OrderRoute);
 

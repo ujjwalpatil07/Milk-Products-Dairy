@@ -29,7 +29,7 @@ export const getAllUserOrders = async (req, res) => {
 };
 
 export const getAllOrders = async (req, res) => {
-  const orders = await Order.find({})
+  const orders = await Order.find()
     .populate({
       path: "address",
       model: "Address",

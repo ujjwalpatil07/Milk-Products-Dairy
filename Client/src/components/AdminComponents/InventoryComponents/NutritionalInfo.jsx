@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types"
 
-export default function NutritionInput({ onChange, value }) {
+export default function NutritionInput({ onChange, value, isAdding }) {
   const [nutrition, setNutrition] = useState([{ key: "", value: "" }]);
 
   // Initialize nutrition state from `value` when it changes
@@ -46,7 +46,7 @@ export default function NutritionInput({ onChange, value }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor="key" className="text-gray-700 dark:text-white font-medium">Nutrition Info</label>
+      <label htmlFor="key" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Nutrition Info</label>
 
       {nutrition.map((item, index) => (
         <div key={index * 0.5} className="flex gap-2 items-center">
@@ -54,27 +54,34 @@ export default function NutritionInput({ onChange, value }) {
             <label htmlFor="key" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Key
             </label>
-            <input
-              type="text"
-              id="key"
-              placeholder="e.g. Calories"
-              value={item.key}
-              onChange={(e) => handleChange(index, "key", e.target.value)}
-              className="p-2 border rounded w-full dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            />
+            <div className="flex items-center gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
+              <input
+                type="text"
+                id="key"
+                placeholder="e.g. Calories"
+                value={item.key}
+                onChange={(e) => handleChange(index, "key", e.target.value)}
+                className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
+              />
+            </div>
+
+
           </div>
           <div className="w-1/2">
             <label htmlFor="value" className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
               Value
             </label>
-            <input
-              type="text"
-              id="value"
-              placeholder="e.g. 100 kcal"
-              value={item.value}
-              onChange={(e) => handleChange(index, "value", e.target.value)}
-              className="p-2 border rounded w-full dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            />
+            <div className="flex items-center gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
+              <input
+                type="text"
+                id="value"
+                placeholder="e.g. 100 kcal"
+                value={item.value}
+                onChange={(e) => handleChange(index, "value", e.target.value)}
+                className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
+              />
+            </div>
+
           </div>
           {index > 0 && (
             <button
@@ -101,5 +108,5 @@ export default function NutritionInput({ onChange, value }) {
 
 NutritionInput.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.object, 
+  value: PropTypes.object,
 };

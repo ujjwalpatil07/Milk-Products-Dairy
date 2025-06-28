@@ -10,6 +10,7 @@ import {
   validateOrderData,
   validateAndProcessProducts,
   addUserNotification,
+  addAdminNotification,
 } from "./helper.js";
 import mongoose from "mongoose";
 import { cloudinary } from "../config/cloudinary.js";
@@ -51,7 +52,7 @@ export const connectToSocket = (server) => {
     }); 
 
     socket.on("place-new-order", async (data) => {
-      const { address, productsData, paymentMode, totalAmount, userId } =
+      const { address, productsData, paymentMode, totalAmount, userId, date } =
         data.orderData;
 
       const { paymentInfo } = data;
@@ -158,11 +159,25 @@ export const connectToSocket = (server) => {
           change: -item.productQuantity,
         }));
 
+        await addAdminNotification(admin, {
+          title: "New Order Recieved",
+          description: `You have new pending order from ${user?.firstName} ${user?.lastName}`,
+          date,
+        });
+
         for (const [_, socketSet] of adminSocketMap) {
           for (const socketId of socketSet) {
             io.to(socketId).emit("order:new-pending-order", {
               order: savedOrder,
             });
+
+            io.to(socketId).emit("admin:notification", {
+              title: "New Order Recieved",
+              description:
+                `You have new pending order`,
+              date,
+            });
+
           }
         }
 
@@ -270,6 +285,7 @@ export const connectToSocket = (server) => {
             });
           }
         }
+
       } catch (error) {
         socket.emit("order:update-status-failed", {
           message:
@@ -758,6 +774,86 @@ export const connectToSocket = (server) => {
         socket.emit("remove-product:failed", {
           message:
             error?.message || "Something went wrong while deleting product",
+        });
+      }
+    });
+
+    //For updating product
+    socket.on("update-product", async (data) => {
+      const updatedProductData = data;
+      try {
+        if (!updatedProductData) {
+          return socket.emit("update-product:failed", {
+            message: "Updated product data is missing",
+          });
+        }
+
+        const productId = updatedProductData?._id;
+
+        if (!productId) {
+          return socket.emit("update-product:failed", {
+            message: "Product Id is missing.",
+          });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+          return socket.emit("update-product:failed", {
+            message: "Product not found",
+          });
+        }
+
+        if (
+          updatedProductData?.name &&
+          updatedProductData?.name !== product?.name
+        ) {
+          const nameExists = await Product.findOne({
+            name: updatedProductData?.name,
+          });
+          if (nameExists) {
+            return socket.emit("update-product:failed", {
+              message:
+                "Product with this name already exists ! You can update it",
+            });
+          }
+        }
+
+        if (updatedProductData?.image?.startsWith("data:image")) {
+          const uploadedImage = await cloudinary.uploader.upload(
+            updatedProductData.image,
+            {
+              folder: "user-profiles",
+            }
+          );
+          updatedProductData.image = [uploadedImage.secure_url];
+        } else {
+          updatedProductData.image = product.image; // reuse existing Cloudinary image
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(
+          productId,
+          { $set: updatedProductData },
+          { new: true }
+        );
+
+        if (!updatedProduct) {
+          return socket.emit("update-product:failed", {
+            message: "Updated product not found",
+          });
+        }
+
+        io.emit("update-product:success", {
+          message: "Product updated successfully",
+          updatedProduct,
+        });
+
+        socket.emit("update-product:updated", {
+          message: `${updatedProduct?.name} updated successfully .`,
+        });
+      } catch (error) {
+        socket.emit("update-product:failed", {
+          message:
+            error?.message || "Something went wrong while updating product",
         });
       }
     });

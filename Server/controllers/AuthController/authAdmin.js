@@ -44,3 +44,45 @@ export const getAdmin = async (req, res) => {
 
   return res.status(200).json({ success: true, admin });
 };
+
+export const removeAdminNotification = async (req, res) => {
+  const { adminId, mode, index } = req.body;
+
+  if (!adminId || !mode) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Admin ID and mode are required." });
+  }
+
+  const admin = await Admin.findById(adminId);
+  if (!admin) {
+    return res.status(404).json({ success: false, message: "Admin not found." });
+  }
+
+  switch (mode) {
+    case "index":
+      if (
+        typeof index !== "number" ||
+        index < 0 ||
+        index >= admin.notifications.length
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid index." });
+      }
+      admin.notifications.splice(index, 1);
+      break;
+
+    case "all":
+      admin.notifications = [];
+      break;
+
+    default:
+      return res.status(400).json({ success: false, message: "Invalid mode." });
+  }
+
+  await admin.save();
+  return res
+    .status(200)
+    .json({ success: true, message: "Notification(s) deleted successfully." });
+};
