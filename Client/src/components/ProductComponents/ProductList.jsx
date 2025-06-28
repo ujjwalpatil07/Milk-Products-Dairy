@@ -35,7 +35,7 @@ export default function ProductList() {
                     return (
                         <li key={category}>
                             <h3
-                                className={`mb-1 pe-2 py-1
+                                className={`mb-1 pe-2 py-1 line-clamp-2 
                                     ${isAnyProductSelected
                                         ? "text-[#843E71]"
                                         : "text-gray-600 dark:text-gray-300"

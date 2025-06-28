@@ -61,7 +61,7 @@ export default function MyWishlist() {
 
   if (loading) {
     content = (
-      <div className="text-center py-20 text-gray-600 md:w-90 lg:w-xl">
+      <div className="text-center py-20 text-gray-600">
         <div className="animate-spin w-6 h-6 border-4 border-dashed rounded-full mx-auto border-[#843E71] mb-3" />
         Loading your wishlist...
       </div>
@@ -84,7 +84,7 @@ export default function MyWishlist() {
           return (
             <li
               key={product?._id}
-              className="w-full sm:w-100 lg:w-full rounded-lg bg-gray-100 dark:bg-gray-500/10 hover:shadow transition"
+              className="w-full rounded-lg bg-gray-100 dark:bg-gray-500/10 hover:shadow transition"
             >
               <div className="flex items-start">
                 <div className="w-25 h-25 flex-shrink-0 bg-white rounded-tl sm:rounded-s overflow-hidden flex justify-center items-center">

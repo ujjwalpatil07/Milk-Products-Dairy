@@ -54,8 +54,7 @@ export const AuthProvider = ({ children }) => {
                     const data = await getAdminById(localAdmin?._id);
                     setAuthAdmin(data?.admin);
                 }
-            } catch (error) {
-                console.error("Admin fetch failed", error);
+            } catch {
                 setAuthAdmin(null);
             } finally {
                 setAuthAdminLoading(false);

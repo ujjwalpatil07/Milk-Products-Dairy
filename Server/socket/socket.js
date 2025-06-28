@@ -49,7 +49,7 @@ export const connectToSocket = (server) => {
         adminSocketMap.set(adminId, new Set());
       }
       adminSocketMap.get(adminId).add(socket.id);
-    });
+    }); 
 
     socket.on("place-new-order", async (data) => {
       const { address, productsData, paymentMode, totalAmount, userId, date } =
@@ -178,6 +178,14 @@ export const connectToSocket = (server) => {
               date,
             });
 
+          }
+        }
+
+        if (userId && userSocketMap.has(userId)) {
+          for (const socketId of userSocketMap.get(userId)) {
+            io.to(socketId).emit("order:place-new-success", {
+              newOrder: savedOrder,
+            });
           }
         }
 
@@ -344,6 +352,13 @@ export const connectToSocket = (server) => {
           { $pull: { pendingOrders: order._id } },
           { new: true }
         );
+
+        const updatedData = order.productsData.map((item) => ({
+          productId: item.productId.toString(),
+          change: item.productQuantity,
+        }));
+
+        io.emit("product-stock-update", { updatedData });
 
         socket.emit("order:update-status-success", {
           message: "Order cancelled and stock restored successfully.",
@@ -671,7 +686,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-    //For adding new product
     socket.on("add-new-product", async (data) => {
       const { image, productDetails } = data;
       let imageUrl = "";
@@ -736,7 +750,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-    //For removing product
     socket.on("remove-product", async (data) => {
       let { productId } = data;
 

@@ -28,7 +28,7 @@ export default function StoreOrdersHistory() {
             try {
                 const data = await getUserOrderHistory(userId);
                 if (data?.success) {
-                    setUserData(data.orders);
+                    setUserData(data?.orders);
                 }
             } catch (error) {
                 enqueueSnackbar(error?.response?.data?.message || "Failed to fetch orders.", { variant: "error" });

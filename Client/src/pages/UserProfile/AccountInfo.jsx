@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   FaUser, FaPhone, FaVenusMars, FaMapMarkerAlt, FaEdit,
   FaRoad, FaCity, FaMapPin,
@@ -7,6 +7,13 @@ import { Close } from "@mui/icons-material";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { getUserProfile, updateUserProfile } from "../../services/userProfileService";
 import { useSnackbar } from "notistack";
+
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function AccountInfo() {
   const { enqueueSnackbar } = useSnackbar();
@@ -77,7 +84,7 @@ export default function AccountInfo() {
     try {
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(editData.mobileNo)) {
-        enqueueSnackbar("Enter a valid 10-digit phone number", {variant: "error"});
+        enqueueSnackbar("Enter a valid 10-digit phone number", { variant: "error" });
         return;
       }
 
@@ -208,35 +215,45 @@ export default function AccountInfo() {
           )}
         </form >
 
-        {showAddressModal && (
-          <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50 transition-all duration-300">
-            <div className="bg-white dark:bg-gray-500/50 p-6 rounded-lg shadow-xl w-full max-w-lg relative animate-fade-in">
+        {
+          (showAddressModal) && <Dialog
+            open={showAddressModal}
+            slots={{
+              transition: Transition,
+            }}
+            keepMounted
+            onClose={() => setShowAddressModal(false)}
+            aria-describedby="alert-dialog-slide-description"
+            fullWidth
+          >
+            <div className="bg-white dark:bg-black/80 p-4 sm:p-6 rounded-lg">
               <button
                 onClick={() => setShowAddressModal(false)}
-                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl font-bold transition"
+                className="absolute top-3 right-3 text-gray-500 hover:text-red-600 dark:hover:text-red-400 text-xl font-bold transition"
               >
                 <Close />
               </button>
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-100">
                 <FaMapMarkerAlt className="!text-[#813E71]" /> Edit Address
               </h2>
+
               <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {["streetAddress", "city", "pincode"].map((field, i) => (
-                  <div key={i * 0.9} className={`${["streetAddress"].includes(field) ? "md:col-span-2" : ""}`}>
-                    {(() => {
-                      let icon;
-                      if (field === "streetAddress") icon = <FaRoad />;
-                      else if (field === "city") icon = <FaCity />;
-                      else icon = <FaMapPin />;
-                      return (
-                        <label className="text-sm font-medium capitalize flex items-center gap-2">
-                          {icon} {field.replace(/([A-Z])/g, ' $1')}
-                        </label>
-                      );
-                    })()}
+                {["streetAddress", "city", "pincode"].map((field) => (
+                  <div
+                    key={field}
+                    className={["streetAddress"].includes(field) ? "md:col-span-2" : ""}
+                  >
+                    <label className="text-sm font-medium capitalize flex items-center gap-2 text-gray-700 dark:text-gray-300 mb-1">
+                      {field === "streetAddress" && <FaRoad />}
+                      {field === "city" && <FaCity />}
+                      {field === "pincode" && <FaMapPin />}
+                      {field.replace(/([A-Z])/g, " $1")}
+                    </label>
+
                     <input
                       type="text"
-                      className="w-full p-2 border rounded transition focus:ring-2 focus:ring-indigo-300  dark:bg-gray-500/20 dark:border-gray-600"
+                      className="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-500/20 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-500 transition"
                       value={editData?.address[field] || ""}
                       onChange={(e) =>
                         setEditData((prev) => ({
@@ -247,21 +264,24 @@ export default function AccountInfo() {
                     />
                   </div>
                 ))}
+
                 <div className="md:col-span-2 flex justify-end gap-4 mt-4">
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-300 dark:bg-gray-500/50 dark:text-white rounded hover:bg-gray-500/60 transition"
+                    className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition"
                     onClick={() => setShowAddressModal(false)}
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E71] transition"
+                    className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#6f2f5c] transition"
                     onClick={() => {
-                      const { streetAddress, city, pincode } = editData.address;
+                      const { streetAddress, city, pincode } = editData?.address || {};
                       if (!streetAddress || !city || !pincode) {
-                        enqueueSnackbar("Please fill out all address fields", { variant: "error" });
+                        enqueueSnackbar("Please fill out all address fields", {
+                          variant: "error",
+                        });
                         return;
                       }
                       setShowAddressModal(false);
@@ -271,9 +291,8 @@ export default function AccountInfo() {
                   </button>
                 </div>
               </form>
-            </div >
-          </div >
-        )
+            </div>
+          </Dialog>
         }
       </>
     )
@@ -289,14 +308,14 @@ export default function AccountInfo() {
     <>
       <div className="w-full !h-fit md:h-full mx-auto flex justify-between items-center mb-4">
         <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2 line-clamp-1">
-          <FaUser className="text-blue-600 dark:text-blue-400" /> Account Information
+          <FaUser className="hidden sm:flex text-blue-600 dark:text-blue-400" /> Account Information
         </h3>
         <button
           type="button"
           onClick={() => setEdit(!edit)}
           className="px-4 py-2 text-sm bg-[#414141] text-white rounded transition duration-300 flex items-center gap-2"
         >
-          <FaEdit />
+          <FaEdit className="hidden sm:flex" />
           {edit ? "Cancel" : "Edit Profile"}
         </button>
       </div>

@@ -100,8 +100,10 @@ export default function Navbar() {
             if (res?.success) {
                 if (mode === "all") {
                     setNotification([]);
+                    enqueueSnackbar(res?.message || "Remove notification.", { variant: "success" });
                 } else if (mode === "index") {
                     setNotification((prev) => prev.filter((_, i) => i !== index));
+                    enqueueSnackbar(res?.message || "Remove all notifications.", { variant: "success" });
                 }
             } else {
                 enqueueSnackbar(res?.message || "Failed to remove notification.", { variant: "error" });
@@ -311,7 +313,6 @@ export default function Navbar() {
                     )}
                 </div>
             </Dialog>
-
         </>
     );
 }

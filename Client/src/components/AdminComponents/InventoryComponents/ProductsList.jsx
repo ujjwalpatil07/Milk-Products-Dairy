@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import UpdateProductModel from './Models/UpdateProductModel';
 import AddProductModel from "./Models/AddProductModel"
@@ -7,7 +7,14 @@ import RemoveModel from './Models/RemoveModel';
 import { SidebarContext } from '../../../context/SidebarProvider';
 import { FilterIcon } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 // Animation variants
 const containerVariants = {
@@ -36,7 +43,7 @@ export default function ProductsList({ products, loading }) {
   const [removeModel, setRemoveModel] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [productList, setProductList] = useState(products || []);
-  const [filterType, setFilterType] = useState('priceLowToHigh');
+  const [filterType, setFilterType] = useState('Filter');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
 
@@ -53,8 +60,9 @@ export default function ProductsList({ products, loading }) {
     { label: "Name: Z to A", value: "alphabeticalZA" },
     { label: "Sold: Low to High", value: "soldLowToHigh" },
     { label: "Sold: High to Low", value: "soldHighToLow" },
+    { label: "Clear", value: "Filter" },
   ];
-  
+
   const handleFilter = (type) => {
     setFilterType(type);
 
@@ -91,7 +99,7 @@ export default function ProductsList({ products, loading }) {
 
     setProductList(sortedProducts);
   };
-  
+
   let content;
   if ((!addModel && !updateModel && !removeModel) && loading) {
     content = (
@@ -127,58 +135,58 @@ export default function ProductsList({ products, loading }) {
                   <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-                <motion.tbody
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  {productList.map((product, index) => {
-                    const isLowStock = product.stock < product.thresholdVal;
+              <motion.tbody
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {productList.map((product, index) => {
+                  const isLowStock = product.stock < product.thresholdVal;
 
-                    return (
-                      <motion.tr
-                        key={product._id || index}
-                        variants={rowVariants}
-                        className={`border-b  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
+                  return (
+                    <motion.tr
+                      key={product._id || index}
+                      variants={rowVariants}
+                      className={`border-b  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
                           }`}
-                      >
-                        <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
-                          {highlightMatch(product.name, navbarInput)}
-                        </td>
-                        <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
-                        <td className="py-2 px-3 whitespace-nowrap">
-                          {product.stock} {product.quantityUnit}
-                        </td>
-                        <td className="py-2 px-3 whitespace-nowrap">
-                          {product.thresholdVal} {product.quantityUnit}
-                        </td>
-                        <td className="py-2 px-3 whitespace-break-spaces">{product.category}</td>
-                        <td className="py-2 px-3 whitespace-nowrap">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedProduct(product);
-                                setUpdateModel(true);
-                              }}
-                              className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-green-300/80"
-                            >
-                              Update
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedProduct(product);
-                                setRemoveModel(true);
-                              }}
-                              className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-3 py-1 rounded-md hover:bg-red-300/80"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </motion.tbody>
+                    >
+                      <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
+                        {highlightMatch(product.name, navbarInput)}
+                      </td>
+                      <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        {product.stock} {product.quantityUnit}
+                      </td>
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        {product.thresholdVal} {product.quantityUnit}
+                      </td>
+                      <td className="py-2 px-3 whitespace-break-spaces">{product.category}</td>
+                      <td className="py-2 px-3 whitespace-nowrap">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setUpdateModel(true);
+                            }}
+                            className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded hover:bg-green-300/80"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setRemoveModel(true);
+                            }}
+                            className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-3 py-1 rounded hover:bg-red-300/80"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </motion.tbody>
 
             </table>
           )}
@@ -190,79 +198,113 @@ export default function ProductsList({ products, loading }) {
           <button className="border px-4 py-2 rounded-xl">Next</button>
         </div>
 
-        <AnimatePresence>
-          {addModel && <AddProductModel setAddModel={setAddModel} />}
-        </AnimatePresence>
-
-
-        {updateModel && (
-          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
-        )}
-
-        {removeModel && (
-          <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
-        )}
+        
       </>
     )
   }
 
   return (
-    <div className="bg-white dark:bg-gray-500/20 rounded-xl p-4 md:p-6 shadow-md w-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Products</h2>
+    <>
+      <div className="bg-white dark:bg-gray-500/20 rounded-xl p-4 md:p-6 shadow-md w-full">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Products</h2>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-2 w-full md:w-auto">
-          <div className='flex gap-2'>
-            <button
-              onClick={() => setAddModel(true)}
-              className="bg-blue-500 dark:bg-orange-600/30 dark:hover:bg-orange-600/40 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              Add Product
-            </button>
-
-            {/* Dropdown menu */}
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 w-full md:w-auto">
+            <div className='flex gap-2'>
               <button
-                type="button"
-                onClick={() => setShowFilterDropdown(prev => !prev)}
-                className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 cursor-pointer"
-                aria-haspopup="listbox"
-                aria-expanded={showFilterDropdown}
+                onClick={() => setAddModel(true)}
+                className="bg-blue-500 dark:bg-orange-600/30 dark:hover:bg-orange-600/40 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
               >
-                <FilterIcon />
-                <span>Filter</span>
+                Add Product
               </button>
 
-              {showFilterDropdown && (
-                <div className="absolute z-10 right-0 mt-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-md w-48">
-                  <ul className="text-sm text-gray-700 dark:text-white">
-                    {filterOptions.map((filter) => (
-                      <li key={filter.value}>
-                        <button
-                          onClick={() => {
-                            handleFilter(filter.value);
-                            setShowFilterDropdown(false); // close dropdown after selection
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        >
-                          {filter.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowFilterDropdown(prev => !prev)}
+                  className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 cursor-pointer"
+                  aria-haspopup="listbox"
+                  aria-expanded={showFilterDropdown}
+                >
+                  <FilterIcon size={"18px"} />
+                  <span>{filterType}</span>
+                </button>
+
+                {showFilterDropdown && (
+                  <div className="absolute z-10 right-0 mt-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-md w-48">
+                    <ul className="text-sm text-gray-700 dark:text-white">
+                      {filterOptions.map((filter) => (
+                        <li key={filter.value}>
+                          <button
+                            onClick={() => {
+                              handleFilter(filter.value);
+                              setShowFilterDropdown(false); // close dropdown after selection
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          >
+                            {filter.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+        {content}
       </div>
 
-      {content}
-    </div>
+      <Dialog
+        open={addModel}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setAddModel(false)}
+        aria-describedby="alert-dialog-slide-description"
+        fullWidth
+        maxWidth="md"
+      >
+        <AddProductModel setAddModel={setAddModel} />
+      </Dialog>
+
+      {
+        (updateModel && selectedProduct) && <Dialog
+          open={updateModel}
+          slots={{
+            transition: Transition,
+          }}
+          keepMounted
+          onClose={() => setUpdateModel(false)}
+          aria-describedby="alert-dialog-slide-description"
+          fullWidth
+          maxWidth="md"
+        >
+          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
+        </Dialog>
+      }
+
+      {
+        (removeModel && selectedProduct) && <Dialog
+          open={removeModel}
+          slots={{
+            transition: Transition,
+          }}
+          keepMounted
+          onClose={() => setRemoveModel(false)}
+          aria-describedby="alert-dialog-slide-description"
+          fullWidth
+          maxWidth="sm"
+        >
+          <RemoveModel setRemoveModel={setRemoveModel} selectedProduct={selectedProduct} />
+        </Dialog>
+      }
+
+    </>
   )
-
-
-
 }
 
 ProductsList.propTypes = {

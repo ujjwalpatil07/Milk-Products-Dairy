@@ -38,10 +38,13 @@ export const ProductProvider = ({ children }) => {
 
         setProducts((prevProducts) =>
             prevProducts?.map((product) => {
-                const change = updateMap?.get(product?._id)
+                const change = updateMap?.get(product?._id);
+
                 if (change !== undefined) {
+                    
                     const updatedStock = Math.max(product?.stock + change, 0);
                     const updatedSoldQuantity = product?.totalQuantitySold + (-1 * change)
+                    
                     return {
                         ...product,
                         stock: updatedStock,
@@ -166,7 +169,6 @@ export const ProductProvider = ({ children }) => {
             )
         );
     }, []);
-      
 
 
     useEffect(() => {

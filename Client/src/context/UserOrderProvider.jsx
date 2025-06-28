@@ -50,6 +50,12 @@ export default function UserOrderProvider({ children }) {
         enqueueSnackbar(description, { variant: "info" });
     }, [enqueueSnackbar]);
 
+    const handlePlaceNewOrder = ({ newOrder }) => {
+         if (newOrder) {
+            setUserOrders((prevOrders) => [newOrder, ...prevOrders]);
+        }
+    }
+
     const handleUserOrderUpdateStatus = ({ orderId, status }) => {
         setUserOrders((prevOrders) =>
             prevOrders?.map((order) =>
@@ -60,10 +66,12 @@ export default function UserOrderProvider({ children }) {
 
     useEffect(() => {
         socket.on("user:notification", handleUserNotification);
+        socket.on("order:place-new-success", handlePlaceNewOrder);
         socket.on("user-order:updated-status", handleUserOrderUpdateStatus);
 
         return () => {
             socket.off("user:notification", handleUserNotification);
+            socket.off("order:place-new-success", handlePlaceNewOrder);
             socket.off("user-order:updated-status", handleUserOrderUpdateStatus);
         }
     }, [handleUserNotification]);
