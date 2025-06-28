@@ -131,12 +131,11 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   const validateInputs = () => {
     const { name, category, price, image, stock, quantityUnit, thresholdVal, shelfLife, discount, description, nutrition } = productDetails;
     if (!name || !category || !price || !image || !stock || !quantityUnit || !thresholdVal || !shelfLife || !nutrition || !discount || !description) {
-      // console.log()
-      enqueueSnackbar("Please fill all fields and select an image.", {variant: "error"});
+      enqueueSnackbar("Please fill all fields and select an image.", { variant: "error" });
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant: "error"});
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", { variant: "error" });
       return false;
     }
     return true;
@@ -158,16 +157,16 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       const res = await updateProduct(updatedProductData);
 
       if (res?.success) {
-        enqueueSnackbar("Product Updated Successfully", {variant: "success"});
+        enqueueSnackbar("Product Updated Successfully", { variant: "success" });
         console.log(res?.product)
       } else {
         console.log(res?.message)
-        enqueueSnackbar(res?.message, {variant: "error"});
+        enqueueSnackbar(res?.message, { variant: "error" });
       }
 
     } catch (error) {
       console.log(error)
-      enqueueSnackbar("Product already exist. Add other product", {variant: "error"})
+      enqueueSnackbar("Product already exist. Add other product", { variant: "error" })
     } finally {
       setUpdateModel(false)
       setIsAdding(false)

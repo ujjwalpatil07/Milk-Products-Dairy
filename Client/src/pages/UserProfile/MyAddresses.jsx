@@ -11,12 +11,17 @@ import EditAddressModel from "./Models/EditAddressModel";
 import NewAddressModel from "./Models/NewAddressModel";
 import { useSnackbar } from "notistack";
 
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function MyAddresses() {
 
   const { enqueueSnackbar } = useSnackbar();
-  const { authUser } = useContext(UserAuthContext);
+  const { authUser, authUserLoading } = useContext(UserAuthContext);
 
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,7 +55,6 @@ export default function MyAddresses() {
       setLoading(false);
     }
   }, [authUser, enqueueSnackbar]);
-
 
   useEffect(() => {
     if (authUser) getAddresses();
@@ -105,7 +109,6 @@ export default function MyAddresses() {
       const data = await updateAddress(selectedAddress._id, selectedAddress);
       if (data?.success) {
         enqueueSnackbar("Address updated successfully", { variant: "success" });
-        setEditModal(false);
         getAddresses();
       } else {
         enqueueSnackbar("Failed to update address", { variant: "error" });
@@ -113,14 +116,15 @@ export default function MyAddresses() {
     } catch {
       enqueueSnackbar("Error updating address", { variant: "error" });
     } finally {
+      setEditModal(false);
       setLoading(false);
     }
   };
 
   let content;
-  if (loading) {
+  if (authUserLoading) {
     content = (
-      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
+      <div className="flex items-center justify-center py-20 text-gray-500 space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <p className="text-sm">Loading...</p>
       </div>
@@ -169,7 +173,7 @@ export default function MyAddresses() {
 
                 <div className="flex w-full space-x-4">
                   <button
-                    className="flex items-center gap-1.5 py-1 px-3 text-sm bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-300 rounded-md font-medium hover:bg-blue-200 dark:hover:bg-blue-600/40 transition-colors duration-200"
+                    className="flex items-center gap-2 py-2 px-3 text-sm bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-300 rounded font-medium hover:bg-blue-200 dark:hover:bg-blue-600/40 transition-colors duration-200"
                     onClick={() => {
                       setEditModal(true);
                       setSelectedAddress(item);
@@ -180,7 +184,7 @@ export default function MyAddresses() {
                   </button>
 
                   <button
-                    className="flex items-center gap-1.5 py-1 px-3 text-sm bg-red-100 text-red-700 dark:bg-red-600/20 dark:text-red-300 rounded-md font-medium hover:bg-red-200 dark:hover:bg-red-600/40 transition-colors duration-200"
+                    className="flex items-center gap-2 py-2 px-3 text-sm bg-red-100 text-red-700 dark:bg-red-600/20 dark:text-red-300 rounded font-medium hover:bg-red-200 dark:hover:bg-red-600/40 transition-colors duration-200"
                     onClick={() => {
                       setRemoveModal(true);
                       setSelectedAddress(item);
@@ -196,32 +200,6 @@ export default function MyAddresses() {
 
           )
         }
-
-        {removeModal && selectedAddress && (
-          <RemoveAddressModel
-            selectedAddress={selectedAddress}
-            setRemoveModal={setRemoveModal}
-            removeAddress={removeAddress}
-          />
-        )}
-
-        {editModal && selectedAddress && (
-          <EditAddressModel
-            selectedAddress={selectedAddress}
-            setEditModal={setEditModal}
-            editAddress={editAddress}
-            setSelectedAddress={setSelectedAddress}
-          />
-        )}
-
-        {newAddressModel && (
-          <NewAddressModel
-            newAddress={newAddress}
-            setNewAddress={setNewAddress}
-            setNewAddressModel={setNewAddressModel}
-            addAddress={addAddress}
-          />
-        )}
       </>
     )
   }
@@ -232,14 +210,71 @@ export default function MyAddresses() {
         <h3 className="text-xl font-semibold">Manage Addresses</h3>
 
         <button
-          className="flex items-center text-sm gap-2 border dark:border-[#843E71] dark:hover:bg-[#843E71] text-blue-800 dark:text-white font-medium py-2 px-2 rounded"
+          className="flex items-center text-sm gap-2 border dark:border-[#843E71] dark:hover:bg-[#843E71] text-blue-800 dark:text-white font-medium py-2 px-1 sm:px-2 rounded"
           onClick={() => setNewAddressModel(true)}
         >
-          <HiPlus className="text-lg" /> ADD A NEW ADDRESS
+          <HiPlus className="text-lg w-6 h-4" /> 
+          <span className="hidden sm:flex">ADD NEW ADDRESS</span>
         </button>
       </div>
 
       {content}
+
+      <Dialog
+        open={removeModal && !!selectedAddress}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setRemoveModal(false)}
+        aria-describedby="alert-dialog-slide-description"
+        fullWidth
+      >
+        <RemoveAddressModel
+          selectedAddress={selectedAddress}
+          setRemoveModal={setRemoveModal}
+          removeAddress={removeAddress}
+          loading={loading}
+        />
+      </Dialog>
+
+      <Dialog
+        open={editModal && !!selectedAddress}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setEditModal(false)}
+        aria-describedby="alert-dialog-slide-description"
+        fullWidth
+      >
+        <EditAddressModel
+          selectedAddress={selectedAddress}
+          setEditModal={setEditModal}
+          editAddress={editAddress}
+          setSelectedAddress={setSelectedAddress}
+          loading={loading}
+        />
+      </Dialog>
+
+      <Dialog
+        open={newAddressModel}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setNewAddressModel(false)}
+        aria-describedby="alert-dialog-slide-description"
+        fullWidth
+      >
+        <NewAddressModel
+          newAddress={newAddress}
+          setNewAddress={setNewAddress}
+          setNewAddressModel={setNewAddressModel}
+          addAddress={addAddress}
+          loading={loading}
+        />
+      </Dialog>
     </>
   );
 }

@@ -43,6 +43,7 @@ export default function Orders() {
       try {
         setLoading(true);
         const res = await getAllOrders();
+
         if (res?.success) {
           setAllOrders(res?.orders);
         }
@@ -55,7 +56,7 @@ export default function Orders() {
     };
 
     fetchAllOrders();
-  }, []);
+  }, [enqueueSnackbar]);
 
   return (
     <motion.div

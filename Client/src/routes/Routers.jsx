@@ -34,6 +34,7 @@ import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider";
 
 export default function Routers() {
 
+    const localUser = localStorage.getItem("User");
     const { authUser } = useContext(UserAuthContext);
     const { authAdmin } = useContext(AdminAuthContext);
 
@@ -82,7 +83,7 @@ export default function Routers() {
 
             <Route path="/contact-us" element={<Layout><ContactPage /></Layout>} />
 
-            <Route path="*" element={<Navigate to={"/login"} replace />} />
+            <Route path="*" element={<Navigate to={localUser ? "/home" : "/login"} replace />} />
         </Routes>
     )
 }

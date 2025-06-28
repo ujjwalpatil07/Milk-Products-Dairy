@@ -16,14 +16,14 @@ export default function MyOrders() {
     Confirmed: 0,
   };
 
-  userOrders.forEach(order => {
-    if (orderStats[order.status] !== undefined) {
-      orderStats[order.status]++;
+  userOrders?.forEach(order => {
+    if (orderStats[order?.status] !== undefined) {
+      orderStats[order?.status]++;
     }
   });
 
   const statCards = [
-    { title: "All", count: userOrders.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
+    { title: "All", count: userOrders?.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
     { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600", icon: <FaCheckCircle /> },
     { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500", icon: <FaHourglassHalf /> },
     { title: "Processing", count: orderStats.Processing, color: "bg-blue-400", icon: <FaBoxOpen /> },
@@ -70,17 +70,17 @@ export default function MyOrders() {
 
   const filteredOrders = (selectedStatus.title === "All")
     ? userOrders
-    : userOrders.filter((order) => order.status === selectedStatus.title);
+    : userOrders.filter((order) => order?.status === selectedStatus?.title);
 
   let content;
   if (orderLoading) {
     content = (
-      <div className="flex items-center justify-center py-20 text-gray-500 max-sm:max-w-xl min-w-xl space-x-2">
+      <div className="flex items-center justify-center py-20 text-gray-500 space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <p className="text-sm">Loading...</p>
       </div>
     );
-  } else if (!filteredOrders || filteredOrders.length === 0) {
+  } else if (!filteredOrders || filteredOrders?.length === 0) {
     content = (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16 w-full">
         You haven't placed any orders yet.
@@ -89,18 +89,18 @@ export default function MyOrders() {
   } else {
     content = (
       <div className="space-y-6">
-        {filteredOrders.map((order) => (
+        {filteredOrders?.map((order) => (
           <div
-            key={order._id}
+            key={order?._id}
             className="bg-gray-100 dark:bg-gray-500/10 md:rounded-lg p-3 md:p-5 shadow-sm"
           >
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
-                {getStatusIcon(order.status)}
-                <span className="font-semibold text-lg">{order.status}</span>
+                {getStatusIcon(order?.status)}
+                <span className="font-semibold text-lg">{order?.status}</span>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-300">
-                {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                {new Date(order?.createdAt).toLocaleDateString("en-GB", {
                   day: "numeric",
                   month: "short",
                   year: "numeric",
@@ -120,27 +120,27 @@ export default function MyOrders() {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.productsData.map((product, idx) => (
+                  {order?.productsData?.map((product, idx) => (
                     <tr
                       key={idx * 0.5}
                       className="border-b border-gray-200 dark:border-gray-600"
                     >
                       <td className="p-2 hidden sm:flex w-12 h-12">
-                        {product.productId?.image?.[0] ? (
+                        {product?.productId?.image?.[0] ? (
                           <img
-                            src={product.productId.image[0]}
-                            alt={product.productId?.name || "Product"}
+                            src={product?.productId?.image[0]}
+                            alt={product?.productId?.name || "Product"}
                             className="rounded object-cover"
                           />
                         ) : (
                           <div className="bg-black/20 w-full h-full rounded flex justify-center items-center"><FaGlassWhiskey className="text-sm text-gray-500" /></div>
                         )}
                       </td>
-                      <td className="p-2 md:px-4 md:py-2 break-words">{product.productId?.name}</td>
-                      <td className="p-2 md:px-4 md:py-2 break-words">{product.productQuantity}</td>
-                      <td className="p-2 md:px-4 md:py-2 break-words">&#8377;{product.productPrice} / {product.productId?.quantityUnit}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">{product?.productId?.name}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">{product?.productQuantity}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">&#8377;{product?.productPrice} / {product?.productId?.quantityUnit}</td>
                       <td className="p-2 md:px-4 md:py-2 font-semibold text-gray-700 dark:text-white break-words">
-                        &#8377;{product.productQuantity * product.productPrice}
+                        &#8377;{product?.productQuantity * product?.productPrice}
                       </td>
                     </tr>
                   ))}
@@ -150,25 +150,25 @@ export default function MyOrders() {
 
             <div className="mt-3 text-sm">
               <h4 className="font-semibold mb-1 text-gray-700 dark:text-white">Delivery Address:</h4>
-              <p>{order.address?.name}, {order.address?.phone}</p>
+              <p>{order?.address?.name}, {order.address?.phone}</p>
               <p className="text-gray-600 dark:text-gray-300">
-                {order.address?.streetAddress}, {order.address?.city}, {order.address?.state} - {order.address?.pincode}
+                {order?.address?.streetAddress}, {order?.address?.city}, {order?.address?.state} - {order?.address?.pincode}
               </p>
               <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded">
-                {order.address?.addressType}
+                {order?.address?.addressType}
               </span>
             </div>
 
             <div className="flex flex-row flex-wrap justify-between items-center gap-3 mt-4 border-t pt-3">
               <p className="font-semibold text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                <FaMoneyBillWave className="text-green-500" /> Payment Mode: {order.paymentMode}
+                <FaMoneyBillWave className="text-green-500" /> Payment Mode: {order?.paymentMode}
               </p>
 
               <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                &#8377;{order.totalAmount}
+                &#8377;{order?.totalAmount}
               </p>
 
-              {order.status === "Confirmed" && (
+              {order?.status === "Confirmed" && (
                 <a
                   href={`http://localhost:9000/pdf/generate-bill/${order?._id}`}
                   target="_blank"
@@ -200,10 +200,10 @@ export default function MyOrders() {
             onClick={handleClick}
             className="!capitalize !rounded-md !shadow !p-0"
           >
-            <div className={`flex items-center text-white rounded gap-2 px-2 py-1 ${selectedStatus.color}`} >
-              {selectedStatus.icon}
-              <span>{selectedStatus.title}</span>
-              {selectedStatus.count}
+            <div className={`flex items-center text-white rounded gap-2 px-2 py-1 ${selectedStatus?.color}`} >
+              {selectedStatus?.icon}
+              <span>{selectedStatus?.title}</span>
+              {selectedStatus?.count}
             </div>
           </Button>
 

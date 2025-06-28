@@ -7,6 +7,7 @@ import { UserAuthContext } from "../context/AuthProvider";
 import PropTypes from "prop-types"
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import { KeyboardDoubleArrowUp, KeyboardDoubleArrowDown } from "@mui/icons-material";
+import { X } from "lucide-react";
 
 export default function UserProfileLayout({ children }) {
     const [toggleDrawer, setToggleDrawer] = useState(false);
@@ -82,18 +83,23 @@ export default function UserProfileLayout({ children }) {
                 onOpen={() => setToggleDrawer(true)}
                 className="!dark:bg-black"
             >
+                <div className="dark:bg-black relative">
 
-                <div className="dark:bg-black">
+                    <button
+                        onClick={() => setToggleDrawer(false)}
+                        className="flex justify-center items-center absolute top-3 right-3 transform text-[#6d286e] bg-[#762e7720] w-10 h-10 rounded text-xl backdrop-blur-md"
+                    >
+                        <X />
+                    </button>
+
                     <UserProfileSidebar />
 
-                    <div className="flex justify-center items-center">
-                        <button
-                            onClick={() => setToggleDrawer(false)}
-                            className="text-[#6d286e] bg-[#762e7720] w-10 h-10 rounded text-xl fixed bottom-5 mx-auto backdrop-blur-md"
-                        >
-                            <KeyboardDoubleArrowUp />
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => setToggleDrawer(false)}
+                        className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-[#6d286e] bg-[#762e7720] w-10 h-10 rounded text-xl backdrop-blur-md"
+                    >
+                        <KeyboardDoubleArrowUp />
+                    </button>
                 </div>
             </SwipeableDrawer>
         </>

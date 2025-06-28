@@ -48,7 +48,7 @@ export const connectToSocket = (server) => {
         adminSocketMap.set(adminId, new Set());
       }
       adminSocketMap.get(adminId).add(socket.id);
-    });
+    }); 
 
     socket.on("place-new-order", async (data) => {
       const { address, productsData, paymentMode, totalAmount, userId } =

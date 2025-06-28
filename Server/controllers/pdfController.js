@@ -12,6 +12,10 @@ export const generateOrderBillPDF = async (req, res) => {
     .populate({
       path: "productsData.productId",
       select: "name",
+    })
+    .populate({
+      path: "userId",
+      select: "username email",
     });
 
   if (!order) return res.status(404).json({ message: "Order not found" });
@@ -21,17 +25,17 @@ export const generateOrderBillPDF = async (req, res) => {
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=Order_${orderId}_Receipt.pdf`
+    `attachment; filename=Bill_${orderId}_${order.userId?.username || "user"}.pdf`
   );
 
   doc.pipe(res);
 
+  // Header
   doc
     .font("Helvetica-Bold")
-    .fontSize(20)
-    .fillColor("#333333")
-    .text("Madhur Dairy & Daily Needs", { align: "center" })
-    .moveDown(0.3);
+    .fontSize(22)
+    .fillColor("#313131")
+    .text("Madhur Dairy & Daily Needs", { align: "center" });
 
   doc
     .fontSize(10)
@@ -40,21 +44,28 @@ export const generateOrderBillPDF = async (req, res) => {
     .text("Shed no. A-31, Datri Mala, Ambad,", { align: "center" })
     .text("MIDC Ambad, Nashik, Maharashtra 422010", { align: "center" })
     .text("+91 92091 43657 | contact@madhurdairy.com", { align: "center" })
-    .moveDown(1);
+    .moveDown(1.2);
+
+  // Order Metadata
+  const createdAtFormatted = new Date(order.createdAt).toLocaleString("en-IN");
 
   doc
     .font("Helvetica-Bold")
     .fontSize(14)
-    .fillColor("black")
-    .text("Order Details", { underline: true })
+    .fillColor("#000000")
+    .text("Order Summary", { underline: true })
     .moveDown(0.5);
 
   doc
     .font("Helvetica")
     .fontSize(12)
+    .fillColor("#000000")
     .text(`Order ID: ${order._id}`)
-    .text(`Status: ${order.status}`)
-    .text(`Payment Mode: ${order.paymentMode}`);
+    .text(`Order Date: ${createdAtFormatted}`)
+    .text(`Customer Username: ${order.userId?.username || "-"}`)
+    .text(`Email: ${order.userId?.email || "-"}`)
+    .text(`Payment Mode: ${order.paymentMode}`)
+    .text(`Order Status: ${order.status}`);
 
   if (order.paymentMode === "Online" && order.razorpay?.paymentId) {
     doc
@@ -64,14 +75,10 @@ export const generateOrderBillPDF = async (req, res) => {
       .text(`Razorpay Order ID: ${order.razorpay.orderId}`);
   }
 
-  doc
-    .fillColor("black")
-    .fontSize(12)
-    .text(`Date: ${new Date(order.createdAt).toLocaleString()}`)
-    .moveDown(1);
+  doc.moveDown(1);
 
+  // Address
   const addr = order.address;
-
   doc
     .font("Helvetica-Bold")
     .fontSize(14)
@@ -81,11 +88,15 @@ export const generateOrderBillPDF = async (req, res) => {
   doc
     .font("Helvetica")
     .fontSize(12)
-    .text(`${addr.name} (${addr.addressType})`)
+    .text(`Name: ${addr.name}`)
+    .text(`Address Type: ${addr.addressType}`)
     .text(`Phone: ${addr.phone}`)
-    .text(`${addr.streetAddress}, ${addr.city}, ${addr.state} - ${addr.pincode}`)
+    .text(
+      `Address: ${addr.streetAddress}, ${addr.city}, ${addr.state} - ${addr.pincode}`
+    )
     .moveDown(1);
 
+  // Product Table Header
   doc
     .font("Helvetica-Bold")
     .fontSize(14)
@@ -126,25 +137,26 @@ export const generateOrderBillPDF = async (req, res) => {
       .text(p.name, itemX, y)
       .text(quantity.toString(), qtyX, y, { width: 40, align: "right" })
       .text(`₹${price.toFixed(2)}`, priceX, y, { width: 60, align: "right" })
-      .text(`₹${subtotal.toFixed(2)}`, subtotalX, y, { width: 80, align: "right" });
+      .text(`₹${subtotal.toFixed(2)}`, subtotalX, y, {
+        width: 80,
+        align: "right",
+      });
 
     y += 20;
   });
 
-  doc
-    .moveTo(itemX, y)
-    .lineTo(550, y)
-    .stroke();
+  doc.moveTo(itemX, y).lineTo(550, y).stroke();
 
-  y += 5;
+  y += 10;
   doc
     .font("Helvetica-Bold")
     .fontSize(13)
-    .text(`Total Amount: ₹${grandTotal.toFixed(2)}`, subtotalX, y, {
+    .text(`Grand Total: ₹${grandTotal.toFixed(2)}`, subtotalX, y, {
       width: 80,
       align: "right",
     });
 
+  // Footer Note
   doc
     .moveDown(3)
     .font("Helvetica-Oblique")
