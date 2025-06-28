@@ -66,3 +66,12 @@ export const addUserNotification = async (
   user.notifications = user.notifications.slice(0, 50);
   await user.save();
 };
+
+export const addAdminNotification = async (
+  admin,
+  { title, description, date }
+) => {
+  admin.notifications.unshift({ title, description, date });
+  admin.notifications = admin.notifications.slice(0, 50);
+  await admin.save();
+};

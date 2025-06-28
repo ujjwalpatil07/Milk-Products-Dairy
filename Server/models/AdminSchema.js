@@ -38,7 +38,7 @@ const AdminSchema = new mongoose.Schema(
       // required: true,
       match: [/^\d{10}$/, "Mobile number must be 10 digits"],
     },
-    
+
     factoryAddress: {
       street: { type: String, trim: true },
       city: { type: String, trim: true },
@@ -58,6 +58,14 @@ const AdminSchema = new mongoose.Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Order",
+      },
+    ],
+
+    notifications: [
+      {
+        title: { type: String },
+        description: { type: String },
+        date: { type: Date, default: Date.now },
       },
     ],
   },

@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import OrdersSummary from "../../components/AdminComponents/OrderComponents/OrdersSummary";
 import OrderDetails from "../../components/AdminComponents/OrderComponents/OrderDetails";
 import {
-  getAllOrders,
   totalActiveOrders,
   totalCanceledOrders,
   totalOrdersCount,
 } from "../../services/orderService";
-import { useSnackbar } from 'notistack';
+
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { AdminOrderContext } from "../../context/AdminOrderProvider";
@@ -32,30 +31,7 @@ const containerVariants = {
 };
 
 export default function Orders() {
-  const { enqueueSnackbar } = useSnackbar();
-  const { adminOrders, orderLoading } = useContext(AdminOrderContext);
-
-  const [allOrders, setAllOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      try {
-        setLoading(true);
-        const res = await getAllOrders();
-        if (res?.success) {
-          setAllOrders(res?.orders);
-        }
-      } catch (error) {
-        console.log(error)
-        enqueueSnackbar("Failed to fetch orders", { variant: "error" });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllOrders();
-  }, []);
+  const { adminOrders, orderLoading, allOrders } = useContext(AdminOrderContext);
 
   return (
     <motion.div
@@ -74,7 +50,7 @@ export default function Orders() {
       </motion.div>
 
       <motion.div variants={fadeUpVariants} className="mt-6">
-        <OrderDetails orders={adminOrders} loading={orderLoading || loading} />
+        <OrderDetails orders={adminOrders} loading={orderLoading} />
       </motion.div>
     </motion.div>
   );

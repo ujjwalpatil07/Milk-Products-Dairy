@@ -139,7 +139,7 @@ export default function ProductsList({ products, loading }) {
                       <motion.tr
                         key={product._id || index}
                         variants={rowVariants}
-                        className={`border-b hover:bg-gray-50 dark:hover:bg-gray-700 ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
+                        className={`border-b  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
                           }`}
                       >
                         <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
@@ -152,7 +152,7 @@ export default function ProductsList({ products, loading }) {
                         <td className="py-2 px-3 whitespace-nowrap">
                           {product.thresholdVal} {product.quantityUnit}
                         </td>
-                        <td className="py-2 px-3 whitespace-nowrap">{product.category}</td>
+                        <td className="py-2 px-3 whitespace-break-spaces">{product.category}</td>
                         <td className="py-2 px-3 whitespace-nowrap">
                           <div className="flex gap-2">
                             <button

@@ -58,7 +58,7 @@ export default function TopSellingStock({ topSellingStocks }) {
                   key={index * 0.9}
                   variants={rowVariants}
                   className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
-                    } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+                    } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
                 >
                   <td className="py-3 px-4 font-medium">{product?.name}</td>
                   <td className="py-3 px-4">

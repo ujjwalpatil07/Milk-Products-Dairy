@@ -9,3 +9,14 @@ export const getAdminById = async (adminId) => {
   const res = await api.post("/admin/get-admin", { _id: adminId });
   return res?.data;
 };
+
+export const removeAdminNotification = async (adminId, mode, index) => {
+  const res = await api.delete("/admin/delete-notification", {
+    data: {
+      adminId,
+      mode,
+      index,
+    },
+  });
+  return res?.data;
+};

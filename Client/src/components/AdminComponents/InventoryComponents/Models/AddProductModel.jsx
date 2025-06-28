@@ -100,8 +100,6 @@ export default function AddProductModal({ setAddModel }) {
     }
   };
 
-  console.log("hii")
-
   const validateInputs = () => {
     const { name, category, price, stock, quantityUnit, thresholdVal, shelfLife, nutrition, discount, description } = productDetails;
     if (!name || !category || !price || !stock || !quantityUnit || !thresholdVal || !selectedFile || !shelfLife || !nutrition || !discount || !description) {
@@ -200,7 +198,7 @@ export default function AddProductModal({ setAddModel }) {
 
           {/* Product Name and Category */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2 ">
               <InputWithLabel
                 label="Product Name"
                 name="name"
@@ -210,7 +208,7 @@ export default function AddProductModal({ setAddModel }) {
 
               />
             </div>
-            <div className="flex flex-col w-1/2">
+            <div className="flex flex-col w-full md:w-1/2">
               <label
                 htmlFor="category"
                 className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
@@ -280,7 +278,7 @@ export default function AddProductModal({ setAddModel }) {
 
           {/* Product"s Shelflife and Selling Price */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 label="Product's Shelflife"
                 name="shelfLife"
@@ -289,7 +287,7 @@ export default function AddProductModal({ setAddModel }) {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 label="Selling Price (₹)"
                 name="price"
@@ -302,7 +300,7 @@ export default function AddProductModal({ setAddModel }) {
 
           {/* Stock and Quantity Unit */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 ">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 label="Stock"
                 name="stock"
@@ -312,7 +310,7 @@ export default function AddProductModal({ setAddModel }) {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="quantityUnit"
@@ -351,7 +349,7 @@ export default function AddProductModal({ setAddModel }) {
 
           {/* Threshold Value and Discount */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 label="Threshold Value"
                 name="thresholdVal"
@@ -360,7 +358,7 @@ export default function AddProductModal({ setAddModel }) {
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 label="Discount (%)"
                 name="discount"

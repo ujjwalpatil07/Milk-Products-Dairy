@@ -102,7 +102,8 @@ export default function OrderCheckoutPage() {
       }),
       paymentMode: selectedMode,
       totalAmount: totalAmount,
-      userId: authUser?._id
+      userId: authUser?._id,
+      date: new Date().toISOString()
     };
 
     setOrderLoading(true);

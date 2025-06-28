@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { updateProduct } from "../../../../services/productServices";
 import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -8,6 +7,8 @@ import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useSnackbar } from 'notistack';
+import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
+import { socket } from "../../../../socket/socket";
 
 const categories = [
   "Milk",
@@ -49,13 +50,15 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
     nutrition: {},
     discount: 0
   })
+
   const [selectedFile, setSelectedFile] = useState(null)
-  const [isAdding, setIsAdding] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [previewImage, setPreviewImage] = useState(
     typeof productDetails?.image === "string"
       ? productDetails.image
       : productDetails?.image?.[0]?.url || ""
   );
+
   const modelRef = useRef()
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -131,47 +134,55 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   const validateInputs = () => {
     const { name, category, price, image, stock, quantityUnit, thresholdVal, shelfLife, discount, description, nutrition } = productDetails;
     if (!name || !category || !price || !image || !stock || !quantityUnit || !thresholdVal || !shelfLife || !nutrition || !discount || !description) {
-      // console.log()
-      enqueueSnackbar("Please fill all fields and select an image.", {variant: "error"});
+      enqueueSnackbar("Please fill all fields and select an image.", { variant: "error" });
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant: "error"});
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", { variant: "error" });
       return false;
     }
     return true;
   };
 
+  useEffect(() => {
+    socket.on("update-product:failed", (data) => {
+      enqueueSnackbar(data?.message, {varient : "error"})
+      setIsUpdating(false)
+    })
+
+    socket.on("update-product:updated", (data) => {
+      enqueueSnackbar(data?.message, { varient: "success" });
+      setIsUpdating(false);
+      setUpdateModel(false);
+    })
+
+    return () => {
+      socket.off("update-product:failed")
+      socket.off("update-product:updated")
+    }
+  }, [setUpdateModel, enqueueSnackbar])
+
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
+    setIsUpdating(true)
     if (!validateInputs()) return;
 
-    try {
-      setIsAdding(true)
-      e.preventDefault()
-
-      const updatedProductData = new FormData();
-
-      updatedProductData.append("image", selectedFile)
-      updatedProductData.append("updatedProductData", JSON.stringify(productDetails))
-
-      const res = await updateProduct(updatedProductData);
-
-      if (res?.success) {
-        enqueueSnackbar("Product Updated Successfully", {variant: "success"});
-        console.log(res?.product)
-      } else {
-        console.log(res?.message)
-        enqueueSnackbar(res?.message, {variant: "error"});
-      }
-
-    } catch (error) {
-      console.log(error)
-      enqueueSnackbar("Product already exist. Add other product", {variant: "error"})
-    } finally {
-      setUpdateModel(false)
-      setIsAdding(false)
+    let updatedProductData;
+    if (!selectedFile) {
+      updatedProductData = productDetails
+      socket.emit("update-product", updatedProductData);
+      return;
     }
+
+    const base64Image = await convertToBase64(selectedFile);
+
+    updatedProductData = {
+      ...productDetails,
+      image: base64Image
+    };
+
+    socket.emit("update-product", updatedProductData);
+
   }
 
   return (
@@ -214,7 +225,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 "https://img.freepik.com/free-vector/dairy-products-poster_1284-18867.jpg?semt=ais_hybrid&w=740"
               }
               alt="Product Preview"
-              className={`w-24 h-24 rounded-xl object-cover border ${isAdding ? "cursor-not-allowed opacity-50" : ""
+              className={`w-24 h-24 rounded-xl object-cover border ${isUpdating ? "cursor-not-allowed opacity-50" : ""
                 }`}
             />
 
@@ -233,7 +244,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
           {/* Product Name and Category */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.name}
                 label="Product Name"
@@ -244,7 +255,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
               />
             </div>
-            <div className="flex flex-col w-1/2">
+            <div className="flex flex-col w-full md:w-1/2">
               <label
                 htmlFor="category"
                 className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
@@ -259,7 +270,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 onChange={handleInputChange}
                 defaultValue=""
 
-                className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
+                className={`${isUpdating ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
               bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
               focus:outline-none focus:ring-1 focus:ring-gray-500`}            >
                 <option value="" disabled hidden>
@@ -289,7 +300,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 rows={5}
                 cols={40}
                 placeholder="Enter something product"
-                className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
+                className={`${isUpdating ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
                 onChange={handleInputChange}
               />
             </div>
@@ -317,7 +328,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
           {/* Product"s Shelflife and Selling Price */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.shelfLife}
                 label="Product's Shelflife"
@@ -327,7 +338,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.price}
                 label="Selling Price (₹)"
@@ -341,18 +352,18 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
           {/* Stock and Quantity Unit */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 ">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.stock}
                 label="Stock"
                 name="stock"
                 placeholder="Ex: 100"
-                isAdding={isAdding}
+                isUpdating={isUpdating}
                 icon={<Archive className="text-gray-500" />}
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="quantityUnit"
@@ -368,7 +379,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                   onChange={handleInputChange}
                   defaultValue=""
 
-                  className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
+                  className={`${isUpdating ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
                  bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
                  focus:outline-none focus:ring-1 focus:ring-gray-500`}
                 >
@@ -392,7 +403,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
           {/* Threshold Value and Discount */}
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.thresholdVal}
                 label="Threshold Value"
@@ -402,7 +413,7 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
                 onChange={handleInputChange}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <InputWithLabel
                 value={productDetails?.discount}
                 label="Discount (%)"
@@ -428,16 +439,17 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              {isAdding ? "Updating..." : "Update Product"}
+              {isUpdating ? "Updating..." : "Update Product"}
             </button>
           </div>
         </form>
       </motion.div>
+
     </motion.div >
   );
 }
 
-function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding, value }) {
+function InputWithLabel({ label, name, placeholder, icon, onChange, isUpdating, value }) {
   return (
     <div>
       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
@@ -450,7 +462,7 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding, va
           name={name}
           value={value}
           placeholder={placeholder}
-          className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
+          className={`${isUpdating ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
           onChange={onChange}
         />
       </div>
@@ -464,7 +476,7 @@ InputWithLabel.propTypes = {
   placeholder: PropTypes.string,
   icon: PropTypes.node,
   onChange: PropTypes.func.isRequired,
-  isAdding: PropTypes.bool,
+  isUpdating: PropTypes.bool,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
