@@ -12,6 +12,7 @@ import {
   addUserNotification,
 } from "./helper.js";
 import mongoose from "mongoose";
+import { cloudinary } from "../config/cloudinary.js";
 
 export const connectToSocket = (server) => {
   const userSocketMap = new Map();
@@ -161,6 +162,14 @@ export const connectToSocket = (server) => {
           for (const socketId of socketSet) {
             io.to(socketId).emit("order:new-pending-order", {
               order: savedOrder,
+            });
+          }
+        }
+
+        if (userId && userSocketMap.has(userId)) {
+          for (const socketId of userSocketMap.get(userId)) {
+            io.to(socketId).emit("order:place-new-success", {
+              newOrder: savedOrder,
             });
           }
         }
@@ -327,6 +336,13 @@ export const connectToSocket = (server) => {
           { $pull: { pendingOrders: order._id } },
           { new: true }
         );
+
+        const updatedData = order.productsData.map((item) => ({
+          productId: item.productId.toString(),
+          change: item.productQuantity,
+        }));
+
+        io.emit("product-stock-update", { updatedData });
 
         socket.emit("order:update-status-success", {
           message: "Order cancelled and stock restored successfully.",
@@ -654,7 +670,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-    //For adding new product
     socket.on("add-new-product", async (data) => {
       const { image, productDetails } = data;
       let imageUrl = "";
@@ -719,7 +734,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-    //For removing product
     socket.on("remove-product", async (data) => {
       let { productId } = data;
 
