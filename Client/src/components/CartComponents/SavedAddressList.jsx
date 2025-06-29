@@ -120,7 +120,7 @@ const { enqueueSnackbar } = useSnackbar();
         {addressContent}
 
         <div className="w-full flex justify-center">
-          <Link to={"/user-profile"} className="w-fit px-3 py-1 bg-blue-500 text-white rounded-lg">Add New Address</Link>
+          <Link to={"/user-profile/addresses"} className="w-fit px-3 py-1 bg-blue-500 text-white rounded-lg">Add New Address</Link>
         </div>
 
         <br />
