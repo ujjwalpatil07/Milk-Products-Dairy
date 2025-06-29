@@ -56,7 +56,7 @@ export default function UserProfileLayout({ children }) {
                 <div className="md:hidden sticky top-17 w-full flex items-center justify-center mt-2 mx-3 rounded-lg !z-70">
                     <button
                         onClick={() => setToggleDrawer(true)}
-                        className="flex items-center gap-1 text-gray-200 hover:text-white px-2 rounded py-1 backdrop-blur-md"
+                        className="flex items-center gap-1 text-gray-800 border border-gray-500/20 dark:text-gray-200 hover:text-white px-2 rounded py-1 backdrop-blur-md"
                     >
                         <KeyboardDoubleArrowDown sx={{ fontSize: "1.2rem" }} />
                         View Profile
