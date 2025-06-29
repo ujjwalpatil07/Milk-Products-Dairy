@@ -7,30 +7,32 @@ export const generateOrderBillPDF = async (req, res) => {
   const order = await Order.findById(orderId)
     .populate({
       path: "address",
-      select: "name phone addressType streetAddress city state pincode",
+      populate: {
+        path: "owner",
+        model: "User",
+        select: "username email",
+      },
+      select: "name phone addressType streetAddress city state pincode owner",
     })
     .populate({
       path: "productsData.productId",
       select: "name",
-    })
-    .populate({
-      path: "userId",
-      select: "username email",
     });
 
   if (!order) return res.status(404).json({ message: "Order not found" });
 
   const doc = new PDFDocument({ margin: 50 });
 
+  // Set response headers
   res.setHeader("Content-Type", "application/pdf");
+  const formattedDate = new Date(order.createdAt).toISOString().split("T")[0]; // e.g., 2025-06-29
+
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=Bill_${orderId}_${order.userId?.username || "user"}.pdf`
+    `attachment; filename=Bill_${orderId}_${formattedDate}_${order.address.owner?.username || "user"}.pdf`
   );
 
   doc.pipe(res);
-
-  // Header
   doc
     .font("Helvetica-Bold")
     .fontSize(22)
@@ -62,8 +64,8 @@ export const generateOrderBillPDF = async (req, res) => {
     .fillColor("#000000")
     .text(`Order ID: ${order._id}`)
     .text(`Order Date: ${createdAtFormatted}`)
-    .text(`Customer Username: ${order.userId?.username || "-"}`)
-    .text(`Email: ${order.userId?.email || "-"}`)
+    .text(`Customer Username: ${order.address.owner?.username || "-"}`)
+    .text(`Email: ${order.address.owner?.email || "-"}`)
     .text(`Payment Mode: ${order.paymentMode}`)
     .text(`Order Status: ${order.status}`);
 
@@ -77,7 +79,7 @@ export const generateOrderBillPDF = async (req, res) => {
 
   doc.moveDown(1);
 
-  // Address
+  // Delivery Address
   const addr = order.address;
   doc
     .font("Helvetica-Bold")
@@ -156,7 +158,7 @@ export const generateOrderBillPDF = async (req, res) => {
       align: "right",
     });
 
-  // Footer Note
+  // Footer
   doc
     .moveDown(3)
     .font("Helvetica-Oblique")

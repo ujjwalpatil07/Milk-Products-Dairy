@@ -49,7 +49,6 @@ app.use("/store", StoreRoute);
 
 app.use("/pdf", PDFRoute);
 
-
 app.get("*", (req, res) => {
   res.send({ result: "Hey, you are looking for a page that doesn't exist!" });
 });

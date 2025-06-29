@@ -68,7 +68,7 @@ export default function MyWishlist() {
     );
   } else if (wishlist.length === 0) {
     content = (
-      <div className="text-center py-16 px-3  text-gray-600 dark:text-gray-300 lg:w-xl bg-white dark:bg-gray-500/20 rounded-lg">
+      <div className="text-center py-10 px-3">
         You haven't added anything to your wishlist yet.
       </div>
     );

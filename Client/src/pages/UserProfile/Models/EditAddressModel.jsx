@@ -7,12 +7,17 @@ import {
 
 export default function EditAddressModel({ selectedAddress, editAddress, setEditModal, setSelectedAddress, loading }) {
   return (
-    <div className="bg-white dark:bg-black/80 p-3">
-      <h2 className="text-xl sm:text-2xl flex justify-center items-center gap-3 font-semibold mb-6 text-gray-800 dark:text-gray-100">
-        <Pen /> Edit Address
-      </h2>
+    <div className="bg-white/70 dark:bg-black/30 backdrop-blur-sm">
+      <div className="bg-white/60 dark:bg-black/40 backdrop-blur-sm px-2 py-2 flex justify-between items-center mb-2">
+        <h2 className="text-xl sm:text-2xl flex items-center gap-3 font-semibold text-gray-800 dark:text-gray-100">
+          <Pen /> Edit Address
+        </h2>
+        <button className="text-white hover:text-gray-300" onClick={() => setEditModal(false)}>
+          <X fontSize="small" />
+        </button>
+      </div>
 
-      <form onSubmit={editAddress} className="grid gap-4 text-sm sm:text-base">
+      <form onSubmit={editAddress} className="grid gap-3 text-sm sm:text-base p-3">
         <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-500/20 p-2 rounded text-black dark:text-white">
           <User className="w-5 h-5" />
           <input

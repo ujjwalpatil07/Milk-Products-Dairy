@@ -3,17 +3,24 @@ import PropTypes from "prop-types";
 import {
   User, Phone, Building2, Mail,
   Home, MapPin, Locate, Plus,
+  X,
 } from "lucide-react";
 
 export default function NewAddressModel({ setNewAddressModel, addAddress, newAddress, setNewAddress, loading }) {
   return (
-    <div className="bg-white dark:bg-black/80 p-3">
+    <div className="bg-white/70 dark:bg-black/30 backdrop-blur-sm">
 
-      <h2 className="text-xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">
-        <Plus className="inline mr-2 mb-1" /> Add New Address
-      </h2>
+      <div className="mb-2 bg-white/60 dark:bg-black/40 backdrop-blur-sm px-3 py-2 flex justify-between items-center">
+        <h2 className="text-xl font-bold text-center text-gray-800 dark:text-gray-100">
+          <Plus className="inline mr-2 mb-1" /> Add New Address
+        </h2>
 
-      <form onSubmit={addAddress} className="space-y-4 text-sm sm:text-base">
+        <button className="text-white hover:text-gray-300" onClick={() => setNewAddressModel(false)}>
+          <X fontSize="small" />
+        </button>
+      </div>
+
+      <form onSubmit={addAddress} className="space-y-4 text-sm sm:text-base p-3">
         <div>
           <label htmlFor="addressType" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Address Type</label>
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-500/20 p-2 rounded">

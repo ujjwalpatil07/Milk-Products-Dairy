@@ -1,7 +1,3 @@
-import Order from "../models/OrderSchema.js";
-import Admin from "../models/AdminSchema.js";
-import User from "../models/UserSchema.js";
-import Address from "../models/AddressShema.js";
 import Product from "../models/ProductSchema.js";
 
 export const validateOrderData = (data) => {
@@ -58,20 +54,47 @@ export const validateAndProcessProducts = async (productsData, socket) => {
   return { validatedProducts, serverTotal };
 };
 
-export const addUserNotification = async (
-  user,
-  { title, description, date }
-) => {
-  user.notifications.unshift({ title, description, date });
-  user.notifications = user.notifications.slice(0, 50);
-  await user.save();
+export const createBulkStockUpdateOps = (validatedProducts, direction = -1) => {
+  return validatedProducts.map((item) => ({
+    updateOne: {
+      filter: { _id: item.productId },
+      update: {
+        $inc: {
+          stock: direction * item.productQuantity,
+          totalQuantitySold: direction === -1 ? item.productQuantity : 0,
+        },
+      },
+    },
+  }));
 };
 
-export const addAdminNotification = async (
-  admin,
-  { title, description, date }
+export const formatTotals = (serverTotal, clientTotal) => {
+  const formattedServerTotal = parseFloat(serverTotal.toFixed(2));
+  const formattedClientTotal = parseFloat(parseFloat(clientTotal).toFixed(2));
+  return { formattedServerTotal, formattedClientTotal };
+};
+
+export const emitAdminOrderNotifications = (
+  adminSocketMap,
+  order,
+  user,
+  date,
+  io
 ) => {
-  admin.notifications.unshift({ title, description, date });
-  admin.notifications = admin.notifications.slice(0, 50);
-  await admin.save();
+  for (const [, socketSet] of adminSocketMap) {
+    for (const socketId of socketSet) {
+      io.to(socketId).emit("order:new-pending-order", { order });
+      io.to(socketId).emit("admin:notification", {
+        title: "New Order Received",
+        description: `You have a new pending order from ${user?.firstName} ${user?.lastName}`,
+        date,
+      });
+    }
+  }
+};
+
+export const addNotification = async (target, notification) => {
+  target.notifications.unshift(notification);
+  target.notifications = target.notifications.slice(0, 50);
+  await target.save();
 };

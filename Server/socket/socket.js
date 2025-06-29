@@ -9,8 +9,10 @@ import Review from "../models/ReviewSchema.js";
 import {
   validateOrderData,
   validateAndProcessProducts,
-  addUserNotification,
-  addAdminNotification,
+  addNotification,
+  formatTotals,
+  createBulkStockUpdateOps,
+  emitAdminOrderNotifications,
 } from "./helper.js";
 import mongoose from "mongoose";
 import { cloudinary } from "../config/cloudinary.js";
@@ -49,7 +51,7 @@ export const connectToSocket = (server) => {
         adminSocketMap.set(adminId, new Set());
       }
       adminSocketMap.get(adminId).add(socket.id);
-    }); 
+    });
 
     socket.on("place-new-order", async (data) => {
       const { address, productsData, paymentMode, totalAmount, userId, date } =
@@ -85,9 +87,9 @@ export const connectToSocket = (server) => {
           return socket.emit("new-order-place-failed", { message: error });
         }
 
-        const formattedServerTotal = parseFloat(serverTotal.toFixed(2));
-        const formattedClientTotal = parseFloat(
-          parseFloat(totalAmount).toFixed(2)
+        const { formattedServerTotal, formattedClientTotal } = formatTotals(
+          serverTotal,
+          totalAmount
         );
 
         if (formattedServerTotal !== formattedClientTotal) {
@@ -140,17 +142,7 @@ export const connectToSocket = (server) => {
         user.orders.push(savedOrder._id);
         await user.save();
 
-        const bulkOperations = validatedProducts.map((item) => ({
-          updateOne: {
-            filter: { _id: item.productId },
-            update: {
-              $inc: {
-                stock: -item.productQuantity,
-                totalQuantitySold: item?.productQuantity,
-              },
-            },
-          },
-        }));
+        const bulkOperations = createBulkStockUpdateOps(validatedProducts);
 
         await Product.bulkWrite(bulkOperations);
 
@@ -159,27 +151,13 @@ export const connectToSocket = (server) => {
           change: -item.productQuantity,
         }));
 
-        await addAdminNotification(admin, {
+        await addNotification(admin, {
           title: "New Order Recieved",
           description: `You have new pending order from ${user?.firstName} ${user?.lastName}`,
           date,
         });
 
-        for (const [_, socketSet] of adminSocketMap) {
-          for (const socketId of socketSet) {
-            io.to(socketId).emit("order:new-pending-order", {
-              order: savedOrder,
-            });
-
-            io.to(socketId).emit("admin:notification", {
-              title: "New Order Recieved",
-              description:
-                `You have new pending order`,
-              date,
-            });
-
-          }
-        }
+        emitAdminOrderNotifications(adminSocketMap, savedOrder, user, date, io);
 
         if (userId && userSocketMap.has(userId)) {
           for (const socketId of userSocketMap.get(userId)) {
@@ -251,9 +229,16 @@ export const connectToSocket = (server) => {
           { $pull: { pendingOrders: order._id } }
         );
 
-        await addUserNotification(user, {
+        const totalItems = order.productsData.reduce(
+          (sum, item) => sum + item.productQuantity,
+          0
+        );
+
+        const notificationMessage = `Your order #${order._id} with ${totalItems} item(s) worth ₹${order.totalAmount} has been confirmed and is being processed.`;
+
+        await addNotification(user, {
           title: "Order Confirmed",
-          description: "Your order has been confirmed and is being processed.",
+          description: notificationMessage,
           date,
         });
 
@@ -279,13 +264,11 @@ export const connectToSocket = (server) => {
 
             io.to(socketId).emit("user:notification", {
               title: "Order Confirmed",
-              description:
-                "Your order has been confirmed and is being processed.",
+              description: notificationMessage,
               date,
             });
           }
         }
-
       } catch (error) {
         socket.emit("order:update-status-failed", {
           message:
@@ -328,6 +311,18 @@ export const connectToSocket = (server) => {
           });
         }
 
+        const totalItems = order.productsData.reduce(
+          (sum, item) => sum + item.productQuantity,
+          0
+        );
+
+        const refundNote =
+          order.paymentMode === "Online"
+            ? " Refund will be processed within 1 working day."
+            : "";
+
+        const timestamp = new Date().toISOString();
+
         const bulkOperations = order.productsData.map((item) => ({
           updateOne: {
             filter: { _id: item.productId },
@@ -340,11 +335,10 @@ export const connectToSocket = (server) => {
         order.status = "Cancelled";
         await order.save();
 
-        await addUserNotification(user, {
+        await addNotification(user, {
           title: "Order Cancelled",
-          description:
-            "Your order has been cancelled and stock has been restored.",
-          date,
+          description: `Order #${order._id} with ${totalItems} item(s) worth ₹${order.totalAmount} has been cancelled.${refundNote}`,
+          date: timestamp,
         });
 
         await Admin.findOneAndUpdate(
@@ -378,14 +372,13 @@ export const connectToSocket = (server) => {
           for (const socketId of userSocketMap.get(userId)) {
             io.to(socketId).emit("user-order:updated-status", {
               orderId,
-              status,
+              status: "Cancelled",
             });
 
             io.to(socketId).emit("user:notification", {
               title: "Order Cancelled",
-              description:
-                "Your order has been cancelled and stock has been restored.",
-              date,
+              description: `Order #${order._id} (${totalItems} items, ₹${order.totalAmount}) was cancelled.${refundNote}`,
+              date: timestamp,
             });
           }
         }
@@ -395,6 +388,105 @@ export const connectToSocket = (server) => {
             error?.message || "Failed to cancel order due to server error.",
           status: "Cancelled",
           orderId,
+        });
+      }
+    });
+
+    socket.on("order:delivered", async ({ orderId, status, userId }) => {
+      try {
+        if (!orderId || !status || !userId) {
+          return socket.emit("order:update-delivered-status", {
+            message: "Missing required fields.",
+            success: false,
+          });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+          return socket.emit("order:update-delivered-status", {
+            message: "Order not found.",
+            success: false,
+          });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return socket.emit("order:update-delivered-status", {
+            message: "User not found.",
+            success: false,
+          });
+        }
+
+        const admin = await Admin.findOne();
+        if (!admin) {
+          return socket.emit("order:update-delivered-status", {
+            message: "Admin not found",
+          });
+        }
+
+        if (order.status === "Delivered") {
+          return socket.emit("order:update-delivered-status", {
+            message: "Order is already marked as delivered.",
+            success: false,
+          });
+        }
+
+        order.status = "Delivered";
+        await order.save();
+
+        const date = new Date().toISOString();
+        const totalItems = order.productsData?.reduce(
+          (sum, item) => sum + item.productQuantity,
+          0
+        );
+
+        await addNotification(user, {
+          title: "Order Delivered",
+          description: `Your order (ID: ${order._id}) with ${totalItems} item(s) has been successfully delivered. Total: ₹${order.totalAmount}.`,
+          date,
+        });
+
+        await addNotification(admin, {
+          title: "Order Delivered",
+          description: `Order #${order._id} placed by ${user?.firstName} ${user?.lastName} has been delivered. Total: ₹${order.totalAmount}, Items: ${totalItems}`,
+          date,
+        });
+
+        socket.emit("order:update-delivered-status", {
+          message: "Order marked as delivered.",
+          success: true,
+        });
+
+        for (const [_, socketSet] of adminSocketMap) {
+          for (const socketId of socketSet) {
+            io.to(socketId).emit("admin:notification", {
+              title: "Order Delivered",
+              description: `Order #${order._id} delivered (${totalItems} items, ₹${order.totalAmount}).`,
+              date,
+            });
+          }
+        }
+
+        if (userId && userSocketMap.has(userId)) {
+          for (const socketId of userSocketMap.get(userId)) {
+            io.to(socketId).emit("user-order:updated-status", {
+              orderId,
+              status: "Delivered",
+            });
+
+            io.to(socketId).emit("user:notification", {
+              title: "Order Delivered",
+              description: `Order #${order._id} delivered successfully. Items: ${totalItems}, Amount: ₹${order.totalAmount}.`,
+              date,
+            });
+          }
+        }
+      } catch (error) {
+        socket.emit("order:update-delivered-status", {
+          message:
+            error?.message ||
+            "Failed to mark order as delivered due to server error.",
+          success: false,
         });
       }
     });
@@ -778,7 +870,6 @@ export const connectToSocket = (server) => {
       }
     });
 
-    //For updating product
     socket.on("update-product", async (data) => {
       const updatedProductData = data;
       try {

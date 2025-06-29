@@ -1,11 +1,23 @@
-import React, { useContext, useState } from "react";
-import { MenuItem, Button, Menu } from "@mui/material";
-import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey } from "react-icons/fa";
+import React, { useContext, useEffect, useState } from "react";
+import { MenuItem, Button, Menu, Dialog } from "@mui/material";
+import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey, FaShoppingCart } from "react-icons/fa";
+import CloseIcon from '@mui/icons-material/Close';
 import { UserOrderContext } from "../../context/UserOrderProvider";
+import { enqueueSnackbar } from "notistack";
+
+import Slide from '@mui/material/Slide';
+import { UserAuthContext } from "../../context/AuthProvider";
+import { socket } from "../../socket/socket";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function MyOrders() {
 
   const { userOrders, orderLoading } = useContext(UserOrderContext);
+  const { authUser } = useContext(UserAuthContext);
+
 
   const orderStats = {
     Pending: 0,
@@ -32,7 +44,9 @@ export default function MyOrders() {
     { title: "Cancelled", count: orderStats.Cancelled, color: "bg-red-500", icon: <FaTimesCircle /> },
   ];
 
+  const [loading, setLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(statCards[0]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -44,10 +58,49 @@ export default function MyOrders() {
     setAnchorEl(null);
   };
 
+  const handleStatusTypeUpdate = ({ success, message }) => {
+    if (success) {
+      enqueueSnackbar(message, { variant: "success" });
+      setSelectedOrder(null);
+    } else {
+      enqueueSnackbar(message, { variant: "error" });
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    socket.on("order:update-delivered-status", handleStatusTypeUpdate);
+
+    return () => {
+      socket.off("order:update-delivered-status", handleStatusTypeUpdate);
+    }
+  }, []);
+
+
   const handleSelect = (card) => {
     setSelectedStatus(card);
     handleClose();
   };
+
+  const handleOrderReceived = () => {
+
+    if (!selectedOrder) {
+      enqueueSnackbar("", { variant: "error" });
+      return;
+    }
+
+    if (!authUser) {
+      enqueueSnackbar("", { variant: "error" })
+      return;
+    }
+
+    setLoading(true);
+    socket.emit("order:delivered", {
+      orderId: selectedOrder?._id,
+      status: "Delivered",
+      userId: authUser?._id,
+    });
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -68,7 +121,7 @@ export default function MyOrders() {
     }
   };
 
-  const filteredOrders = (selectedStatus.title === "All")
+  const filteredOrders = (selectedStatus?.title === "All")
     ? userOrders
     : userOrders.filter((order) => order?.status === selectedStatus?.title);
 
@@ -97,7 +150,7 @@ export default function MyOrders() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
                 {getStatusIcon(order?.status)}
-                <span className="font-semibold text-lg">{order?.status}</span>
+                <span className="font-semibold text-lg">{order?.status === "Cancelled" ? "Rejected" : order?.status}</span>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-300">
                 {new Date(order?.createdAt).toLocaleDateString("en-GB", {
@@ -169,11 +222,21 @@ export default function MyOrders() {
               </p>
 
               {order?.status === "Confirmed" && (
+                <button
+                  onClick={() => setSelectedOrder(order)}
+                  className="px-4 py-1.5 text-sm font-semibold rounded bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Order Received
+                </button>
+              )}
+
+              {order?.status === "Delivered" && (
                 <a
                   href={`http://localhost:9000/pdf/generate-bill/${order?._id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-fit px-4 py-1.5 text-sm font-semibold rounded bg-[#843E71] hover:bg-[#843E7190] text-white inline-block text-center"
+                  download
                 >
                   Download Bill
                 </a>
@@ -232,6 +295,107 @@ export default function MyOrders() {
       </div>
 
       {content}
+
+      <Dialog
+        open={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        slots={{
+          transition: Transition,
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              borderRadius: 1,
+            },
+          },
+        }}
+        fullWidth
+        maxWidth="sm"
+      >
+        <div className="bg-white/40 dark:bg-black/50 text-black dark:text-white backdrop-blur-sm rounded-md">
+          <div className="bg-white/60 dark:bg-black/40 backdrop-blur-sm px-2 py-2 flex justify-between items-center">
+            <h1 className="flex items-center gap-2 font-bold text-lg">
+              <FaShoppingCart className="text-[#843E71]" size={20} />
+              Order Details
+            </h1>
+            <button className="hover:text-gray-200" onClick={() => setSelectedOrder(null)}>
+              <CloseIcon fontSize="small" />
+            </button>
+          </div>
+
+          <div className="overflow-x-auto px-3">
+            <table className="w-full text-sm border-separate border-spacing-y-1">
+              <thead className="text-left text-gray-700 dark:text-gray-300 font-semibold">
+                <tr>
+                  <th className="p-2">Product</th>
+                  <th className="p-2 text-right">Qty</th>
+                  <th className="p-2 text-right">Price</th>
+                  <th className="p-2 text-right">Total</th> 
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrder?.productsData.map((item, idx) => (
+                  <tr
+                    key={idx * 0.5}
+                    className="bg-gray-100/50 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100"
+                  >
+                    <td className="p-2 line-clamp-1">{item?.productId?.name}</td>
+                    <td className="p-2 text-right">{item?.productQuantity}</td>
+                    <td className="p-2 text-right">&#8377;{item?.productPrice}</td>
+                    <td className="p-2 text-right font-medium">
+                      &#8377;{(item?.productPrice * item?.productQuantity).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-end mt-2 px-3 font-semibold text-base text-gray-800 dark:text-green-400">
+            Total: &#8377;{selectedOrder?.totalAmount}
+          </div>
+
+          <div className="mt-2 text-xs text-gray-800 dark:text-gray-400 text-right px-3">
+            Ordered on:{" "}
+            {new Date(selectedOrder?.createdAt).toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
+
+          <div className="mt-2 text-xs text-yellow-700 dark:text-yellow-400 px-3 flex items-center gap-1">
+            <span>Please ensure all items have been received in correct quantity and condition before confirming.</span>
+          </div>
+
+
+          {/* Actions */}
+          <div className="flex justify-end items-center gap-3 mt-2 pt-0 p-3">
+            <button
+              disabled={loading}
+              onClick={() => setSelectedOrder(null)}
+              className="flex items-center gap-1 px-4 py-1.5 rounded bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-sm text-black dark:text-white disabled:cursor-not-allowed"
+            >
+              <FaTimesCircle size={16} />
+              Cancel
+            </button>
+            <button
+              disabled={loading}
+              onClick={handleOrderReceived}
+              className="flex items-center gap-1 px-4 py-1.5 rounded bg-[#843E71] hover:bg-green-700 text-sm text-white disabled:cursor-not-allowed"
+            >
+              {
+                loading ? <p>Updating...</p>
+                  : <>
+                    <FaCheckCircle size={16} />
+                    Received
+                  </>
+              }
+            </button>
+          </div>
+        </div>
+      </Dialog>
     </>
   );
 }

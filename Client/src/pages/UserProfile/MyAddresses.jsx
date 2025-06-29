@@ -155,7 +155,7 @@ export default function MyAddresses() {
             {addresses.map((item) => (
               <div
                 key={item._id}
-                className="rounded-lg bg-gray-50 dark:bg-gray-500/20 p-4 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 dark:hover:bg-gray-500/30"
+                className="rounded-lg bg-gray-500/10 dark:bg-gray-500/20 p-4 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 dark:hover:bg-gray-500/30"
               >
                 <div className="w-full">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold tracking-wide bg-gray-800 text-white dark:text-white`}>
@@ -213,7 +213,7 @@ export default function MyAddresses() {
           className="flex items-center text-sm gap-2 border dark:border-[#843E71] dark:hover:bg-[#843E71] text-blue-800 dark:text-white font-medium py-2 px-1 sm:px-2 rounded"
           onClick={() => setNewAddressModel(true)}
         >
-          <HiPlus className="text-lg w-6 h-4" /> 
+          <HiPlus className="text-lg w-6 h-4" />
           <span className="hidden sm:flex">ADD NEW ADDRESS</span>
         </button>
       </div>
@@ -224,6 +224,14 @@ export default function MyAddresses() {
         open={removeModal && !!selectedAddress}
         slots={{
           transition: Transition,
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              borderRadius: 1,
+            },
+          },
         }}
         keepMounted
         onClose={() => setRemoveModal(false)}
@@ -243,6 +251,14 @@ export default function MyAddresses() {
         slots={{
           transition: Transition,
         }}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              borderRadius: 1,
+            },
+          },
+        }}
         keepMounted
         onClose={() => setEditModal(false)}
         aria-describedby="alert-dialog-slide-description"
@@ -261,6 +277,14 @@ export default function MyAddresses() {
         open={newAddressModel}
         slots={{
           transition: Transition,
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              borderRadius: 1,
+            },
+          },
         }}
         keepMounted
         onClose={() => setNewAddressModel(false)}

@@ -5,7 +5,6 @@ localStorage.setItem = function () {
   window.dispatchEvent(event);
 };
 
-
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'

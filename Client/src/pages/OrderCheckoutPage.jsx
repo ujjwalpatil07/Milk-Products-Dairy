@@ -329,14 +329,23 @@ export default function OrderCheckoutPage() {
         slots={{
           transition: Transition,
         }}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              boxShadow: 24,
+              borderRadius: 1,
+            },
+          },
+        }}
         maxWidth="sm"
         fullWidth
       >
-        <div className="bg-white dark:bg-black/80 text-gray-900 dark:text-white">
+        <div className="bg-white/70 dark:bg-black/80 text-gray-900 dark:text-white backdrop-blur-sm">
 
-          <header className="sticky top-0 left-0 flex justify-between items-center px-4 py-3 border-b border-gray-300 dark:border-gray-600 backdrop-blur-md bg-white/70 dark:bg-gray-700/80 z-10">
+          <header className="sticky top-0 left-0 flex justify-between items-center px-4 py-3 border-b border-gray-300 dark:border-gray-600 backdrop-blur-md bg-white/70 dark:bg-gray-500/20 z-10">
             <span className="text-xl font-semibold">Choose Payment Mode</span>
-            <button onClick={() => setOpen(false)} className="text-gray-600 dark:text-gray-300">
+            <button onClick={() => setOpen(false)} className="text-gray-600 dark:text-gray-300 dark:hover:text-white">
               <CloseIcon fontSize="small" />
             </button>
           </header>
