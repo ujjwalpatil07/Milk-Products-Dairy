@@ -249,7 +249,7 @@ export default function Navbar() {
                     sx: {
                         position: 'absolute',
                         top: 75,
-                        right: 50,
+                        right: 10,
                         m: 0,
                         width: '350px',
                         maxHeight: "300px",
