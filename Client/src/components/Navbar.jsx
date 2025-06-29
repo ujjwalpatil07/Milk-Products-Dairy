@@ -76,6 +76,7 @@ export default function Navbar() {
         setOpen(false);
         if (!authUser) {
             setOpenLoginDialog(true);
+            enqueueSnackbar("You are not logged in.", { variant: "error" });
             return;
         }
 
@@ -215,12 +216,12 @@ export default function Navbar() {
                             <span>Theme</span>
                         </button>
 
-                        <Link onClick={handleUserCart} className={linkStyle}>
+                        <button onClick={handleUserCart} className={linkStyle}>
                             <Badge badgeContent={cartItems?.length || 0} color="primary">
                                 <ShoppingCartIcon sx={{ fontSize: '1.2rem' }} />
                             </Badge>
                             My Orders
-                        </Link>
+                        </button>
 
                         {!authUser && (
                             <Link to="/login" onClick={toggleDrawer(false)} className={linkStyle}>
