@@ -1,14 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
+import {
+  Dialog,
+  DialogActions
+} from "@mui/material";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
-import NutritionInput from "../NutritionalInfo";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
-import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import { socket } from "../../../../socket/socket";
 import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
+import NutritionInput from "../NutritionalInfo";
 import { useSnackbar } from "notistack";
+import PropTypes from "prop-types";
+
 
 const categories = [
   "Milk",
@@ -34,7 +37,7 @@ const categories = [
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
 
-export default function AddProductModal({ setAddModel }) {
+export default function AddProductModel({ open, onClose }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const [productDetails, setProductDetails] = useState({
@@ -53,31 +56,6 @@ export default function AddProductModal({ setAddModel }) {
   })
   const [selectedFile, setSelectedFile] = useState(null)
   const [isAdding, setIsAdding] = useState(false);
-
-  const modelRef = useRef()
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modelRef.current && !modelRef.current.contains(event.target)) {
-        setAddModel(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setAddModel]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setAddModel(false);
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [setAddModel]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +85,7 @@ export default function AddProductModal({ setAddModel }) {
       return false;
     }
     if (isNaN(price) || isNaN(stock) || isNaN(thresholdVal) || isNaN(discount) || isNaN(shelfLife)) {
-      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", {variant : "info"});
+      enqueueSnackbar("Price, Stock, Discount, Shelflife and Threshold should be numbers.", { variant: "info" });
       return false;
     }
     return true;
@@ -116,25 +94,26 @@ export default function AddProductModal({ setAddModel }) {
 
   useEffect(() => {
     socket.on("add-new-product:failed", (data) => {
-      enqueueSnackbar(data?.message, {variant: "error"});
+      enqueueSnackbar(data?.message, { variant: "error" });
       setIsAdding(false);
     })
 
     socket.on("added-new-product:to-inventory", (data) => {
-      enqueueSnackbar(data?.message, {variant: "success"});
-      setAddModel(false);
+      enqueueSnackbar(data?.message, { variant: "success" });
+      onClose(false);
       setIsAdding(false)
     })
 
-    return  () => {
+    return () => {
       socket.off("add-new-product:failed")
       socket.off("added-new-product:to-inventory")
     }
-  }, [setAddModel, enqueueSnackbar])
+  }, [enqueueSnackbar, onClose])
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     if (!validateInputs()) return;
+
 
     setIsAdding(true)
     const base64Image = await convertToBase64(selectedFile);
@@ -148,33 +127,40 @@ export default function AddProductModal({ setAddModel }) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center overflow-auto"
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      slotProps={{
+        ...{
+          paper: {
+            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
+          },
+          backdrop: {
+            className: "!bg-black/40 !backdrop-blur-sm"
+          }
+        }
+      }}
     >
-      <motion.div
-        ref={modelRef}
-        initial={{ scale: 0.9, opacity: 0, y: 50 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 50 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl space-y-4"
-      >
+
+      {/* Sticky Title */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t-xl">
+
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Add New Product
         </h2>
-
         <button
-          onClick={() => {
-            setAddModel(false);
-          }}
+          onClick={() => onClose(false)}
           className="absolute top-3 right-5 text-xl"
-        >X</button>
+        >
+          <X className="text-black dark:text-gray-100 "/>
+        </button>
+      </div>
 
-        <form onSubmit={handleAddProduct} className="space-y-6 text-sm sm:text-base">
+
+      <div className="overflow-y-auto scrollbar-hide px-6  flex-1 bg-white dark:bg-gray-500/20 p-6 sm:p-8 shadow-xl w-full max-w-4xl space-y-4 ">
+        <form onSubmit={handleAddProduct} className="space-y-6 text-sm sm:text-base ">
           {/* Image upload */}
           <div className="relative w-24 h-24 mx-auto">
             <img
@@ -368,34 +354,27 @@ export default function AddProductModal({ setAddModel }) {
               />
             </div>
           </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between mt-6">
-            <button
-              type="button"
-              onClick={() => setAddModel(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              {isAdding ? "Adding..." : "Add Product"}
-            </button>
-          </div>
         </form>
-      </motion.div>
-    </motion.div>
+      </div>
 
+
+      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-4 !py-5 rounded-b-xl">
+        <button
+          onClick={onClose}
+          disabled={isAdding}
+          className="bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white px-3 py-1 rounded hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+        <button onClick={handleAddProduct} disabled={isAdding}
+          className="bg-blue-500 dark:bg-orange-600/30 dark:hover:bg-orange-600/40 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+        >
+          {isAdding ? "Adding..." : "Add Product"}
+        </button>
+      </DialogActions>
+    </Dialog>
   );
 }
-
-AddProductModal.propTypes = {
-  setAddModel: PropTypes.func.isRequired,
-};
 
 function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) {
   return (

@@ -68,7 +68,7 @@ export default function Routers() {
             <Route path="/user-profile/payments" element={<UserProfileLayout><Payments /></UserProfileLayout>} />
 
             <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
-            <Route path="/admin/profile" element={ <AdminProfile />} />
+            <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout> } />
             <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
             <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
             <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />
