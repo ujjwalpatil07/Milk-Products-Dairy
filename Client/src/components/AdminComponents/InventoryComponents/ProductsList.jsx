@@ -9,6 +9,7 @@ import { FilterIcon } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
+import { Pagination } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -43,7 +44,8 @@ export default function ProductsList({ products, loading }) {
   const [productList, setProductList] = useState(products || []);
   const [filterType, setFilterType] = useState('Filter');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 7;
 
   useEffect(() => {
     setProductList(products || []);
@@ -96,6 +98,8 @@ export default function ProductsList({ products, loading }) {
     }
 
     setProductList(sortedProducts);
+    setCurrentPage(1); 
+
   };
 
   let content;
@@ -113,9 +117,13 @@ export default function ProductsList({ products, loading }) {
       </div>
     );
   } else {
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = productList.slice(indexOfFirstProduct, indexOfLastProduct);
+
     content = (
       <>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           {products.length === 0 ? (
             <div className="text-center py-10 text-gray-600 dark:text-gray-300">
               <p className="text-lg font-medium">No products found.</p>
@@ -124,7 +132,7 @@ export default function ProductsList({ products, loading }) {
           ) : (
             <table className="min-w-full text-left border-collapse">
               <thead>
-                <tr className="border-b text-gray-600 dark:text-gray-300">
+                <tr className="border-b dark:border-gray-700 text-gray-600 dark:text-gray-300">
                   <th className="pb-3 px-3 whitespace-nowrap">Products</th>
                   <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
                   <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
@@ -138,14 +146,14 @@ export default function ProductsList({ products, loading }) {
                 initial="hidden"
                 animate="visible"
               >
-                {productList.map((product, index) => {
+                {currentProducts?.map((product, index) => {
                   const isLowStock = product.stock < product.thresholdVal;
 
                   return (
                     <motion.tr
                       key={product._id || index}
                       variants={rowVariants}
-                      className={`border-b  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
+                      className={`border-b dark:border-gray-700  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
                         }`}
                     >
                       <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
@@ -182,6 +190,7 @@ export default function ProductsList({ products, loading }) {
                         </div>
                       </td>
                     </motion.tr>
+                    
                   );
                 })}
               </motion.tbody>
@@ -190,10 +199,32 @@ export default function ProductsList({ products, loading }) {
           )}
         </div>
 
-        <div className="flex  flex-row justify-between items-center px-3 mt-6 gap-2 text-sm">
-          <button className="border px-4 py-2 rounded-xl">Previous</button>
-          <p className="text-gray-700 dark:text-white">Page 1 of 12</p>
-          <button className="border px-4 py-2 rounded-xl">Next</button>
+        <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+          <Pagination
+            count={Math.ceil(productList.length / productsPerPage)}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            variant="outlined"
+            shape="rounded"
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "inherit",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  border: "2px solid #843E71",
+                },
+              },
+              "& .Mui-selected": {
+                backgroundColor: "#843E71",
+                color: "#fff",
+                borderColor: "#843E71",
+                "&:hover": {
+                  backgroundColor: "#6e305e",
+                },
+              },
+            }}
+          />
+
         </div>
 
 

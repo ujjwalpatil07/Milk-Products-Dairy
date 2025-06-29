@@ -210,7 +210,7 @@ export default function OrderDetails({ allOrders, loading }) {
             <p><strong>Address:</strong> {highlightMatch(address?.streetAddress, navbarInput)}</p>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <h3 className="font-semibold mb-2">Order Products</h3>
             <table className="min-w-[600px] w-full text-sm">
               <thead>

@@ -34,7 +34,7 @@ export default function TopSellingStock({ topSellingStocks }) {
         Top Selling Stock
       </h2>
 
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto scrollbar-hide">
         <table className="min-w-full table-auto text-left border-collapse">
           <thead>
             <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
@@ -52,7 +52,7 @@ export default function TopSellingStock({ topSellingStocks }) {
             variants={containerVariants}
           >
             {topSellingStocks.map((product, index) => {
-              const isLowStock = product.stock < product.thresholdVal;
+              const isLowStock = product?.stock < product?.thresholdVal;
               return (
                 <motion.tr
                   key={index * 0.9}
