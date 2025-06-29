@@ -108,7 +108,7 @@ export default function AccountInfo() {
 
   if (dataLoading) {
     content = (
-      <div className="flex items-center justify-center py-20 text-gray-500 min-w-xl space-x-2">
+      <div className="flex items-center justify-center py-20 text-gray-500 space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <p className="text-sm">Loading...</p>
       </div>
