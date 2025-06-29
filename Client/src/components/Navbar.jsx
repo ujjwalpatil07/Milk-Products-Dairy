@@ -36,6 +36,7 @@ export default function Navbar() {
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const location = useLocation();
+    const loginUser = localStorage.getItem("User");
 
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
@@ -163,7 +164,7 @@ export default function Navbar() {
                             className="p-2.5 rounded-full hover:bg-gray-500/20 dark:hover:bg-[#00000090] transition relative"
                         >
                             <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                            {notification?.length > 0 && (
+                            {(notification?.length > 0 && loginUser) && (
                                 <span
                                     className={`absolute top-0 right-0 font-bold px-1.5 h-fit bg-red-500 text-white rounded-md text-[12px] transition-all duration-300 ${animate ? "animate-bounce" : ""}`}
                                 >
