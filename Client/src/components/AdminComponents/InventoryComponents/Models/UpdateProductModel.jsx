@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import { Image, Tag, Archive, Package, AlertCircle, FlaskConical } from "lucide-react";
+import {
+  Dialog,
+  DialogActions
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import NutritionInput from "../NutritionalInfo";
 import PropTypes from "prop-types";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import { useSnackbar } from 'notistack';
 import { convertToBase64 } from "../../../../utils/InventoryHelpers/imageBase64Converter";
 import { socket } from "../../../../socket/socket";
@@ -33,7 +35,7 @@ const categories = [
 
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
-export default function UpdateProductModel({ setUpdateModel, selectedProduct }) {
+export default function UpdateProductModel({ open, onClose, selectedProduct }) {
   const { enqueueSnackbar } = useSnackbar();
 
   const [productDetails, setProductDetails] = useState({
@@ -58,32 +60,6 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
       ? productDetails.image
       : productDetails?.image?.[0]?.url || ""
   );
-
-  const modelRef = useRef()
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modelRef.current && !modelRef.current.contains(event.target)) {
-        setUpdateModel(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setUpdateModel]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        setUpdateModel(false);
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [setUpdateModel]);
-
 
   useEffect(() => {
     if (selectedProduct) {
@@ -146,21 +122,21 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
 
   useEffect(() => {
     socket.on("update-product:failed", (data) => {
-      enqueueSnackbar(data?.message, {varient : "error"})
+      enqueueSnackbar(data?.message, { varient: "error" })
       setIsUpdating(false)
     })
 
     socket.on("update-product:updated", (data) => {
       enqueueSnackbar(data?.message, { varient: "success" });
       setIsUpdating(false);
-      setUpdateModel(false);
+      onClose();
     })
 
     return () => {
       socket.off("update-product:failed")
       socket.off("update-product:updated")
     }
-  }, [setUpdateModel, enqueueSnackbar])
+  }, [onClose, enqueueSnackbar])
 
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
@@ -186,32 +162,37 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
   }
 
   return (
-    <motion.div
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      slotProps={{
+        ...{
+          paper: {
+            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
+          },
+          backdrop: {
+            className: "!bg-black/40 !backdrop-blur-sm"
+          }
+        }
+      }}
+    >
 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex flex-col items-center  overflow-auto">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t-xl">
 
-      <motion.div
-        ref={modelRef}
-        initial={{ scale: 0.9, opacity: 0, y: 50 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 50 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="relative bg-white dark:bg-gray-500/20 p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-4xl animate-fadeIn space-y-4"
-      >
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Update the Product
         </h2>
-
         <button
           onClick={() => {
-            setUpdateModel(false);
+            onClose();
           }}
           className="absolute top-3 right-5 text-xl"
-        >X</button>
+        ><X className="text-black dark:text-gray-100" /></button>
+      </div>
+
+      <div className="overflow-y-auto scrollbar-hide px-6  flex-1 bg-white dark:bg-gray-500/20 p-6 sm:p-8 shadow-xl w-full max-w-4xl space-y-4 ">
 
         <form onSubmit={handleUpdateProduct} className="space-y-6 text-sm sm:text-base">
           {/* Image upload */}
@@ -424,28 +405,25 @@ export default function UpdateProductModel({ setUpdateModel, selectedProduct }) 
               />
             </div>
           </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between mt-6">
-            <button
-              type="button"
-              onClick={() => setUpdateModel(false)}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              {isUpdating ? "Updating..." : "Update Product"}
-            </button>
-          </div>
         </form>
-      </motion.div>
+      </div>
 
-    </motion.div >
+      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-7 !py-5 rounded-b-xl">
+        <button
+          onClick={onClose}
+          disabled={isUpdating}
+          className=" bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white px-3 py-1 rounded hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+        <button onClick={handleUpdateProduct} disabled={isUpdating}
+          className=" bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded hover:bg-green-300/80"
+        >
+          {isUpdating ? "Updating..." : "Update"}
+        </button>
+      </DialogActions>
+
+    </Dialog >
   );
 }
 
@@ -481,6 +459,7 @@ InputWithLabel.propTypes = {
 };
 
 UpdateProductModel.propTypes = {
-  setUpdateModel: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
   selectedProduct: PropTypes.object.isRequired,
 };

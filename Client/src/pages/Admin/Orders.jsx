@@ -50,7 +50,7 @@ export default function Orders() {
       </motion.div>
 
       <motion.div variants={fadeUpVariants} className="mt-6">
-        <OrderDetails orders={adminOrders} loading={orderLoading} />
+        <OrderDetails orders={adminOrders} allOrders={allOrders} loading={orderLoading} />
       </motion.div>
     </motion.div>
   );

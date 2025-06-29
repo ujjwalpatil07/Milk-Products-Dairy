@@ -9,21 +9,21 @@ import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterOrdersBySearch } from "../../../utils/filterOrders";
 import { socket } from "../../../socket/socket";
 
-export default function OrderDetails({ orders, loading }) {
+export default function OrderDetails({ allOrders, loading }) {
 
   const { enqueueSnackbar } = useSnackbar();
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
   const { authAdmin } = useContext(AdminAuthContext);
-
+  const [statusFilter, setStatusFilter] = useState("All");
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
-
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
-  const [sortOption, setSortOption] = useState("oldest");
+  const [sortOption, setSortOption] = useState("latest");
+
 
   useEffect(() => {
-    setLocalOrders(orders);
-  }, [orders]);
+    setLocalOrders(allOrders);
+  }, [allOrders]);
 
   const handleOrderUpdateFailed = useCallback(({ message, status }) => {
     const action = status === "Cancelled" ? "cancel" : "accept";
@@ -100,9 +100,9 @@ export default function OrderDetails({ orders, loading }) {
       date: new Date().toISOString(),
     });
   };
-  
+
   const handleSortOrders = useCallback(() => {
-    const sorted = [...orders];
+    const sorted = [...allOrders];
     if (sortOption === "latest") {
       sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortOption === "amountHigh") {
@@ -111,14 +111,17 @@ export default function OrderDetails({ orders, loading }) {
       sorted.sort((a, b) => a.totalAmount - b.totalAmount);
     }
     setLocalOrders(sorted);
-  }, [orders, sortOption]);
+  }, [allOrders, sortOption]);
 
   useEffect(() => {
     handleSortOrders();
-  }, [orders, handleSortOrders]);
-
+  }, [allOrders, handleSortOrders]);
 
   const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
+  const statusFilteredOrders =
+    statusFilter === "All"
+      ? filteredOrders
+      : filteredOrders.filter((order) => order.status === statusFilter);
 
   const filterOptions = [
     { value: "latest", label: "Order Date: Newest First" },
@@ -135,23 +138,52 @@ export default function OrderDetails({ orders, loading }) {
         <span className="text-xl">Loading orders...</span>
       </div>
     );
-  } else if (filteredOrders?.length === 0) {
+  } else if (statusFilteredOrders?.length === 0) {
     content = (
       <div className="text-center text-gray-500 dark:text-gray-300 py-4">
         No orders found.
       </div>
     );
   } else {
-    content = filteredOrders.map((order) => {
+
+
+    content = statusFilteredOrders.map((order) => {
       const address = order?.address;
       const owner = address?.owner;
       const products = order?.productsData;
 
+      const getStatusBadgeClass = (status) => {
+        switch (status) {
+          case "Pending":
+            return "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300";
+          case "Confirmed":
+            return "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300";
+          case "Cancelled":
+            return "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300";
+          default:
+            return "bg-gray-200 text-gray-800 dark:bg-gray-700/20 dark:text-gray-300";
+        }
+      };
+      
+
       return (
         <div
           key={order._id}
-          className="bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg w-full max-w-6xl mx-auto space-y-3"
+          className="relative bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg w-full max-w-6xl mx-auto space-y-3"
         >
+
+          <div className="absolute top-3 right-3 text-right">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusBadgeClass(order?.status)}`}
+            >
+ 
+              {order?.status}
+            </span>
+            <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+              {new Date(order?.createdAt).toLocaleString()}
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="flex items-center gap-4">
               <img
@@ -168,9 +200,7 @@ export default function OrderDetails({ orders, loading }) {
                 </p>
               </div>
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-300">
-              {new Date(order?.createdAt).toLocaleString()}
-            </div>
+
           </div>
 
           <div>
@@ -180,7 +210,7 @@ export default function OrderDetails({ orders, loading }) {
             <p><strong>Address:</strong> {highlightMatch(address?.streetAddress, navbarInput)}</p>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide">
             <h3 className="font-semibold mb-2">Order Products</h3>
             <table className="min-w-[600px] w-full text-sm">
               <thead>
@@ -195,7 +225,7 @@ export default function OrderDetails({ orders, loading }) {
               <tbody>
                 {products.map((product, idx) => (
                   <tr key={idx * 0.9} className="border-b border-gray-300 dark:border-gray-700">
-                    <td className="p-2">{product?.productId._id}</td>
+                    <td className="p-2">{product?.productId?._id}</td>
                     <td className="p-2">{product?.productId?.name}</td>
                     <td className="p-2">{product?.productQuantity}</td>
                     <td className="p-2">&#8377;{product?.productPrice}</td>
@@ -212,33 +242,35 @@ export default function OrderDetails({ orders, loading }) {
             <div className="text-lg font-semibold">
               Total Amount: &#8377;{order?.totalAmount}
             </div>
-            <div className="space-x-4">
-              <button
-                onClick={() => handleAcceptOrders(order?._id, owner?._id)}
-                disabled={!!processingId}
-                className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order?._id
-                  ? "bg-green-400"
-                  : "bg-green-600 hover:bg-green-700"
-                  }`}
-              >
-                {(processingId?.orderId === order?._id && processingId?.status === "Accept")
-                  ? "Loading..."
-                  : "Accept"}
-              </button>
+            {order?.status === "Pending" ? (
+              <div className="space-x-4">
+                <button
+                  onClick={() => handleAcceptOrders(order?._id, owner?._id)}
+                  disabled={!!processingId}
+                  className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order?._id
+                    ? "bg-green-400"
+                    : "bg-green-600 hover:bg-green-700"
+                    }`}
+                >
+                  {(processingId?.orderId === order?._id && processingId?.status === "Accept")
+                    ? "Loading..."
+                    : "Accept"}
+                </button>
 
-              <button
-                onClick={() => handleRejectOrders(order?._id, owner?._id)}
-                disabled={!!processingId}
-                className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order._id
-                  ? "bg-red-400"
-                  : "bg-red-600 hover:bg-red-700"
-                  }`}
-              >
-                {(processingId?.orderId === order._id && processingId?.status === "Reject")
-                  ? "Loading..."
-                  : "Reject"}
-              </button>
-            </div>
+                <button
+                  onClick={() => handleRejectOrders(order?._id, owner?._id)}
+                  disabled={!!processingId}
+                  className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order._id
+                    ? "bg-red-400"
+                    : "bg-red-600 hover:bg-red-700"
+                    }`}
+                >
+                  {(processingId?.orderId === order._id && processingId?.status === "Reject")
+                    ? "Loading..."
+                    : "Reject"}
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       );
@@ -265,6 +297,22 @@ export default function OrderDetails({ orders, loading }) {
           </select>
         </div>
       </div>
+      <div className="flex flex-wrap gap-2 text-sm font-medium text-gray-600 dark:text-white mb-4">
+        {["All", "Pending", "Confirmed", "Cancelled"].map((status) => (
+          <button
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            className={`px-4 py-2 rounded-full transition-all duration-200
+        ${statusFilter === status
+                ? "bg-[#843E71] text-white shadow"
+                : "bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-white"}
+      `}
+          >
+            {status}
+          </button>
+        ))}
+      </div>
+
 
       {content}
     </div>

@@ -77,7 +77,7 @@ export default function ProductDetails({ productId }) {
 
         addToCart(productId, quantity, discountedPrice);
         setQuantity(0);
-        enqueueSnackbar("Product added to cart!", { variant: "error" });
+        enqueueSnackbar("Product added to cart!", { variant: "success" });
     }
 
     const handleLikeProduct = async (productId) => {
