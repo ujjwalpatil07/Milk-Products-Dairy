@@ -98,10 +98,9 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
                   <motion.tr
                     key={index * 0.9}
                     variants={rowVariants}
-                    className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
-                      } text-sm text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
+                    className={`text-sm text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
                   >
-                    <td className="py-3 px-4 font-medium">{product?.name}</td>
+                    <td className={`${isLowStock && "text-red-500 animate-pulse"} py-3 px-4 font-medium`}>{product?.name}</td>
                     <td className="py-3 px-4">
                       {product?.totalQuantitySold} {product?.quantityUnit}
                     </td>
