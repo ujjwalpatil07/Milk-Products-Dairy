@@ -29,26 +29,26 @@ const itemVariants = {
 
 export default function OverallInventory({
   totalCategories,
-  totalStock,
+  totalProducts,
   lowStockCount,
   outOfStockProducts,
   expiringSoonCount,
 }) {
   const inventorySummaryData = [
     {
-      name: "Categories",
+      name: "Total Categories",
       value: totalCategories,
       icon: <CategoryIcon className="text-green-600" />,
       bg: "bg-green-100 dark:bg-green-800/30",
     },
     {
-      name: "Total Stock Quantity",
-      value: totalStock,
+      name: "Total Products",
+      value: totalProducts,
       icon: <InventoryIcon className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
-      name: "Low Stock Items",
+      name: "Low Stock Products",
       value: lowStockCount,
       icon: <TrendingDownIcon className="text-red-600" />,
       bg:

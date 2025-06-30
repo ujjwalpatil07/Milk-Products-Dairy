@@ -5,10 +5,11 @@ import {
   Home, MapPin, Locate, Plus,
   X,
 } from "lucide-react";
+import { maharashtraCities } from "../../../data/cities";
 
 export default function NewAddressModel({ setNewAddressModel, addAddress, newAddress, setNewAddress, loading }) {
   return (
-    <div className="bg-white/70 dark:bg-black/30 backdrop-blur-sm">
+    <div className="bg-white/70 dark:bg-black/30 backdrop-blur-sm ">
 
       <div className="mb-2 bg-white/60 dark:bg-black/40 backdrop-blur-sm px-3 py-2 flex justify-between items-center">
         <h2 className="text-xl font-bold text-center text-gray-800 dark:text-gray-100">
@@ -20,7 +21,7 @@ export default function NewAddressModel({ setNewAddressModel, addAddress, newAdd
         </button>
       </div>
 
-      <form onSubmit={addAddress} className="space-y-4 text-sm sm:text-base p-3">
+      <form onSubmit={addAddress} className="space-y-4 text-sm sm:text-base py-5 px-5">
         <div>
           <label htmlFor="addressType" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Address Type</label>
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-500/20 p-2 rounded">
@@ -99,17 +100,23 @@ export default function NewAddressModel({ setNewAddressModel, addAddress, newAdd
             <label htmlFor="city" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">City *</label>
             <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-500/20 p-2 rounded">
               <Building2 className="w-5 h-5 text-gray-500" />
-              <input
-                type="text"
-                id="city"
-                className="flex-1 bg-transparent outline-none text-gray-800 dark:text-white"
-                placeholder="e.g. Mumbai"
-                value={newAddress.city}
+
+              <select
+                name="city"
+                required
+                value={newAddress?.city}
                 onChange={(e) =>
                   setNewAddress({ ...newAddress, city: e.target.value })
-                }
-                required
-              />
+                }                
+                className={` rounded-md w-full text-[#555] dark:text-[#ccc] transition duration-200 ease-in-out scrollbar-hide ${loading ? "cursor-not-allowed opacity-70" : ""}`}
+              >
+                <option value="" className="">Select City</option>
+                {maharashtraCities.map((city, idx) => (
+                  <option key={idx * 0.9} value={city} className="text-black dark:text-white bg-white dark:bg-gray-500">
+                    {city}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -155,7 +162,7 @@ export default function NewAddressModel({ setNewAddressModel, addAddress, newAdd
         <div className="flex justify-end gap-4 mt-6">
           <button
             type="button"
-            className="flex-1 py-2 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-60010 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+            className="flex-1 py-2 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-600/20 hover:text-blue-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
             onClick={() => setNewAddressModel(false)}
             disabled={loading}
           >
@@ -163,7 +170,7 @@ export default function NewAddressModel({ setNewAddressModel, addAddress, newAdd
           </button>
           <button
             type="submit"
-            className="flex-1 py-2 border border-green-600 text-green-600 font-semibold rounded hover:bg-green-600/10 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+            className="flex-1 py-1 border border-green-600 text-green-600 font-semibold rounded hover:bg-green-600/10  hover:text-green-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {

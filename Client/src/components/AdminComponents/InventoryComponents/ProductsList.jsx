@@ -9,7 +9,16 @@ import { FilterIcon } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
-import { Pagination } from '@mui/material';
+import { ThemeContext } from '../../../context/ThemeProvider';
+import {
+  Pagination,
+  Dialog,
+  DialogContent,
+  List,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -35,7 +44,6 @@ const rowVariants = {
 };
 
 export default function ProductsList({ products, loading }) {
-
   const { navbarInput, highlightMatch } = useContext(SidebarContext)
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -47,17 +55,21 @@ export default function ProductsList({ products, loading }) {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 7;
 
+  const { theme } = useContext(ThemeContext)
+
+
+
   useEffect(() => {
     setProductList(products || []);
   }, [products]);
 
   const filterOptions = [
+    { label: "Out of stock", value: "outOfStock" },
+    { label: "Low Stocks", value: "lowStock" },
     { label: "Price: Low to High", value: "priceLowToHigh" },
     { label: "Price: High to Low", value: "priceHighToLow" },
     { label: "Quantity: Low to High", value: "quantityLowToHigh" },
     { label: "Quantity: High to Low", value: "quantityHighToLow" },
-    { label: "Name: A to Z", value: "alphabeticalAZ" },
-    { label: "Name: Z to A", value: "alphabeticalZA" },
     { label: "Sold: Low to High", value: "soldLowToHigh" },
     { label: "Sold: High to Low", value: "soldHighToLow" },
     { label: "Clear", value: "Filter" },
@@ -79,13 +91,13 @@ export default function ProductsList({ products, loading }) {
         sortedProducts.sort((a, b) => a.stock - b.stock);
         break;
       case 'quantityHighToLow':
-        sortedProducts.sort((a, b) => b.stock - a.stock);
+        sortedProducts = sortedProducts.sort((a, b) => b.stock - a.stock);
         break;
-      case 'alphabeticalAZ':
-        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+      case 'outOfStock':
+        sortedProducts = sortedProducts.filter((p) => p.stock === 0);
         break;
-      case 'alphabeticalZA':
-        sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+      case 'lowStock':
+        sortedProducts = sortedProducts.filter((p) => p?.stock < p?.thresholdVal);
         break;
       case 'soldLowToHigh':
         sortedProducts.sort((a, b) => (a.totalQuantitySold || 0) - (b.totalQuantitySold || 0));
@@ -98,7 +110,7 @@ export default function ProductsList({ products, loading }) {
     }
 
     setProductList(sortedProducts);
-    setCurrentPage(1); 
+    setCurrentPage(1);
 
   };
 
@@ -190,7 +202,7 @@ export default function ProductsList({ products, loading }) {
                         </div>
                       </td>
                     </motion.tr>
-                    
+
                   );
                 })}
               </motion.tbody>
@@ -215,8 +227,8 @@ export default function ProductsList({ products, loading }) {
                 },
               },
               "& .Mui-selected": {
-                backgroundColor: "#843E71",
-                color: "#fff",
+                backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}` ,
+                color: `${theme === "light" ? "#843E71" : "#fff"}`,
                 borderColor: "#843E71",
                 "&:hover": {
                   backgroundColor: "#6e305e",
@@ -260,23 +272,48 @@ export default function ProductsList({ products, loading }) {
                 </button>
 
                 {showFilterDropdown && (
-                  <div className="absolute z-10 right-0 mt-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-md w-48">
-                    <ul className="text-sm text-gray-700 dark:text-white">
-                      {filterOptions.map((filter) => (
-                        <li key={filter.value}>
-                          <button
+                  <Dialog
+                    open={showFilterDropdown}
+                    onClose={() => setShowFilterDropdown(false)}
+                    TransitionComponent={Transition}
+                    keepMounted
+                    fullWidth
+                    maxWidth="xs"
+                    PaperProps={{
+                      sx: {
+                        backgroundColor: theme === "dark" ? "#374151" : "#fff",
+                        borderRadius: "10px",
+                        boxShadow: 3,
+                        position: "absolute",
+                        right: 0
+                      },
+                    }}
+                  >
+                    <DialogContent sx={{ p: 0, maxHeight: 300, overflowY: "auto" }} className='scrollbar-hide'>
+                      <List dense>
+                        {filterOptions.map((filter) => (
+                          <ListItemButton
+                            key={filter.value}
                             onClick={() => {
                               handleFilter(filter.value);
-                              setShowFilterDropdown(false); // close dropdown after selection
+                              setShowFilterDropdown(false);
                             }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                            sx={{
+                              px: 2,
+                              py: 1.5,
+                              color: theme === "dark" ? "#fff" : "#374151",
+                              "&:hover": {
+                                backgroundColor: theme === "dark" ? "#4b5563" : "#f3f4f6",
+                              },
+                            }}
                           >
-                            {filter.label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                            <ListItemText primary={filter.label} />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </DialogContent>
+                  </Dialog>
+
                 )}
               </div>
             </div>

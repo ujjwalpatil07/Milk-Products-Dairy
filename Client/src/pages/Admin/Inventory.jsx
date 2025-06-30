@@ -7,7 +7,7 @@ import {
   lowStockCount,
   outOfStockProducts,
   totalCategories,
-  totalStock,
+  totalProducts,
 } from "../../utils/InventoryHelpers/inventoryOverviewHelper";
 
 // eslint-disable-next-line no-unused-vars
@@ -38,7 +38,7 @@ export default function Inventory() {
       >
         <OverallInventory
           totalCategories={totalCategories(products)}
-          totalStock={totalStock(products)}
+          totalProducts={totalProducts(products)}
           lowStockCount={lowStockCount(products)}
           outOfStockProducts={outOfStockProducts(products)}
           expiringSoonCount={expiringSoonCount}

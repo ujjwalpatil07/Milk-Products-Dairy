@@ -202,13 +202,28 @@ export default function Navbar() {
 
             <Drawer open={open} onClose={toggleDrawer(false)} >
                 <Box className={`w-64 p-4 flex flex-col gap-4 h-full overflow-auto bg-gray-100 text-black dark:bg-[#282828] dark:text-white'}`}>
+                    <Link to="/">
+                        <img
+                            src={theme === 'light' ? logoLightMode : logoDarkMode}
+                            alt="logo"
+                            loading='lazy'
+                            className="h-12 sm:h-12 object-cover rounded-md"
+                        />
+                    </Link>
+
+                    <hr className='text-gray-500/40'/>
+                    
                     <div className='flex-1 space-y-4'>
+
                         {navItems.map((item, idx) =>
                             <Link key={idx * 0.9} onClick={toggleDrawer(false)} to={item.path} className={linkStyle}>
                                 {item.icon} {item.label}
                             </Link>
                         )}
                     </div>
+
+                    <hr className='text-gray-500/40' />
+
 
                     <div className='space-y-4'>
 
@@ -250,19 +265,31 @@ export default function Navbar() {
                 slots={{
                     transition: Transition,
                 }}
-                PaperProps={{
-                    sx: {
-                        position: 'absolute',
-                        top: 75,
-                        right: 10,
-                        m: 0,
-                        width: '350px',
-                        maxHeight: "300px",
-                        backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
+                slotProps={{
+                    paper: {
+                        sx: {
+                            position: 'absolute',
+                            top: 75,
+                            m: 0,
+                            maxHeight: "300px",
+                            backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
+                            // Responsive right and width
+                            right: {
+                                xs: 30,      // right: 0 on small screens
+                                sm: 100,      // right: 0 on small-medium screens
+                                md: 150     // right: 150px on medium and above
+                            },
+                            width: {
+                                xs: '300px', // width: 300px on small screens
+                                sm: '300px',
+                                md: '350px'  // width: 350px on medium and above
+                            }
+                        },
                     },
                 }}
                 fullWidth
             >
+
                 <div className="text-black dark:text-white">
                     <div className="sticky top-0 z-10 backdrop-blur bg-white/30 dark:bg-[#2f2f2f]/30 px-3 py-2 flex items-center justify-between rounded-t">
                         <h2 className="text-lg font-semibold">Notifications</h2>

@@ -1,14 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { ThemeContext } from "../../../context/ThemeProvider";
 import { signupUser } from "../../../services/userService";
 import { useSnackbar } from "notistack";
+import { DialogContent } from "@mui/material";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 export default function UserSignUp() {
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -48,147 +47,154 @@ export default function UserSignUp() {
     }
   };
 
-  const getTextFieldStyles = (theme) => ({
-    input: {
-      color: theme === "dark" ? "#fff" : "#000",
-    },
-    "& label": {
-      color: theme === "dark" ? "#ccc" : "#555",
-      "&.Mui-focused": {
-        color: "#843E71",
-      },
-    },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: theme === "dark" ? "#999" : "#ccc",
-      },
-      "&:hover fieldset": {
-        borderColor: "#843E71",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#843E71",
-      },
-    },
-  });
+
+  const loginType = "user"
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-      <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-xl px-6 py-10 w-full max-w-md">
-      <form onSubmit={handleFormSubmit} className="flex flex-col items-center w-full gap-6">
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="p-6 bg-white dark:bg-gray-900 rounded-md w-lg">
+        <h2 className="text-lg font-semibold text-center text-gray-800 dark:text-gray-200">
+          Welcome to
+        </h2>
+        <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
+          Madhur Dairy & Daily Needs
+        </h1>
 
-          <div className="flex justify-between bg-[#D595C3] dark:bg-[#843E71] w-full rounded-lg p-1">
+        <div className="mb-4 mt-3 flex justify-center">
+          <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-600">
             <button
-              className="w-[48%] font-semibold p-1 bg-white text-black dark:bg-gray-200 rounded-lg"
               type="button"
+              onClick={() => navigate("/login")}
+              className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "user"
+                ? "bg-[#843E71] text-white"
+                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
             >
               User
             </button>
             <button
-              className="w-[48%] font-semibold p-1 rounded-lg hover:bg-white hover:text-black transition"
               type="button"
               onClick={() => navigate("/admin/login")}
+              className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "admin"
+                ? "bg-[#843E71] text-white"
+                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
             >
               Admin
             </button>
           </div>
+        </div>
+        <form onSubmit={handleFormSubmit} className="space-y-4">
 
-          <h1 className="text-2xl font-bold text-center text-black dark:text-white">User Signup</h1>
-
-          <TextField
-            label="Email Address"
-            name="email"
+          <input
             type="email"
-            value={formData.email}
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            value={formData?.email}
             onChange={handleInputChange}
-            className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
-            variant="outlined"
-            fullWidth
+            className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
             required
-            sx={getTextFieldStyles(theme)}
           />
 
           {/* Password */}
           <div className="relative w-full">
-            <TextField
-              label="Password"
+
+            <input
+              id="password"
               name="password"
+              placeholder="Enter your password"
               type={showPassword ? "text" : "password"}
-              value={formData.password}
+              value={formData?.password}
               onChange={handleInputChange}
-              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
-              variant="outlined"
-              fullWidth
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"} w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]`}
               required
-              sx={getTextFieldStyles(theme)}
             />
             <button
               className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500`}
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPassword(!showPassword);
+              }}
             ></button>
           </div>
 
 
           <div className="relative w-full">
-            <TextField
-              label="Confirm Password"
+
+            <input
+              id="confirmPassword"
               name="confirmPassword"
               type={showPassword ? "text" : "password"}
-              value={formData.confirmPassword}
+              placeholder="Enter your password"
+              value={formData?.confirmPassword}
               onChange={handleInputChange}
-              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"}`}
-              variant="outlined"
-              fullWidth
+              className={`${isLoading ? "cursor-not-allowed" : "cursor-text"} w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]`}
               required
-              sx={getTextFieldStyles(theme)}
             />
             <button
               className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500`}
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPassword(!showPassword);
+              }}
             ></button>
           </div>
 
           {/* Terms */}
-          <label className="w-full flex justify-start text-sm font-medium text-gray-700 dark:text-gray-300">
-            <input type="checkbox" required className="mr-2" />
-            I agree to the Terms and Privacy Policy
+          <input id="terms" type="checkbox" required className="mr-2 accent-[#843E71]" />
+          <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
+            I agree to the <span className="text-[#FF8682]">Terms</span> and <span className="text-[#FF8682]">Privacy Policy</span>
           </label>
 
-          {/* Submit Button */}
-          <Button
-            variant="contained"
-            className="w-full !bg-[#843E71] text-white font-semibold py-2"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing up..." : "Signup"}
-          </Button>
 
-          {/* Already have account */}
-          <p className="text-sm text-black dark:text-white">
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="mt-1 w-full bg-[#843E71] text-white py-2 rounded hover:bg-[#6f3360] transition text-sm font-medium disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isLoading ? "Signing in..." : "Sign in"}
+            {/* <span className="h-4 w-4 border-2 border-white border-t-transparent">Login</span> */}
+          </button>
+
+
+        </form>
+
+        {/* Already have account */}
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Already have an account?{" "}
-            <Link to="/login" className="text-[#FF8682] hover:underline font-medium">
+            <Link
+              to={"/login"}
+              className="text-[#843E71] hover:underline cursor-pointer"
+            >
               Login
             </Link>
           </p>
+        </div>
 
-          {/* OR */}
-          <div className="flex items-center w-full">
-            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
-            <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
-            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
-          </div>
+        {/* OR */}
+        <div className="flex items-center w-full mt-3">
+          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
+          <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
+          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
+        </div>
 
-          {/* Social login */}
-          <div className="flex w-full justify-between ">
-            <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
-              <i className="fa-brands fa-facebook"></i>
-            </div>
-            <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
-              <i className="fa-brands fa-google"></i>
-            </div>
+        {/* Social login */}
+        <div className="flex w-full justify-between mt-4">
+          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
+            <i className="fa-brands fa-facebook"></i>
           </div>
-        </form>
-      </div>
+          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
+            <i className="fa-brands fa-google"></i>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -2,6 +2,9 @@ import { Route, Routes, Navigate } from "react-router-dom"
 import Layout from "../layouts/Layout";
 import AdminLayout from "../layouts/AdminLayout";
 
+import { AnimatePresence } from "framer-motion";
+
+
 import UserLogin from "../pages/Auth/User/UserLogin";
 import UserSignUp from "../pages/Auth/User/UserSignUp";
 import AdminLogin from "../pages/Auth/Admin/AdminLogin";
@@ -38,52 +41,55 @@ export default function Routers() {
     const { authUser } = useContext(UserAuthContext);
     const { authAdmin } = useContext(AdminAuthContext);
 
-    useEffect(() =>{
-        if(!authUser?._id) return;
+    useEffect(() => {
+        if (!authUser?._id) return;
 
-        socket.emit("user:register", { userId: authUser?._id});
+        socket.emit("user:register", { userId: authUser?._id });
     }, [authUser]);
 
-    useEffect(() =>{
-        if(!authAdmin?._id) return;
+    useEffect(() => {
+        if (!authAdmin?._id) return;
 
-        socket.emit("admin:register", { adminId: authAdmin?._id});
+        socket.emit("admin:register", { adminId: authAdmin?._id });
     }, [authAdmin]);
- 
+
     return (
-        <Routes>
-            <Route path="/" element={<Layout><LandingPage /></Layout>} />
-            <Route path="/home" element={<Layout><HomePage /></Layout>} />
+        <AnimatePresence>
+            <Routes>
+                <Route path="/" element={<Layout><LandingPage /></Layout>} />
+                <Route path="/home" element={<Layout><HomePage /></Layout>} />
 
-            <Route path="/login" element={<UserLogin />} />
-            <Route path="/signup" element={<UserSignUp />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
- 
-            <Route path="/signup/otp-verification" element={<OtpVerification />} />
-            <Route path="/signup/info-input" element={<ProfileInfoInput />} />
-            <Route path="/user-profile" element={<UserProfileLayout><AccountInfo /></UserProfileLayout>} />
-            <Route path="/user-profile/addresses" element={<UserProfileLayout><MyAddresses /></UserProfileLayout>} />
-            <Route path="/user-profile/orders" element={<UserProfileLayout><MyOrders /></UserProfileLayout>} />
-            <Route path="/user-profile/wishlist" element={<UserProfileLayout><MyWishlist /></UserProfileLayout>} />
-            <Route path="/user-profile/payments" element={<UserProfileLayout><Payments /></UserProfileLayout>} />
+                <Route path="/login" element={<UserLogin />} />
+                <Route path="/signup" element={<UserSignUp />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
 
-            <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
-            <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout> } />
-            <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
-            <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-            <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />
-            <Route path="/admin/store/:userId/orders-History" element={<AdminLayout><StoreOrdersHistory /></AdminLayout>} />
+                <Route path="/signup/otp-verification" element={<OtpVerification />} />
+                <Route path="/signup/info-input" element={<ProfileInfoInput />} />
+                <Route path="/user-profile" element={<UserProfileLayout><AccountInfo /></UserProfileLayout>} />
+                <Route path="/user-profile/addresses" element={<UserProfileLayout><MyAddresses /></UserProfileLayout>} />
+                <Route path="/user-profile/orders" element={<UserProfileLayout><MyOrders /></UserProfileLayout>} />
+                <Route path="/user-profile/wishlist" element={<UserProfileLayout><MyWishlist /></UserProfileLayout>} />
+                <Route path="/user-profile/payments" element={<UserProfileLayout><Payments /></UserProfileLayout>} />
 
-            <Route path="/about" element={<Layout><AboutPage /></Layout>} />
-            <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />
-            <Route path="/product-details/:productId?" element={<Layout><ProductDetailsPage /></Layout>} />
+                <Route path="/admin/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
+                <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout>} />
+                <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
+                <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
+                <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />
+                <Route path="/admin/store/:userId/orders-History" element={<AdminLayout><StoreOrdersHistory /></AdminLayout>} />
 
-            <Route path="/cart" element={<Layout><CartPage /></Layout>} />
-            <Route path="/order-checkout" element={<Layout><OrderCheckoutPage /></Layout>} />
+                <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+                <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />
+                <Route path="/product-details/:productId?" element={<Layout><ProductDetailsPage /></Layout>} />
 
-            <Route path="/contact-us" element={<Layout><ContactPage /></Layout>} />
+                <Route path="/cart" element={<Layout><CartPage /></Layout>} />
+                <Route path="/order-checkout" element={<Layout><OrderCheckoutPage /></Layout>} />
 
-            <Route path="*" element={<Navigate to={localUser ? "/home" : "/login"} replace />} />
-        </Routes>
+                <Route path="/contact-us" element={<Layout><ContactPage /></Layout>} />
+
+                <Route path="*" element={<Navigate to={localUser ? "/home" : "/login"} replace />} />
+            </Routes>
+        </AnimatePresence>
+
     )
 }

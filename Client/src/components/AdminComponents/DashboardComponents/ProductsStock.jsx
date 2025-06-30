@@ -54,14 +54,17 @@ export const ProductsStock = ({ fetchedProducts }) => {
     },
   };
 
+  console.log(chartData)
+
   return (
     <div className="w-full h-fit bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Products Stock</h2>
       <hr className="my-2 border-gray-200 dark:border-gray-600" />
-      {chartData ? (
+      {chartData?.datasets?.data ? (
         <Doughnut data={chartData} options={options} />
       ) : (
-        <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>
+        <div>No stocks listed</div>
+        // <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>
       )}
     </div>
   );

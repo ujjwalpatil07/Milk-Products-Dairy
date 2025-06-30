@@ -114,9 +114,9 @@ export default function OtpVerification() {
 
       <div className="hidden md:flex w-[50%] h-full justify-center items-center">
         <img
-          src="https://img.freepik.com/free-vector/otp-concept-illustration_114360-7882.jpg"
+          src="https://useme.in/web/assets/images/what-now/your-privacy.png"
           alt="OTP Illustration"
-          className="w-[80%] max-h-[400px] object-contain dark:invert"
+          className="w-[80%] max-h-[400px] object-contain "
         />
       </div>
     </div>

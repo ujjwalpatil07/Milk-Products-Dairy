@@ -25,17 +25,30 @@ export default function UserProfileLayout({ children }) {
 
     const isUserInStorage = localStorage.getItem("User");
 
+    let content;
     if (authUserLoading) {
-        return (
+        content = (
             <div className="h-screen p-4 gap-3 flex justify-center items-center bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
                 <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
                 <p className="text-sm animate-pulse">Loading your profile... Please wait.</p>
             </div>
         );
+    }else{
+        content = (
+            <main className="w-full sm:w-auto md:mx-10 lg:mx-52 flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 h-full md:h-[calc(100vh-64px)]">
+                <div className="hidden md:block">
+                    <UserProfileSidebar />
+                </div>
+
+                <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden rounded-lg shadow-md scrollbar-hide bg-white dark:bg-gray-500/20 dark:text-white p-4 transition-all duration-300 border-y-15 border-white dark:border-transparent">
+                    {children}
+                </div>
+            </main>
+        )
     }
 
     if (!isUserInStorage && !authUser) {
-        return (
+        content = (
             <div className="h-screen p-4 flex flex-col items-center justify-center text-center space-y-4 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
                 <span className="text-red-500 font-medium">You must be logged in to access this page.</span>
                 <Link to="/login" className="px-4 py-2 bg-[#843E71] text-white rounded hover:bg-[#843E7190] transition">
@@ -63,15 +76,7 @@ export default function UserProfileLayout({ children }) {
                     </button>
                 </div>
 
-                <main className="w-full sm:w-auto md:mx-10 lg:mx-52 flex-1 flex flex-col md:flex-row py-5 p-3 gap-5 h-full md:h-[calc(100vh-64px)]">
-                    <div className="hidden md:block">
-                        <UserProfileSidebar />
-                    </div>
-
-                    <div className="flex-1 w-full h-full overflow-y-auto overflow-x-hidden rounded-lg shadow-md scrollbar-hide bg-white dark:bg-gray-500/20 dark:text-white p-4 transition-all duration-300 border-y-15 border-white dark:border-transparent">
-                        {children}
-                    </div>
-                </main>
+                {content}
 
                 <Footer />
             </div>

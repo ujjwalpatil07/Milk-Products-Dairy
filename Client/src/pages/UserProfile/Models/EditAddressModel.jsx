@@ -90,14 +90,14 @@ export default function EditAddressModel({ selectedAddress, editAddress, setEdit
           <button
             type="button"
             onClick={() => setEditModal(false)}
-            className="flex justify-center items-center py-2 gap-1 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-600/10 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+            className="flex justify-center items-center py-2 gap-1 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
             disabled={loading}
           >
             <X size={18} /> Cancel
           </button>
           <button
             type="submit"
-            className="flex justify-center items-center py-2 gap-1 border border-green-600 text-green-600 font-semibold rounded hover:bg-green-600/10 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+            className="flex justify-center items-center py-2 gap-1 border border-green-600 text-green-600 font-semibold rounded hover:bg-green-600/10 hover:text-green-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
             disabled={loading}
           >
             {

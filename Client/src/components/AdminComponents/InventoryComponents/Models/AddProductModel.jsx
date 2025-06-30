@@ -2,7 +2,7 @@ import {
   Dialog,
   DialogActions
 } from "@mui/material";
-import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X } from "lucide-react";
+import { Image, Tag, Archive, Package, AlertCircle, FlaskConical, X, Percent, LifeBuoy, Hourglass } from "lucide-react";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { useEffect, useState } from "react";
@@ -31,7 +31,7 @@ const categories = [
   "Ice Cream",
   "Shrikhand",
   "Whey Protein",
-  "Dairy-Based Sweets (e.g., Rasgulla, Gulab Jamun, Kalakand)",
+  "Dairy-Based Sweets",
 ];
 
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
@@ -197,31 +197,41 @@ export default function AddProductModel({ open, onClose }) {
             <div className="flex flex-col w-full md:w-1/2">
               <label
                 htmlFor="category"
-                className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
+                className="text-sm text-gray-200/90  font-medium"
               >
-                <Package className="text-gray-500 text-sm" />
                 Category
               </label>
-              <select
-                id="category"
-                name="category"
-                onChange={handleInputChange}
-                defaultValue=""
 
-                className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
-              bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
-              focus:outline-none focus:ring-1 focus:ring-gray-500`}            >
-                <option value="" disabled hidden>
-                  Select a category
-                </option>
-                {categories.map((cat, index) => (
-                  <option key={index * 0.9} value={cat} className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
-                  >
-                    {cat}
+              <div className="relative mt-1">
+                {/* Icon inside the select field */}
+                <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500  pointer-events-none" />
+
+                <select
+                  id="category"
+                  name="category"
+                  onChange={handleInputChange}
+                  defaultValue=""
+                  className={`pl-10 pr-3 py-2.5 w-full rounded-lg border border-gray-600 dark:border-gray-600 
+        bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
+        focus:outline-none focus:ring-1 focus:ring-gray-500 scrollbar-hide ${isAdding ? "cursor-not-allowed" : ""
+                    }`}
+                >
+                  <option value="" className="!text-gray-500" disabled hidden>
+                    Select a category
                   </option>
-                ))}
-              </select>
+                  {categories.map((cat, index) => (
+                    <option
+                      key={index}
+                      value={cat}
+                      className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                    >
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
           </div>
 
           {/* Product Description */}
@@ -269,7 +279,7 @@ export default function AddProductModel({ open, onClose }) {
                 label="Product's Shelflife"
                 name="shelfLife"
                 placeholder="Ex: 4 Days"
-                icon={<CurrencyRupeeIcon className="text-gray-500" />}
+                icon={<Hourglass className="text-gray-500" />}
                 onChange={handleInputChange}
               />
             </div>
@@ -297,40 +307,46 @@ export default function AddProductModel({ open, onClose }) {
               />
             </div>
             <div className="w-full md:w-1/2">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1 relative">
                 <label
                   htmlFor="quantityUnit"
-                  className="text-sm text-gray-700 dark:text-white font-medium flex items-center gap-2"
+                  className="text-sm text-gray-700 dark:text-white font-medium"
                 >
-                  <FlaskConical className="text-gray-500 !text-sm" />
                   Quantity Unit
                 </label>
-                <select
-                  id="quantityUnit"
-                  name="quantityUnit"
-                  onChange={handleInputChange}
-                  defaultValue=""
 
-                  className={`${isAdding ? "cursor-not-allowed" : null} p-3 rounded-lg border border-gray-600 dark:border-gray-600 
-                 bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
-                 focus:outline-none focus:ring-1 focus:ring-gray-500`}
-                >
-                  <option value="" disabled hidden>
-                    Select unit
-                  </option>
+                <div className="relative">
+                  {/* Icon inside the select field */}
+                  <FlaskConical className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500  pointer-events-none" />
 
-                  {quantityUnits.map((unit, index) => (
-                    <option
-                      key={index * 0.9}
-                      value={unit}
-                      className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
-                    >
-                      {unit}
+                  <select
+                    id="quantityUnit"
+                    name="quantityUnit"
+                    onChange={handleInputChange}
+                    defaultValue=""
+                    className={`pl-10 pr-3 py-2 w-full rounded-lg border border-gray-600 dark:border-gray-600 
+                    bg-gray-50 dark:bg-gray-500/30 text-gray-700 dark:text-white 
+                    focus:outline-none focus:ring-1 focus:ring-gray-500 ${isAdding ? "cursor-not-allowed" : ""
+                      }`}
+                  >
+                    <option value="" className="!text-gray-500" disabled hidden>
+                      Select unit
                     </option>
-                  ))}
-                </select>
+
+                    {quantityUnits.map((unit, index) => (
+                      <option
+                        key={index}
+                        value={unit}
+                        className="bg-white dark:bg-gray-600 text-gray-800 dark:text-white"
+                      >
+                        {unit}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
+
           </div>
 
           {/* Threshold Value and Discount */}
@@ -349,7 +365,7 @@ export default function AddProductModel({ open, onClose }) {
                 label="Discount (%)"
                 name="discount"
                 placeholder="Ex: 10%"
-                icon={<CurrencyRupeeIcon className="text-gray-500" />}
+                icon={<Percent className="text-gray-500" />}
                 onChange={handleInputChange}
               />
             </div>

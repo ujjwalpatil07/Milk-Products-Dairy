@@ -102,7 +102,7 @@ export default function CartPage() {
                         <>
                             <h1>
                                 Deliver To:
-                                <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#d51ca4]">
+                                <span className="ps-1 text-lg font-bold break-all text-[#b1338f] dark:text-[#cc5eaf]">
                                     {deliveryAddress?.name}
                                 </span>
                                 <span className="text-sm ms-3 px-3 rounded-full bg-gray-500/10 dark:bg-gray-200/50">
@@ -170,55 +170,65 @@ export default function CartPage() {
                         const itemSaved = saved * item.selectedQuantity;
 
                         return (
-                            <div key={idx * 0.89} className="pb-2 border-b border-dashed border-gray-500/30 dark:border-gray-400/30 mb-2">
-                                <p className="font-semibold text-base text-gray-800 dark:text-white">{item.name}</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
-                                    {item.selectedQuantity} {item.quantityUnit} x {" "}
-                                    <span className="line-through text-gray-400 mr-1 pe-1">
-                                        &#8377;{formatNumberWithCommas(item.price)}
+                            <div
+                                key={idx * 0.89}
+                                className="pb-2 border-b border-dashed border-gray-300 dark:border-gray-600 mb-2 space-y-1"
+                            >
+                                <p className="font-semibold text-base text-gray-800 dark:text-white">
+                                    {item.name}
+                                </p>
+
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    {item.selectedQuantity} {item.quantityUnit} ×{" "}
+                                    <span className="line-through text-gray-400 dark:text-gray-500 me-1">
+                                        ₹{formatNumberWithCommas(item.price)}
                                     </span>
-                                    <span className="text-blue-600 font-semibold">
-                                        &#8377;{formatNumberWithCommas(discountedPrice)}
+                                    <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                                        ₹{formatNumberWithCommas(discountedPrice)}
                                     </span>
                                 </p>
-                                <div className="flex justify-between">
-                                    <span className="text-green-600 font-bold">
-                                        Total: &#8377;{formatNumberWithCommas(itemTotal)}
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-800 dark:text-gray-200 font-bold">
+                                        Total: ₹{formatNumberWithCommas(itemTotal)}
                                     </span>
+
                                     {saved > 0 && (
-                                        <span className="text-sm text-red-500">
-                                            Saved &#8377;{formatNumberWithCommas(itemSaved)}
+                                        <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                                            Saved ₹{formatNumberWithCommas(itemSaved)}
                                         </span>
                                     )}
                                 </div>
                             </div>
+
                         );
                     })}
 
-                    <div className="space-y-1 font-medium">
+                    <div className="space-y-1 font-medium border-b border-dashed border-gray-500/30 dark:border-gray-400/30 py-2">
                         <p className="text-gray-800 dark:text-gray-100">
-                            Total MRP:
-                            <span className="ml-1 text-blue-600 font-bold">&#8377;{formatNumberWithCommas(subtotal)}</span>
+                            Total MRP :
+                            <span className="ml-1 text-gray-600 dark:text-gray-100 font-bold"> &#8377; {formatNumberWithCommas(subtotal)}</span>
                         </p>
 
-                        <p className="text-red-600">
-                            You Saved:
-                            <span className="ml-1 font-bold">&#8377;{formatNumberWithCommas(totalSaving)}</span>
-                        </p>
+                        
 
-                        <p className="text-lg font-bold text-green-700 dark:text-green-400">
+                        <p className="text-lg font-bold text-[#843E71] dark:text-[#cc5eaf]">
                             Final Total:
                             <span className="ml-1">&#8377;{formatNumberWithCommas(totalAmount)}</span>
                         </p>
                     </div>
 
-                    <div className="pt-10">
+                    <div className="pt-3 ">
                         <button
                             onClick={handleProceedCheckout}
                             className="block w-full text-center bg-[#843E71] text-white py-2 rounded-md hover:bg-[#843e71d4] transition"
                         >
                             Proceed to Checkout
                         </button>
+                        <p className="text-green-600/80 mt-2 ms-2">
+                            You will save
+                            <span className="ml-1 font-bold ">&#8377;{formatNumberWithCommas(totalSaving)} </span>on this order.
+                        </p>
                     </div>
 
                 </motion.div>

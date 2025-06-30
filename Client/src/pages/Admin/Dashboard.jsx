@@ -4,7 +4,7 @@ import { ProductsStock } from "../../components/AdminComponents/DashboardCompone
 import Statistics from "../../components/AdminComponents/DashboardComponents/Statastics";
 import LowQuantityStock from "../../components/AdminComponents/DashboardComponents/LowQuantityStock";
 import TopSellingStock from "../../components/AdminComponents/DashboardComponents/TopSellingStock";
-import { getExpiryStatusCounts, lowStockCount, outOfStockProducts, totalStock } from "../../utils/InventoryHelpers/inventoryOverviewHelper";
+import { getExpiryStatusCounts, lowStockCount, outOfStockProducts } from "../../utils/InventoryHelpers/inventoryOverviewHelper";
 import { useContext } from "react";
 import OrdersOverview from "../../components/AdminComponents/DashboardComponents/PurchaseOverview";
 import { totalActiveOrders } from "../../services/orderService";
@@ -58,7 +58,6 @@ export default function Dashboard() {
                     <motion.div variants={fadeUpVariant} className="w-full">
                         <InventorySummary
                             totalProducts={products?.length}
-                            totalStock={totalStock(products)}
                             lowStockCount={lowStockCount(products)}
                             outOfStockProducts={outOfStockProducts(products)}
                             expiringSoonCount={expiringSoonCount}

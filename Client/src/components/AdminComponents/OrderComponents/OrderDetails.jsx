@@ -248,12 +248,12 @@ export default function OrderDetails({ allOrders, loading }) {
                   onClick={() => handleAcceptOrders(order?._id, owner?._id)}
                   disabled={!!processingId}
                   className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order?._id
-                    ? "bg-green-400"
-                    : "bg-green-600 hover:bg-green-700"
+                    ? "bg-green-600/50 dark:bg-green-700/40"
+                    : "bg-green-600 dark:bg-green-700/50"
                     }`}
                 >
                   {(processingId?.orderId === order?._id && processingId?.status === "Accept")
-                    ? "Loading..."
+                    ? "Accepting..."
                     : "Accept"}
                 </button>
 
@@ -261,12 +261,12 @@ export default function OrderDetails({ allOrders, loading }) {
                   onClick={() => handleRejectOrders(order?._id, owner?._id)}
                   disabled={!!processingId}
                   className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order._id
-                    ? "bg-red-400"
-                    : "bg-red-600 hover:bg-red-700"
+                    ? "bg-red-600/50 dark:bg-red-700/40"
+                    : "bg-red-600 dark:bg-red-700/50"
                     }`}
                 >
                   {(processingId?.orderId === order._id && processingId?.status === "Reject")
-                    ? "Loading..."
+                    ? "Rejecting..."
                     : "Reject"}
                 </button>
               </div>
