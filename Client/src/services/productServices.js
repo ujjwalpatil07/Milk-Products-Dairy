@@ -13,5 +13,5 @@ export const productLike = async (productId, userId) => {
 
 export const fetchRecentReviews = async () => {
   const res = await api.get("/products/recent-reviews");
-  return res?.data?.reviews ?? [];
+  return res?.data ?? [];
 };

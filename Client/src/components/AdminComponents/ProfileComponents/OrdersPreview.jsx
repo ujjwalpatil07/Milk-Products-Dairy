@@ -17,7 +17,7 @@ export default function OrdersPreview() {
     const getOrders = async () => {
       try {
         const res = await fetchRecentOrders();
-        setOrders(res?.data?.orders || []);
+        setOrders(res?.orders || []);
       } catch (error) {
         console.error("Error fetching recent orders", error);
       } finally {
