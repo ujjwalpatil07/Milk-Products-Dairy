@@ -9,7 +9,7 @@ import { FilterIcon } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
-import { Pagination } from '@mui/material';
+import { Pagination, Menu, MenuItem, IconButton } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -43,8 +43,10 @@ export default function ProductsList({ products, loading }) {
   const [selectedProduct, setSelectedProduct] = useState({});
   const [productList, setProductList] = useState(products || []);
   const [filterType, setFilterType] = useState('Filter');
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
   const productsPerPage = 7;
 
   useEffect(() => {
@@ -98,8 +100,16 @@ export default function ProductsList({ products, loading }) {
     }
 
     setProductList(sortedProducts);
-    setCurrentPage(1); 
+    setCurrentPage(1);
 
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   let content;
@@ -132,13 +142,13 @@ export default function ProductsList({ products, loading }) {
           ) : (
             <table className="min-w-full text-left border-collapse">
               <thead>
-                <tr className="border-b dark:border-gray-700 text-gray-600 dark:text-gray-300">
-                  <th className="pb-3 px-3 whitespace-nowrap">Products</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Category</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300">
+                  <th className="sm:w-[25%] pb-3 px-3 whitespace-nowrap">Products</th>
+                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Selling Price</th>
+                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Quantity</th>
+                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Threshold Value</th>
+                  <th className="sm:w-[20%] pb-3 px-3 whitespace-nowrap">Category</th>
+                  <th className="sm:w-[10%] pb-3 px-3 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <motion.tbody
@@ -153,13 +163,12 @@ export default function ProductsList({ products, loading }) {
                     <motion.tr
                       key={product._id || index}
                       variants={rowVariants}
-                      className={`border-b dark:border-gray-700  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
-                        }`}
+                      className={`border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20`}
                     >
-                      <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
+                      <td className={`py-2 px-3 font-medium text-gray-700 dark:text-white ${isLowStock && "text-red-500 animate-pulse"}`}>
                         {highlightMatch(product.name, navbarInput)}
                       </td>
-                      <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
+                      <td className="py-2 px-3 whitespace-nowrap">&#8377; {product.price}</td>
                       <td className="py-2 px-3 whitespace-nowrap">
                         {product.stock} {product.quantityUnit}
                       </td>
@@ -190,7 +199,7 @@ export default function ProductsList({ products, loading }) {
                         </div>
                       </td>
                     </motion.tr>
-                    
+
                   );
                 })}
               </motion.tbody>
@@ -199,34 +208,34 @@ export default function ProductsList({ products, loading }) {
           )}
         </div>
 
-        <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
-          <Pagination
-            count={Math.ceil(productList.length / productsPerPage)}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-            variant="outlined"
-            shape="rounded"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                color: "inherit",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  border: "2px solid #843E71",
+        {productList.length > productsPerPage && (
+          <div className="p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+            <Pagination
+              count={Math.ceil(productList.length / productsPerPage)}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              variant="outlined"
+              shape="rounded"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "inherit",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    border: "2px solid #843E71",
+                  },
                 },
-              },
-              "& .Mui-selected": {
-                backgroundColor: "#843E71",
-                color: "#fff",
-                borderColor: "#843E71",
-                "&:hover": {
-                  backgroundColor: "#6e305e",
+                "& .Mui-selected": {
+                  backgroundColor: "#843E71",
+                  color: "#fff",
+                  borderColor: "#843E71",
+                  "&:hover": {
+                    backgroundColor: "#6e305e",
+                  },
                 },
-              },
-            }}
-          />
-
-        </div>
-
+              }}
+            />
+          </div>
+        )}
 
       </>
     )
@@ -234,7 +243,7 @@ export default function ProductsList({ products, loading }) {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-500/20 rounded-xl p-4 md:p-6 shadow-md w-full">
+      <div className="bg-white dark:bg-gray-500/20 rounded p-4 md:p-6 shadow-md w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Products</h2>
 
@@ -250,34 +259,41 @@ export default function ProductsList({ products, loading }) {
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowFilterDropdown(prev => !prev)}
+                  onClick={handleClick}
                   className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 cursor-pointer"
                   aria-haspopup="listbox"
-                  aria-expanded={showFilterDropdown}
                 >
                   <FilterIcon size={"18px"} />
                   <span>{filterType}</span>
                 </button>
 
-                {showFilterDropdown && (
-                  <div className="absolute z-10 right-0 mt-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-md w-48">
-                    <ul className="text-sm text-gray-700 dark:text-white">
-                      {filterOptions.map((filter) => (
-                        <li key={filter.value}>
-                          <button
-                            onClick={() => {
-                              handleFilter(filter.value);
-                              setShowFilterDropdown(false); // close dropdown after selection
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                          >
-                            {filter.label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  slotProps={{
+                    paper: {
+                      sx: {
+                        backgroundColor: "transparent",
+                      },
+                    },
+                  }}
+                >
+                  <div className='space-y-3 p-3 bg-white text-gray-800 dark:bg-gray-500/50 backdrop-blur-md dark:text-white'>
+                    {filterOptions.map((filter) => (
+                      <button
+                        key={filter.value}
+                        onClick={() => {
+                          handleFilter(filter.value);
+                          handleClose();
+                        }}
+                        className="dark:hover:bg-gray-600 flex"
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </Menu>
               </div>
             </div>
           </div>

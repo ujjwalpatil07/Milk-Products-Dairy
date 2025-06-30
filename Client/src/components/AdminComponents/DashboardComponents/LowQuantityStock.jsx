@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import UpdateProductModel from "../InventoryComponents/Models/UpdateProductModel";
 
-export default function LowQuantityStock({ fetchedProducts }) {
+export default function LowQuantityStock({ fetchedProducts, loading }) {
 
   const [products, setProducts] = useState([]);
   const [updateModel, setUpdateModel] = useState(false);
@@ -21,20 +21,40 @@ export default function LowQuantityStock({ fetchedProducts }) {
 
   }, [fetchedProducts]);
 
+  if (products.length === 0 && !loading) {
+    return (
+      <div className="w-full bg-white dark:bg-gray-500/20 rounded-sm p-3">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">Low Quantity Stocks</h2>
+        <p className="text-sm text-center text-gray-500 dark:text-gray-300">
+          All products are above threshold.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="w-full bg-white dark:bg-gray-500/20 rounded-sm p-3">
+    <div className="w-full bg-white dark:bg-gray-500/20 rounded p-3">
       <div className="flex justify-between px-2">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Low Quantity Stocks</h2>
         <button className="text-blue-600 hover:underline text-sm">See all</button>
       </div>
 
       <div className="space-y-4 mt-5">
-        {products.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-300">
-            All products are above threshold.
-          </p>
-        ) : (
-          products.map((product, index) => (
+        {loading
+          ? Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index * 0.89}
+              className="flex items-center bg-white shadow-md rounded p-3 space-x-4 dark:bg-gray-500/10 animate-pulse"
+            >
+              <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-md"></div>
+              <div className="flex flex-col gap-2 w-full">
+                <div className="h-4 w-40 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                <div className="h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                <div className="h-2 w-28 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              </div>
+            </div>
+          ))
+          : products.map((product, index) => (
             <div
               key={index * 0.9}
               className="relative group flex items-center bg-white shadow-md rounded p-3 space-x-4 dark:bg-gray-500/30"
@@ -44,15 +64,14 @@ export default function LowQuantityStock({ fetchedProducts }) {
                 alt={product.name}
                 className="w-16 h-16 object-cover rounded-md"
               />
-
               <div>
                 <h4 className="text-base font-semibold text-gray-800 dark:text-white">
                   {product.name}
                 </h4>
                 <h5
                   className={`text-sm ${product.stock < product.thresholdVal
-                    ? "text-red-600 dark:text-red-500 animate-pulse"
-                    : "text-gray-600 dark:text-gray-300"
+                      ? "text-red-600 dark:text-red-500 animate-pulse"
+                      : "text-gray-600 dark:text-gray-300"
                     }`}
                 >
                   Remaining Stock: {product.stock} {product.quantityUnit}
@@ -62,19 +81,17 @@ export default function LowQuantityStock({ fetchedProducts }) {
                 </p>
               </div>
 
-              {/* Add Stock Button (only on hover) */}
               <button
                 onClick={() => {
-                  setSelectedProduct(product)
-                  setUpdateModel(true)
-                } }
+                  setSelectedProduct(product);
+                  setUpdateModel(true);
+                }}
                 className="absolute top-1.5 right-2 hidden group-hover:block bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-md transition"
               >
                 Add Stock
               </button>
             </div>
-          ))
-        )}
+          ))}
 
         {updateModel && (
           <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />

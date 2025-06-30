@@ -135,7 +135,7 @@ export default function AddProductModel({ open, onClose }) {
       slotProps={{
         ...{
           paper: {
-            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
+            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
           },
           backdrop: {
             className: "!bg-black/40 !backdrop-blur-sm"
@@ -145,7 +145,7 @@ export default function AddProductModel({ open, onClose }) {
     >
 
       {/* Sticky Title */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t-xl">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded">
 
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Add New Product
@@ -358,7 +358,7 @@ export default function AddProductModel({ open, onClose }) {
       </div>
 
 
-      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-4 !py-5 rounded-b-xl">
+      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-4 !py-5 rounded">
         <button
           onClick={onClose}
           disabled={isAdding}
@@ -382,11 +382,11 @@ function InputWithLabel({ label, name, placeholder, icon, onChange, isAdding }) 
       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">
         {label}
       </label>
-      <div className="flex items-center gap-2 border rounded-md p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
+      <div className="flex items-center gap-2 border rounded- p-2 bg-gray-50 dark:bg-gray-500/30 dark:border-gray-600">
         {icon}
         <input
           type="text"
-          name={name}
+          name={name}md
           placeholder={placeholder}
           className={`${isAdding ? " cursor-not-allowed" : null} flex-1 bg-transparent focus:outline-none text-gray-900 dark:text-white`}
           onChange={onChange}

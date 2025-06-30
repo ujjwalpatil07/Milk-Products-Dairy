@@ -18,9 +18,10 @@ import { AdminOrderContext } from "../../context/AdminOrderProvider";
 export default function Dashboard() {
 
     const {allOrders} = useContext(AdminOrderContext)
-    const { products } = useContext(ProductContext)
+    const { products, productLoading } = useContext(ProductContext)
 
     const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
+
     const fadeUpVariant = {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
@@ -40,7 +41,7 @@ export default function Dashboard() {
                     initial="hidden"
                     animate="visible"
                 >
-                    <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} />
+                    <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} loading={productLoading} />
                 </motion.div>
             </section>
 
@@ -63,6 +64,7 @@ export default function Dashboard() {
                             outOfStockProducts={outOfStockProducts(products)}
                             expiringSoonCount={expiringSoonCount}
                             expiredCount={expiredCount}
+                            loading={productLoading}
                         />
                     </motion.div>
 
@@ -71,6 +73,7 @@ export default function Dashboard() {
                         <OrdersOverview
                             totalOrdersRecieved={allOrders?.length}
                             totalPendingOrders={totalActiveOrders(allOrders)}
+                            loading={productLoading}
                         />
                     </motion.div>
 
@@ -79,7 +82,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     <motion.div variants={fadeUpVariant} className="w-full">
-                        <TopSellingStock topSellingStocks={topSellingStocks(products)} />
+                        <TopSellingStock topSellingStocks={topSellingStocks(products)} loading={productLoading} />
                     </motion.div>
                 </motion.section>
 
@@ -92,7 +95,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     <motion.div variants={fadeUpVariant} className="w-full">
-                        <LowQuantityStock fetchedProducts={products} />
+                        <LowQuantityStock fetchedProducts={products} loading={productLoading} />
                     </motion.div>
                 </motion.section>
             </motion.section>
