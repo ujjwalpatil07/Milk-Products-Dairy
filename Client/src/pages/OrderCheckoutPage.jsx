@@ -290,9 +290,9 @@ export default function OrderCheckoutPage() {
           })}
 
           <div className="pt-4 text-sm text-gray-800 dark:text-gray-100 space-y-2 font-medium">
-            <p>Total MRP: <span className="float-right text-blue-600 font-bold">&#8377;{formatNumberWithCommas(subtotal)}</span></p>
-            <p>You Saved: <span className="float-right text-red-500">&#8377;{formatNumberWithCommas(totalSaving)}</span></p>
-            <p className="text-lg font-bold">Final Payable: <span className="float-right text-green-600">&#8377;{formatNumberWithCommas(totalAmount)}</span></p>
+            <p>Total MRP: <span className="float-right text-gray-600 dark:text-gray-200 font-bold">&#8377;{formatNumberWithCommas(subtotal)}</span></p>
+            <p className="text-green-500 dark:text-green-600">You Saved: <span className="float-right text-green-500 dark:text-green-600">&#8377;{formatNumberWithCommas(totalSaving)}</span></p>
+            <p className="text-lg font-bold text-gray-600 dark:text-[#cc5eaf]">Final Payable: <span className="float-right text-gray-600 dark:text-[#cc5eaf]">&#8377;{formatNumberWithCommas(totalAmount)}</span></p>
           </div>
 
         </motion.div>
@@ -341,7 +341,7 @@ export default function OrderCheckoutPage() {
         maxWidth="sm"
         fullWidth
       >
-        <div className="bg-white/70 dark:bg-black/80 text-gray-900 dark:text-white backdrop-blur-sm">
+        <div className="bg-white dark:bg-gray-500/20 text-gray-900 dark:text-white backdrop-blur-sm">
 
           <header className="sticky top-0 left-0 flex justify-between items-center px-4 py-3 border-b border-gray-300 dark:border-gray-600 backdrop-blur-md bg-white/70 dark:bg-gray-500/20 z-10">
             <span className="text-xl font-semibold">Choose Payment Mode</span>
@@ -353,10 +353,10 @@ export default function OrderCheckoutPage() {
           <DialogContent className="space-y-2 px-4 pt-4 pb-2">
             <p><strong>Total Items:</strong> {cartDetails.length}</p>
             <p><strong>Total MRP:</strong> &#8377; {formatNumberWithCommas(subtotal)}</p>
-            <p className="text-red-500">
+            <p className="text-green-500 dark:text-green-600">
               <strong>You Saved:</strong> &#8377; {formatNumberWithCommas(totalSaving)}
             </p>
-            <p className="text-green-600 font-bold">
+            <p className="text-blue-600 dark:text-blue-500 font-bold">
               <strong>Payable Amount:</strong> &#8377; {formatNumberWithCommas(totalAmount)}
             </p>
           </DialogContent>

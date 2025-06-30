@@ -133,7 +133,7 @@ export default function ProductDetails({ productId }) {
             const data = await addToWishlist(authUser._id, productId);
 
             if (data?.success) {
-                enqueueSnackbar("Product added to wishlist!", { variant: "success" });  
+                enqueueSnackbar("Product added to wishlist!", { variant: "success" });
                 setIsWishlisted(true);
                 setAuthUser((prev) => ({
                     ...prev,
@@ -239,8 +239,15 @@ export default function ProductDetails({ productId }) {
                 </div>
 
                 {stock > 0 ? (
-                    <div className="bg-red-600/10 text-red-500 px-2 rounded text-[14px] inline-block mb-1">
-                        AVAILABILITY: ONLY {stock} {(selectedProduct?.quantityUnit || "Unit").toUpperCase()} IN STOCK
+                    <div
+                        className={`px-2 rounded text-[14px] inline-block mb-1
+                            ${stock < selectedProduct?.thresholdVal
+                                ? "bg-red-600/10 text-red-700 dark:text-red-500"
+                                : "bg-green-600/10 text-green-800 dark:text-green-500"}
+                        `}
+                    >
+                        {stock < selectedProduct?.thresholdVal ? "AVAILABILITY : ONLY " : "AVAILABILITY : "}{" "}
+                        {stock} {(selectedProduct?.quantityUnit || "Unit").toUpperCase()} IN STOCK
                     </div>
                 ) : (
                     <div className="text-red-600 font-semibold text-[14px] mb-1">
@@ -248,7 +255,8 @@ export default function ProductDetails({ productId }) {
                     </div>
                 )}
 
-                <div className="text-green-700 dark:text-green-500 font-semibold text-sm mb-3">
+
+                <div className="text-gray-700 dark:text-gray-400 font-semibold text-sm mb-3">
                     Minimum Quantity: {minQty || 1} {selectedProduct?.quantityUnit || "Unit"}
                 </div>
 
@@ -355,7 +363,7 @@ export default function ProductDetails({ productId }) {
                         </Tooltip>
                         <input
                             type="number"
-                            className="hide-input-spin text-center w-17 md:text-2xl text-gray-800 dark:text-white font-semibold border-2 border-gray-300 dark:border-gray-500 rounded-lg py-1 bg-white dark:bg-gray-500/20"
+                            className="hide-input-spin text-center w-17 md:text-2xl text-gray-800 dark:text-white font-semibold border-2 border-gray-300 dark:border-gray-500 rounded-lg  bg-white dark:bg-gray-500/20"
                             value={quantity}
                             min={0}
                             max={Math.max(0, stock - (existing?.quantity || 0))}

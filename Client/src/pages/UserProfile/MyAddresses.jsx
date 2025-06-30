@@ -122,85 +122,82 @@ export default function MyAddresses() {
   };
 
   let content;
-  if (authUserLoading) {
+  if (authUserLoading || loading) {
     content = (
       <div className="flex items-center justify-center py-20 text-gray-500 space-x-2">
         <div className="w-6 h-6 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <p className="text-sm">Loading...</p>
       </div>
     );
-  } else {
+  } else if (addresses?.length === 0) {
     content = (
-      <>
-        {
-          addresses.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                <MapPin className="text-gray-400 dark:text-gray-300 h-12 w-12" />
-              </div>
-              <h4 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">
-                No addresses saved yet
-              </h4>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                Add your first address to get started
+      <div className="text-center py-12">
+        <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+          <MapPin className="text-gray-400 dark:text-gray-300 h-12 w-12" />
+        </div>
+        <h4 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">
+          No addresses saved yet
+        </h4>
+        <p className="text-gray-500 dark:text-gray-400 mb-4">
+          Add your first address to get started
+        </p>
+        <button
+          className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium border border-blue-600 dark:border-blue-400 px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-200"
+          onClick={() => setNewAddressModel(true)}
+        >
+          <Plus size={16} /> Add Address
+        </button>
+      </div>
+
+    )
+  }else {
+    content = (
+      <div className="space-y-4">
+        {addresses.map((item) => (
+          <div
+            key={item._id}
+            className="rounded-lg bg-gray-500/10 dark:bg-gray-500/20 p-4 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 dark:hover:bg-gray-500/30"
+          >
+            <div className="w-full">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold tracking-wide bg-gray-800 text-white dark:text-white`}>
+                {item.addressType}
+              </span>
+              <p className="font-semibold text-lg mt-3 text-gray-800 dark:text-gray-100">
+                {item.name} <span className="font-normal text-gray-600 dark:text-gray-300 ml-3">{item.phone}</span>
               </p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                {item.streetAddress}, {item.city}, {item.state} - {item.pincode}
+              </p>
+            </div>
+
+            <hr className="border-dashed border-gray-300 dark:border-gray-500 w-full my-3" />
+
+            <div className="flex w-full space-x-4">
               <button
-                className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium border border-blue-600 dark:border-blue-400 px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                onClick={() => setNewAddressModel(true)}
+                className="flex items-center gap-2 py-2 px-3 text-sm bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-300 rounded font-medium hover:bg-blue-200 dark:hover:bg-blue-600/40 transition-colors duration-200"
+                onClick={() => {
+                  setEditModal(true);
+                  setSelectedAddress(item);
+                }}
+                aria-label={`Edit address for ${item.name}`}
               >
-                <Plus size={16} /> Add Address
+                <Edit2 size={14} /> Edit
+              </button>
+
+              <button
+                className="flex items-center gap-2 py-2 px-3 text-sm bg-red-100 text-red-700 dark:bg-red-600/20 dark:text-red-300 rounded font-medium hover:bg-red-200 dark:hover:bg-red-600/40 transition-colors duration-200"
+                onClick={() => {
+                  setRemoveModal(true);
+                  setSelectedAddress(item);
+                }}
+                aria-label={`Remove address for ${item.name}`}
+              >
+                <Trash2 size={14} /> Remove
               </button>
             </div>
-          ) : (<div className="space-y-4">
-            {addresses.map((item) => (
-              <div
-                key={item._id}
-                className="rounded-lg bg-gray-500/10 dark:bg-gray-500/20 p-4 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 dark:hover:bg-gray-500/30"
-              >
-                <div className="w-full">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold tracking-wide bg-gray-800 text-white dark:text-white`}>
-                    {item.addressType}
-                  </span>
-                  <p className="font-semibold text-lg mt-3 text-gray-800 dark:text-gray-100">
-                    {item.name} <span className="font-normal text-gray-600 dark:text-gray-300 ml-3">{item.phone}</span>
-                  </p>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                    {item.streetAddress}, {item.city}, {item.state} - {item.pincode}
-                  </p>
-                </div>
-
-                <hr className="border-dashed border-gray-300 dark:border-gray-500 w-full my-3" />
-
-                <div className="flex w-full space-x-4">
-                  <button
-                    className="flex items-center gap-2 py-2 px-3 text-sm bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-300 rounded font-medium hover:bg-blue-200 dark:hover:bg-blue-600/40 transition-colors duration-200"
-                    onClick={() => {
-                      setEditModal(true);
-                      setSelectedAddress(item);
-                    }}
-                    aria-label={`Edit address for ${item.name}`}
-                  >
-                    <Edit2 size={14} /> Edit
-                  </button>
-
-                  <button
-                    className="flex items-center gap-2 py-2 px-3 text-sm bg-red-100 text-red-700 dark:bg-red-600/20 dark:text-red-300 rounded font-medium hover:bg-red-200 dark:hover:bg-red-600/40 transition-colors duration-200"
-                    onClick={() => {
-                      setRemoveModal(true);
-                      setSelectedAddress(item);
-                    }}
-                    aria-label={`Remove address for ${item.name}`}
-                  >
-                    <Trash2 size={14} /> Remove
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
-
-          )
-        }
-      </>
+        ))}
+      </div>
     )
   }
 
@@ -222,21 +219,21 @@ export default function MyAddresses() {
 
       <Dialog
         open={removeModal && !!selectedAddress}
-        slots={{
-          transition: Transition,
-        }}
+        fullWidth
+        maxWidth="md"
         slotProps={{
-          paper: {
-            sx: {
-              backgroundColor: "transparent",
-              borderRadius: 1,
+          ...{
+            paper: {
+              className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-xl !scrollbar-hide"
             },
-          },
+            backdrop: {
+              className: "!bg-black/40 !backdrop-blur-sm"
+            }
+          }
         }}
         keepMounted
         onClose={() => setRemoveModal(false)}
         aria-describedby="alert-dialog-slide-description"
-        fullWidth
       >
         <RemoveAddressModel
           selectedAddress={selectedAddress}
@@ -248,21 +245,21 @@ export default function MyAddresses() {
 
       <Dialog
         open={editModal && !!selectedAddress}
-        slots={{
-          transition: Transition,
-        }}
+        fullWidth
+        maxWidth="md"
         slotProps={{
-          paper: {
-            sx: {
-              backgroundColor: "transparent",
-              borderRadius: 1,
+          ...{
+            paper: {
+              className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-xl !scrollbar-hide"
             },
-          },
+            backdrop: {
+              className: "!bg-black/40 !backdrop-blur-sm"
+            }
+          }
         }}
         keepMounted
         onClose={() => setEditModal(false)}
         aria-describedby="alert-dialog-slide-description"
-        fullWidth
       >
         <EditAddressModel
           selectedAddress={selectedAddress}
@@ -275,21 +272,21 @@ export default function MyAddresses() {
 
       <Dialog
         open={newAddressModel}
-        slots={{
-          transition: Transition,
-        }}
+        fullWidth
+        maxWidth="md"
         slotProps={{
-          paper: {
-            sx: {
-              backgroundColor: "transparent",
-              borderRadius: 1,
+          ...{
+            paper: {
+              className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-xl !scrollbar-hide"
             },
-          },
+            backdrop: {
+              className: "!bg-black/40 !backdrop-blur-sm"
+            }
+          }
         }}
         keepMounted
         onClose={() => setNewAddressModel(false)}
         aria-describedby="alert-dialog-slide-description"
-        fullWidth
       >
         <NewAddressModel
           newAddress={newAddress}

@@ -91,7 +91,7 @@ export default function ProductCard({ item }) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold text-[#843E71]">&#8377;{formatNumberWithCommas(discountedPrice)}</span>
+                    <span className="text-xl font-bold text-[#843E71] dark:text-[#cc5eaf]">&#8377;{formatNumberWithCommas(discountedPrice)}</span>
                     {discount > 0 && (
                         <>
                             <span className="text-sm line-through text-gray-500">&#8377;{formatNumberWithCommas(price)}</span>
@@ -105,7 +105,7 @@ export default function ProductCard({ item }) {
                     {totalSaved > 0 && <> | You saved &#8377; {totalSaved.toFixed(2)}</>}
                 </p>
 
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                     Selected Quantity: <span className="font-medium">{selectedQuantity} {quantityUnit}</span> ({type || "Not specified"})
                 </p>
 

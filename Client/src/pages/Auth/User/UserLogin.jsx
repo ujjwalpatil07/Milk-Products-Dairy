@@ -1,18 +1,17 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { ThemeContext } from "../../../context/ThemeProvider";
 import { loginUser } from "../../../services/userService";
 import { AdminAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
+import { DialogContent } from "@mui/material";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 export default function UserLogin() {
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
-  const { theme } = useContext(ThemeContext);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,126 +54,132 @@ export default function UserLogin() {
     }
   };
 
-  const getTextFieldStyles = (theme) => ({
-    input: {
-      color: theme === "dark" ? "#fff" : "#000",
-      backgroundColor: "transparent",
-    },
-    "& label": {
-      color: theme === "dark" ? "#bbb" : "#555",
-    },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: theme === "dark" ? "#888" : "#ccc",
-      },
-      "&:hover fieldset": {
-        borderColor: "#843E71",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#843E71",
-      },
-    },
-  });
+  const loginType = "user"
+
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-      <div className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-xl px-6 py-10 w-full max-w-md">
-        <form className="flex flex-col items-center w-full" onSubmit={handleFormSubmit}>
-          <div className="flex flex-col items-center w-full px-3 gap-2 mb-6">
-            <div className="flex justify-between bg-[#D595C3] dark:bg-[#843E71] w-full rounded-lg my-2 p-1">
-              <button
-                className="w-[48%] font-semibold p-1 text-center bg-white text-black dark:bg-gray-200 rounded-lg"
-                type="button"
-              >
-                User
-              </button>
-              <button
-                className="w-[48%] font-semibold p-1 text-center rounded-lg cursor-pointer hover:bg-white hover:text-black transition"
-                onClick={() => navigate("/admin/login")}
-                type="button"
-              >
-                Admin
-              </button>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">User Login</h1>
-          </div>
+      <motion.div 
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={ {duration: 0.8, ease: "easeOut"} }
+      className="p-6 bg-white dark:bg-gray-900 rounded-md w-lg">
+        <h2 className="text-lg font-semibold text-center text-gray-800 dark:text-gray-200">
+          Welcome to
+        </h2>
+        <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
+          Madhur Dairy & Daily Needs
+        </h1>
 
-          <div className="w-full flex flex-col gap-5">
-            <TextField
-              id="email"
-              label="Email"
-              name="email"
-              value={formData.email}
+        <div className="mb-4 mt-3 flex justify-center">
+          <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-600">
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "user"
+                ? "bg-[#843E71] text-white"
+                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+            >
+              User
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin/login")}
+              className={`px-4 py-1 text-sm font-semibold transition-colors duration-300 ${loginType === "admin"
+                ? "bg-[#843E71] text-white"
+                : "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
+
+        <form onSubmit={handleFormSubmit} className="space-y-5">
+
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            value={formData?.email}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
+            required
+          />
+
+
+          <div className="relative w-full">
+            <input
+              id="password"
+              label="Password"
+              name="password"
+              placeholder="Enter your password"
+              type={showPassword ? "text" : "password"}
+              value={formData?.password}
               onChange={handleInputChange}
-              variant="outlined"
-              fullWidth
+              className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
               required
-              sx={getTextFieldStyles(theme)}
             />
 
-            <div className="relative w-full">
-              <TextField
-                id="password"
-                label="Password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={handleInputChange}
-                variant="outlined"
-                fullWidth
-                required
-                sx={getTextFieldStyles(theme)}
-              />
-              <button
-                type="button"
-                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-300`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></button>
-            </div>
-
-            <div className="text-sm flex justify-between font-semibold text-right mb-3 text-[#FF8682]">
-              <div className="flex justify-center text-black dark:text-gray-300 hover:underline">
-                <input type="checkbox" className="me-2" /> Remember me
-              </div>
-              <Link to="/forget" className="hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <button
+              type="button"
+              className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-300`}
+              onClick={() => setShowPassword(!showPassword)}
+            ></button>
           </div>
 
-          <Button
-            variant="contained"
-            color="warning"
-            className="w-full mt-6 font-semibold !bg-[#843E71] hover:!bg-[#6e2b5c]"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </Button>
 
-          <div className="mt-5 text-sm text-black dark:text-gray-300 flex flex-row items-center justify-center">
-            <p className="mr-1">Don't have an account?</p>
-            <Link to="/signup" className="text-[#FF8682] hover:underline font-medium">
-              Sign up
+          <div className="text-sm flex justify-between font-semibold text-right mb-3 text-[#843E71]">
+            <div className="flex justify-center text-black dark:text-gray-300 hover:underline">
+              <input type="checkbox" className="me-2" /> Remember me
+            </div>
+            <Link to="/forget" className="hover:underline">
+              Forgot password?
             </Link>
           </div>
 
-          <div className="flex items-center my-6 w-full">
-            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
-            <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
-            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
-          </div>
+          <button
+            type="submit"
+            className="mt-1 w-full bg-[#843E71] text-white py-2 rounded hover:bg-[#6f3360] transition text-sm font-medium disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </button>
 
-          <div className="flex w-full justify-between pt-2">
-            <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-              <i className="fa-brands fa-facebook"></i>
-            </div>
-            <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-              <i className="fa-brands fa-google"></i>
-            </div>
-          </div>
+
+
         </form>
-      </div>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            Don't have an account?{" "}
+            <Link
+              to={"/signup"}
+              className="text-[#843E71] hover:underline cursor-pointer"
+            >
+              Sign Up
+            </Link>
+          </p>
+        </div>
+
+        <div className="flex items-center my-4 w-full">
+          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
+          <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
+          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
+        </div>
+
+        <div className="flex w-full justify-between pt-2">
+          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
+            <i className="fa-brands fa-facebook"></i>
+          </div>
+          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
+            <i className="fa-brands fa-google"></i>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

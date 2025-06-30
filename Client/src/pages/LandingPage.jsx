@@ -115,7 +115,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            <section className="max-w-3xl mx-auto px-3 py-10">
+            <section className="max-w-5xl mx-auto px-3 py-10">
                 <h2
                     className="text-2xl font-bold mb-6 text-gray-800 dark:text-white"
                 >

@@ -27,14 +27,14 @@ export default function RemoveAddressModel({ selectedAddress, setRemoveModal, re
       <div className="flex justify-between gap-4 px-3 pb-3">
         <button
           disabled={loading}
-          className="flex-1 py-2 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-600/10 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+          className="flex-1 py-2 border border-blue-600 text-blue-600 font-semibold rounded hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
           onClick={() => setRemoveModal(false)}
         >
           Cancel
         </button>
         <button
           disabled={loading}
-          className="flex-1 py-2 border border-red-600 text-red-600 font-semibold rounded hover:bg-red-600/10 hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
+          className="flex-1 py-2 border border-red-600 text-red-600 font-semibold rounded hover:bg-red-600/10 hover:text-red-600 dark:hover:text-white transition-all duration-300 disabled:cursor-not-allowed"
           onClick={() => removeAddress(selectedAddress)}
         >
           {

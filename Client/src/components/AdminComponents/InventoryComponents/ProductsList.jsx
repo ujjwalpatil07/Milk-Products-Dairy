@@ -9,6 +9,16 @@ import { FilterIcon } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
+import { ThemeContext } from '../../../context/ThemeProvider';
+import {
+  Pagination,
+  Dialog,
+  DialogContent,
+  List,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+
 import { Pagination, Menu, MenuItem, IconButton } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -35,7 +45,6 @@ const rowVariants = {
 };
 
 export default function ProductsList({ products, loading }) {
-
   const { navbarInput, highlightMatch } = useContext(SidebarContext)
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -49,17 +58,21 @@ export default function ProductsList({ products, loading }) {
 
   const productsPerPage = 7;
 
+  const { theme } = useContext(ThemeContext)
+
+
+
   useEffect(() => {
     setProductList(products || []);
   }, [products]);
 
   const filterOptions = [
+    { label: "Out of stock", value: "outOfStock" },
+    { label: "Low Stocks", value: "lowStock" },
     { label: "Price: Low to High", value: "priceLowToHigh" },
     { label: "Price: High to Low", value: "priceHighToLow" },
     { label: "Quantity: Low to High", value: "quantityLowToHigh" },
     { label: "Quantity: High to Low", value: "quantityHighToLow" },
-    { label: "Name: A to Z", value: "alphabeticalAZ" },
-    { label: "Name: Z to A", value: "alphabeticalZA" },
     { label: "Sold: Low to High", value: "soldLowToHigh" },
     { label: "Sold: High to Low", value: "soldHighToLow" },
     { label: "Clear", value: "Filter" },
@@ -81,13 +94,13 @@ export default function ProductsList({ products, loading }) {
         sortedProducts.sort((a, b) => a.stock - b.stock);
         break;
       case 'quantityHighToLow':
-        sortedProducts.sort((a, b) => b.stock - a.stock);
+        sortedProducts = sortedProducts.sort((a, b) => b.stock - a.stock);
         break;
-      case 'alphabeticalAZ':
-        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+      case 'outOfStock':
+        sortedProducts = sortedProducts.filter((p) => p.stock === 0);
         break;
-      case 'alphabeticalZA':
-        sortedProducts.sort((a, b) => b.name.localeCompare(a.name));
+      case 'lowStock':
+        sortedProducts = sortedProducts.filter((p) => p?.stock < p?.thresholdVal);
         break;
       case 'soldLowToHigh':
         sortedProducts.sort((a, b) => (a.totalQuantitySold || 0) - (b.totalQuantitySold || 0));
@@ -101,7 +114,6 @@ export default function ProductsList({ products, loading }) {
 
     setProductList(sortedProducts);
     setCurrentPage(1);
-
   };
 
   const handleClick = (event) => {
@@ -224,13 +236,13 @@ export default function ProductsList({ products, loading }) {
                     border: "2px solid #843E71",
                   },
                 },
-                "& .Mui-selected": {
-                  backgroundColor: "#843E71",
-                  color: "#fff",
-                  borderColor: "#843E71",
-                  "&:hover": {
-                    backgroundColor: "#6e305e",
-                  },
+              },
+              "& .Mui-selected": {
+                backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}` ,
+                color: `${theme === "light" ? "#843E71" : "#fff"}`,
+                borderColor: "#843E71",
+                "&:hover": {
+                  backgroundColor: "#6e305e",
                 },
               }}
             />

@@ -1,10 +1,8 @@
 export const totalCategories = (fetchedProducts) =>
   new Set(fetchedProducts.map((product) => product.category)).size;
 
-export const totalStock = (fetchedProducts) => {
-  return fetchedProducts.reduce((total, product) => {
-    return total + Number(product.stock || 0);
-  }, 0);
+export const totalProducts = (fetchedProducts) => {
+  return fetchedProducts?.length;
 };
 
 export const lowStockCount = (fetchedProducts) => {
