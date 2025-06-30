@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import {
   Loader,
-  Eye,
   PackageCheck,
   Clock,
   AlertTriangle,
   ArrowRight,
 } from "lucide-react";
+import { fetchRecentOrders } from "../../../services/orderService";
 
 export default function OrdersPreview() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecentOrders = async () => {
+    const getOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/order/recent-20");
+        const res = await fetchRecentOrders();
         setOrders(res?.data?.orders || []);
       } catch (error) {
         console.error("Error fetching recent orders", error);
@@ -26,7 +25,7 @@ export default function OrdersPreview() {
       }
     };
 
-    fetchRecentOrders();
+    getOrders();
   }, []);
 
   const getStatusClass = (status) => {

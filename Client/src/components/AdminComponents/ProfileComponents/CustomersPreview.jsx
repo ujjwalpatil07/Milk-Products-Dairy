@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { EyeIcon, MessageCircleMore, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterCustomers } from "../../../utils/filterCustomers.js";
+import { fetchCustomers } from "../../../services/adminService.js";
 
 export default function CustomersList() {
   const { navbarInput } = useContext(SidebarContext);
@@ -13,10 +13,10 @@ export default function CustomersList() {
   const [visibleCount, setVisibleCount] = useState(10);
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const getCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/u/customers");
-        setCustomers(res?.data?.customers ?? []);
+        const res = await fetchCustomers();
+        setCustomers(res?.customers ?? []);
       } catch (error) {
         console.error("Failed to load customers:", error);
       } finally {
@@ -24,7 +24,7 @@ export default function CustomersList() {
       }
     };
 
-    fetchCustomers();
+    getCustomers();
   }, []);
 
   const filteredCustomers = filterCustomers(customers, navbarInput);
@@ -77,7 +77,6 @@ export default function CustomersList() {
       </tr>
     ));
   }
-
 
   return (
     <div className="bg-white dark:bg-gray-500/20 p-5 rounded shadow-sm space-y-4 w-full">

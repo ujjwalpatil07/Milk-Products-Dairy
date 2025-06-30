@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MessageCircle, ThumbsUp, Loader } from "lucide-react";
-import axios from "axios";
 import { Avatar, Rating } from "@mui/material";
+import { fetchRecentReviews } from "../../../services/productServices";
 
 export default function AdminProfileReviews() {
   const [customerReviews, setCustomerReviews] = useState([]);
@@ -10,8 +10,8 @@ export default function AdminProfileReviews() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/products/recent-reviews");
-        setCustomerReviews(res.data.reviews);
+        const res = await fetchRecentReviews();;
+        setCustomerReviews(res?.reviews || []);
       } catch (err) {
         console.error("Error fetching reviews", err);
       } finally {

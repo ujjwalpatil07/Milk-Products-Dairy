@@ -29,3 +29,8 @@ export const handleAdminProfileEdit = async (formData) => {
   });
   return res.data;
 };
+
+export const fetchCustomers = async () => {
+  const res = await api.get("/u/customers");
+  return res?.data?.customers ?? [];
+};

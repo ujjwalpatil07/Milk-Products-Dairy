@@ -11,15 +11,8 @@ import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
 import { ThemeContext } from '../../../context/ThemeProvider';
 import {
-  Pagination,
-  Dialog,
-  DialogContent,
-  List,
-  ListItemButton,
-  ListItemText,
+  Pagination, Menu, MenuItem, IconButton
 } from "@mui/material";
-
-import { Pagination, Menu, MenuItem, IconButton } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -175,8 +168,8 @@ export default function ProductsList({ products, loading }) {
                     <motion.tr
                       key={product._id || index}
                       variants={rowVariants}
-                      className={`border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20`}
-                    >
+                      className={`border-b dark:border-gray-700  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"}
+                  `}>
                       <td className={`py-2 px-3 font-medium text-gray-700 dark:text-white ${isLowStock && "text-red-500 animate-pulse"}`}>
                         {highlightMatch(product.name, navbarInput)}
                       </td>
@@ -221,7 +214,7 @@ export default function ProductsList({ products, loading }) {
         </div>
 
         {productList.length > productsPerPage && (
-          <div className="p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+          <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
             <Pagination
               count={Math.ceil(productList.length / productsPerPage)}
               page={currentPage}
@@ -236,16 +229,17 @@ export default function ProductsList({ products, loading }) {
                     border: "2px solid #843E71",
                   },
                 },
-              },
-              "& .Mui-selected": {
-                backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}` ,
-                color: `${theme === "light" ? "#843E71" : "#fff"}`,
-                borderColor: "#843E71",
-                "&:hover": {
-                  backgroundColor: "#6e305e",
+                "& .Mui-selected": {
+                  backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}`,
+                  color: `${theme === "light" ? "#843E71" : "#fff"}`,
+                  borderColor: "#843E71",
+                  "&:hover": {
+                    backgroundColor: "#6e305e",
+                  },
                 },
               }}
             />
+
           </div>
         )}
 
