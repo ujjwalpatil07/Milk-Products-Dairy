@@ -2,12 +2,11 @@ import React from 'react';
 
 import AdminProfileInfo from '../../components/AdminComponents/ProfileComponents/AdminProfileInfo';
 import OrdersPreview from '../../components/AdminComponents/ProfileComponents/OrdersPreview';
-import InvoicesPreview from '../../components/AdminComponents/ProfileComponents/InvoicesPreview';
 import CustomersPreview from '../../components/AdminComponents/ProfileComponents/CustomersPreview';
 import AdminProfileReviews from '../../components/AdminComponents/ProfileComponents/AdminProfileReviews';
 
 export default function AdminProfile() {
- 
+
   return (
     <div className="p-4 space-y-6 bg-white dark:bg-gray-500/20 rounded-sm min-h-screen m-4">
       <div className="flex justify-between items-center">
@@ -16,10 +15,12 @@ export default function AdminProfile() {
 
       <AdminProfileInfo />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <OrdersPreview />
-        <InvoicesPreview />
-        <CustomersPreview />
+      <div className="space-y-4 space-x-4 flex flex-wrap md:flex-nowrap">
+        <div className='space-y-4 flex-1 overflow-hidden'>
+          <OrdersPreview />
+          <CustomersPreview />
+        </div>
+
         <AdminProfileReviews />
       </div>
     </div>

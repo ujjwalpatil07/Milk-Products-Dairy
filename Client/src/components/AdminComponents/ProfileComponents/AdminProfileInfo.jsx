@@ -92,12 +92,12 @@ export default function AdminProfileInfo() {
   const fallback = (value) => value || <span className="italic text-gray-400">Not provided</span>;
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-500/20 p-6 rounded flex flex-col md:flex-row gap-6 transition-all duration-300 hover:shadow-xl items-start md:items-center">
+    <div className="bg-gray-100 dark:bg-gray-500/20 p-3 md:p-6 rounded flex flex-col md:flex-row gap-6 transition-all duration-300 items-start md:items-center">
       <div className="flex flex-col items-center gap-3">
         <Avatar
           src={previewImage}
           alt={formData.name || "Admin"}
-          className="!w-24 !h-24 sm:!w-36 sm:!h-36"
+          className="!w-24 !h-24 sm:!w-36 sm:!h-36 md:!w-50 md:!h-50"
         />
         {editMode && (
           <label className="text-sm text-blue-600 dark:text-blue-300 cursor-pointer">
@@ -107,14 +107,14 @@ export default function AdminProfileInfo() {
         )}
       </div>
 
-      <div className="flex-1 w-full space-y-4 text-gray-800 dark:text-white">
+      <div className="flex-1 w-full space-y-2 text-gray-800 dark:text-white">
         {[{ label: "Name", name: "name", placeholder: "Enter your name" },
         { label: "Username", name: "username", placeholder: "Enter username" },
         { label: "Email", name: "email", placeholder: "Enter email address" },
         { label: "Mobile No", name: "mobileNo", placeholder: "Enter 10-digit mobile number" }]
           .map((field) => (
             <div key={field.name} className="flex items-center justify-between gap-4">
-              <span className="font-medium w-32 sm:w-40">{field.label}:</span>
+              <span className="font-medium w-20 sm:w-30 md:w-40">{field.label}:</span>
               {editMode ? (
                 <input
                   type="text"
@@ -130,12 +130,12 @@ export default function AdminProfileInfo() {
             </div>
           ))}
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="font-semibold text-lg text-gray-900 dark:text-white">Factory Address</div>
           {editMode ? (
             ["street", "city", "state", "pincode"].map((key) => (
               <div key={key} className="flex items-center justify-between gap-4">
-                <span className="font-medium w-32 sm:w-40 capitalize">{key}:</span>
+                <span className="font-medium w-20 sm:w-30 md:w-40 capitalize">{key}:</span>
                 <input
                   type="text"
                   name={`factoryAddress.${key}`}
@@ -148,7 +148,7 @@ export default function AdminProfileInfo() {
             ))
           ) : (
             <div className="flex items-start gap-4">
-              <span className="font-medium w-32 sm:w-40">Address:</span>
+              <span className="font-medium w-20 sm:w-30 md:w-40">Address:</span>
               <span className="flex-1 text-sm">
                 {[
                   formData.factoryAddress?.street,
@@ -163,7 +163,7 @@ export default function AdminProfileInfo() {
           )}
         </div>
 
-        <div className="flex justify-end pt-4 gap-3">
+        <div className="flex justify-end pt-2 gap-3">
           {!editMode ? (
             <button
               onClick={() => setEditMode(true)}

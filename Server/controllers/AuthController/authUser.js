@@ -159,3 +159,14 @@ export const removeUserNotification = async (req, res) => {
     .status(200)
     .json({ success: true, message: "Notification(s) deleted successfully." });
 };
+
+export const getAllCustomers = async (req, res) => {
+  const customers = await User.find({})
+    .select("firstName lastName email gender mobileNo orders")
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    customers,
+  });
+};
