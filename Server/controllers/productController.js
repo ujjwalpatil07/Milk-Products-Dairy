@@ -1,4 +1,5 @@
 import Product from "../models/ProductSchema.js";
+import Review from "../models/ReviewSchema.js";
 
 export const getProducts = async (req, res) => {
   const products = await Product.find().populate({
@@ -49,4 +50,14 @@ export const likeProduct = async (req, res) => {
     message: "Product liked successfully.",
     updatedLikes: product.likes,
   });
+};
+
+export const getRecentReview = async (req, res) => {
+  const reviews = await Review.find()
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .populate("userId", "username photo") 
+    .lean();
+
+  res.status(200).json({ success: true, reviews });
 };

@@ -17,6 +17,7 @@ import logoDarkMode from "../../assets/logoDarkMode.png";
 import logoLightMode from "../../assets/logoLightMode.png";
 import { SidebarContext } from "../../context/SidebarProvider";
 import { AdminOrderContext } from "../../context/AdminOrderProvider";
+import { User } from "lucide-react";
 
 export default function Sidebar() {
 
@@ -95,6 +96,12 @@ export default function Sidebar() {
             </nav>
 
             <div className="px-4 py-6 border-t border-gray-300 dark:border-gray-700 space-y-4">
+                <Link to={"/admin/profile"} className={`flex items-center gap-4 w-full p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/20 transition 
+                    ${(location.pathname === "/admin/profile") && "bg-blue-100 text-blue-500 dark:bg-blue-900/20 dark:text-blue-400 font-semibold"}
+                    `}>
+                    <User />
+                    <span>Profile</span>
+                </Link>
                 <button
                     onClick={() => {
                         toggleTheme();

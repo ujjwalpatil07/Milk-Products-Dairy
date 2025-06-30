@@ -87,7 +87,7 @@ export default function UserProfileSidebar() {
     ];
 
     return (
-        <aside className="scrollbar-hide border-y-15 border-white dark:border-transparent w-full h-full min-w-65 sm:w-65 bg-white dark:bg-gray-500/20 p-4 shadow-md overflow-y-auto rounded-md transition-all duration-300">
+        <aside className="scrollbar-hide border-y-15 border-white dark:border-transparent w-full h-full min-w-65 md:w-65 bg-white dark:bg-gray-500/20 p-4 shadow-md overflow-y-auto rounded-md transition-all duration-300">
             <div className="flex flex-col items-center mb-5 relative group">
                 <div className="relative w-24 h-24">
                     <img

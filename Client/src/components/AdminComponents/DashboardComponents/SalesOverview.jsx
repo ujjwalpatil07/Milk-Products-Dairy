@@ -30,7 +30,8 @@ const cardVariants = {
     },
 };
 
-export default function SalesOverview({ totalRevenue, totalProfit }) {
+export default function SalesOverview({ totalRevenue, totalProfit, loading }) {
+
     const salesData = [
         {
             name: "Revenue",
@@ -77,23 +78,38 @@ export default function SalesOverview({ totalRevenue, totalProfit }) {
                 className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide"
                 variants={containerVariants}
             >
-                {salesData.map((item, index) => (
-                    <motion.div
-                        key={index * 0.9}
-                        className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
-                        variants={cardVariants}
-                    >
-                        <div className="text-2xl shrink-0">{item.icon}</div>
-                        <div className="flex flex-col">
-                            <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                                {item.name}
+                {
+                    loading
+                        ? Array.from({ length: 5 }).map((_, index) => (
+                            <div
+                                key={index * 0.5}
+                                className="min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-500/10 animate-pulse"
+                            >
+                                <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                                <div className="flex flex-col gap-2 w-full">
+                                    <div className="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                                    <div className="h-4 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                                </div>
                             </div>
-                            <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
-                                ₹ {formatNumberWithCommas(item.value)}
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
+                        ))
+                        : salesData.map((item, index) => (
+                            <motion.div
+                                key={index * 0.9}
+                                className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+                                variants={cardVariants}
+                            >
+                                <div className="text-2xl shrink-0">{item.icon}</div>
+                                <div className="flex flex-col">
+                                    <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        {item.name}
+                                    </div>
+                                    <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
+                                        &#8377; {formatNumberWithCommas(item.value)}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))
+                }
             </motion.div>
         </motion.div>
     );
@@ -102,4 +118,5 @@ export default function SalesOverview({ totalRevenue, totalProfit }) {
 SalesOverview.propTypes = {
     totalRevenue: PropTypes.number.isRequired,
     totalProfit: PropTypes.number.isRequired,
+    loading: PropTypes.bool.isRequired
 };

@@ -170,7 +170,7 @@ export default function UpdateProductModel({ open, onClose, selectedProduct }) {
       slotProps={{
         ...{
           paper: {
-            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
+            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded !shadow-xl !w-full !max-w-2xl !scrollbar-hide"
           },
           backdrop: {
             className: "!bg-black/40 !backdrop-blur-sm"
@@ -179,7 +179,7 @@ export default function UpdateProductModel({ open, onClose, selectedProduct }) {
       }}
     >
 
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t-xl">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded">
 
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
           🧾 Update the Product
@@ -408,7 +408,7 @@ export default function UpdateProductModel({ open, onClose, selectedProduct }) {
         </form>
       </div>
 
-      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-7 !py-5 rounded-b-xl">
+      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-7 !py-5 rounded">
         <button
           onClick={onClose}
           disabled={isUpdating}

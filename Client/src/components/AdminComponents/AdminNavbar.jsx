@@ -22,14 +22,16 @@ export default function AdminNavbar() {
     const location = useLocation();
     const { theme } = useContext(ThemeContext);
 
-    const { authAdmin } = useContext(AdminAuthContext);
+    const { authAdmin, authAdminLoading } = useContext(AdminAuthContext);
     const { setIsSidebarOpen, navbarInput, setNavbarInput } = useContext(SidebarContext);
-    const {notification, setNotification} = useContext(AdminOrderContext)
+    const { notification, setNotification } = useContext(AdminOrderContext)
     const [notificationDialog, setNotificationDialog] = useState(false);
     const [notificationLoadingIndex, setNotificationLoadingIndex] = useState(null);
     const [animate, setAnimate] = useState(false);
 
     const prevCountRef = useRef(notification.length);
+
+    const loginAdmin = localStorage.getItem("Admin");
 
     useEffect(() => {
         if (notification.length > prevCountRef.current) {
@@ -100,8 +102,6 @@ export default function AdminNavbar() {
                 </button>
             </div>
 
-
-
             <div className="flex items-center gap-5">
                 <div className="relative inline-block">
                     <button
@@ -109,18 +109,23 @@ export default function AdminNavbar() {
                         className="p-2.5 rounded-full hover:bg-gray-500/20 dark:hover:bg-[#00000090] transition relative"
                     >
                         <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                        {notification?.length > 0 && (
+                        {(notification?.length > 0 && loginAdmin) && (
                             <span
                                 className={`absolute top-0 right-0 font-bold px-1.5 h-fit bg-red-500 text-white rounded-md text-[12px] transition-all duration-300 ${animate ? "animate-bounce" : ""}`}
                             >
-                                {notification.length}
+                                {notification?.length}
                             </span>
                         )}
                     </button>
                 </div>
                 <Link to={"/admin/profile"}>
-                    <Avatar src={authAdmin?.image} alt={authAdmin?.name} />
+                    {authAdminLoading ? (
+                        <div className="h-10 w-10 rounded-full bg-gray-300/70 dark:bg-gray-500/30 shadow animate-pulse"></div>
+                    ) : (
+                        <Avatar src={authAdmin?.image} alt={authAdmin?.name} />
+                    )}
                 </Link>
+
             </div>
 
 

@@ -1,74 +1,84 @@
-import React from "react";
-import { Star, MessageCircle } from "lucide-react";
-
-const customerReviews = [
-  {
-    id: 1,
-    customerName: "Rahul Sharma",
-    rating: 5,
-    message: "The milk quality is top-notch! Always fresh and delivered on time.",
-    date: "2025-06-01T14:35:00Z",
-    product: "Cow Milk"
-  },
-  {
-    id: 2,
-    customerName: "Sneha Patil",
-    rating: 4,
-    message: "Great paneer quality but would love faster delivery in peak hours.",
-    date: "2025-06-18T10:12:00Z",
-    product: "Paneer"
-  },
-  {
-    id: 3,
-    customerName: "Amit Joshi",
-    rating: 3,
-    message: "Lassi was good but bottle packaging can be improved.",
-    date: "2025-06-20T08:50:00Z",
-    product: "Lassi"
-  }
-];
+import React, { useEffect, useState } from "react";
+import { MessageCircle, ThumbsUp, Loader } from "lucide-react";
+import axios from "axios";
+import { Avatar, Rating } from "@mui/material";
 
 export default function AdminProfileReviews() {
+  const [customerReviews, setCustomerReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get("http://localhost:9000/products/recent-reviews");
+        setCustomerReviews(res.data.reviews);
+      } catch (err) {
+        console.error("Error fetching reviews", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
   return (
-    <div className="bg-white dark:bg-gray-500/20 p-5 rounded-xl shadow space-y-4">
+    <div className="bg-gray-100 dark:bg-gray-500/20 p-4 rounded shadow space-y-4 md:w-80 lg:w-90 h-fit  transition-all duration-300">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
         <MessageCircle className="text-purple-600" />
-        Customer Reviews
+        Recent 20 Customer Reviews
       </h2>
 
-      {customerReviews.map((review) => (
-        <div
-          key={review.id}
-          className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700/30 shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-1">
-            <div className="font-medium text-gray-800 dark:text-white">
-              {review.customerName}
-              <span className="ml-2 text-sm text-gray-500">
-                ({review.product})
-              </span>
-            </div>
-            <div className="flex items-center gap-1 text-yellow-500">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={16}
-                  fill={i < review.rating ? "currentColor" : "none"}
-                  stroke="currentColor"
-                />
-              ))}
-            </div>
-          </div>
-
-          <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-            "{review.message}"
-          </p>
-
-          <div className="text-xs text-gray-400 mt-2">
-            {new Date(review.date).toLocaleString()}
-          </div>
+      {loading ? (
+        <div className="flex justify-center items-center py-6">
+          <Loader className="animate-spin text-purple-600 w-6 h-6" />
         </div>
-      ))}
+      ) : (
+        customerReviews.map((review) => (
+          <div
+            key={review._id}
+            className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700/30 shadow-sm  transition-all duration-300"
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3 mb-2">
+                <Avatar
+                  src={review.userId?.photo || "/default-avatar.png"}
+                  alt={review.userId?.username}
+                  sx={{ width: 32, height: 32 }}
+                />
+                <div className="text-sm font-medium text-gray-800 dark:text-white line-clamp-1">
+                  {review.userId?.username || "Anonymous"}
+                </div>
+              </div>
+
+              <Rating
+                value={review?.rating || 1}
+                precision={0.5}
+                readOnly
+                size="small"
+              />
+            </div>
+
+            <p className="text-sm text-gray-700 dark:text-gray-300 italic mt-2 line-clamp-5">
+              "{review.message}"
+            </p>
+
+            <div className="flex justify-between items-center text-xs text-gray-400 mt-3">
+              <div className="flex items-center gap-1">
+                <ThumbsUp size={14} className="text-blue-500" />
+                {review.likes?.length || 0}
+              </div>
+              <div>
+                {new Date(review.createdAt).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </div>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

@@ -43,6 +43,7 @@ export default function Inventory() {
           outOfStockProducts={outOfStockProducts(products)}
           expiringSoonCount={expiringSoonCount}
           expiredCount={expiredCount}
+          loading={productLoading}
         />
       </motion.div>
 

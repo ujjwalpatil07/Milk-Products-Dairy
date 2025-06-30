@@ -33,7 +33,9 @@ export default function OverallInventory({
   lowStockCount,
   outOfStockProducts,
   expiringSoonCount,
+  loading
 }) {
+
   const inventorySummaryData = [
     {
       name: "Total Categories",
@@ -89,23 +91,37 @@ export default function OverallInventory({
         className="flex flex-nowrap overflow-x-auto gap-4 pb-2 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 scrollbar-hide"
         variants={containerVariants}
       >
-        {inventorySummaryData.map((item, index) => (
-          <motion.div
-            key={index * 0.9}
-            className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
-            variants={itemVariants}
-          >
-            <div className="text-2xl shrink-0">{item.icon}</div>
-            <div className="flex flex-col">
-              <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-                {item.name}
-              </div>
-              <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
-                {item.value}
+        {loading
+          ? Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index * 0.89}
+              className="min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-500/10 animate-pulse"
+            >
+              <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+              <div className="flex flex-col gap-2 w-full">
+                <div className="h-4 w-28 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
               </div>
             </div>
-          </motion.div>
-        ))}
+          ))
+          : inventorySummaryData.map((item, index) => (
+            <motion.div
+              key={index * 0.9}
+              className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+              variants={itemVariants}
+            >
+              <div className="text-2xl shrink-0">{item.icon}</div>
+              <div className="flex flex-col">
+                <div className="text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                  {item.name}
+                </div>
+                <div className="text-lg font-bold flex-nowrap whitespace-nowrap text-ellipsis overflow-hidden">
+                  {item.value}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
       </motion.div>
     </motion.div>
   );
@@ -117,4 +133,5 @@ OverallInventory.propTypes = {
   lowStockCount: PropTypes.number.isRequired,
   outOfStockProducts: PropTypes.number.isRequired,
   expiringSoonCount: PropTypes.number.isRequired,
+  loading: PropTypes.bool
 };
