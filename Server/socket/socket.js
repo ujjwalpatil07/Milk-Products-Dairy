@@ -23,7 +23,10 @@ export const connectToSocket = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: ["http://localhost:5173", "https://milk-products-dairy.vercel.app"],
+      origin: [
+        "http://localhost:5173",
+        "https://milk-products-dairy.vercel.app",
+      ],
       methods: ["GET", "POST", "DELETE", "PUT"],
     },
   });
@@ -461,11 +464,13 @@ export const connectToSocket = (server) => {
           for (const socketId of socketSet) {
             io.to(socketId).emit("admin:notification", {
               title: "Order Delivered",
-              description: `Order #${order._id} delivered (${totalItems} items, ₹${order.totalAmount}).`,
+              description: `Order #${order._id} placed by ${user?.firstName} ${user?.lastName} has been delivered. Total: ₹${order.totalAmount}, Items: ${totalItems}`,
               date,
             });
 
-            io.to(socketId).emit("admin-order:delivered-success", { orderId });
+            io.to(socketId).emit("admin-order:delivered-success", {
+              orderId,
+            });
           }
         }
 

@@ -160,7 +160,7 @@ export default function MyOrders() {
               </div>
             </div>
 
-            <div className="overflow-x-auto mb-3">
+            <div className="overflow-x-auto scrollbar-hide mb-3">
               <table className="w-full overflow-x-auto text-sm text-left">
                 <thead className="bg-gray-200 dark:bg-gray-600">
                   <tr>
@@ -213,7 +213,9 @@ export default function MyOrders() {
 
             <div className="flex flex-row flex-wrap justify-between items-center gap-3 mt-4 border-t pt-3">
               <p className="font-semibold text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                <FaMoneyBillWave className="text-green-500" /> Payment Mode: {order?.paymentMode}
+                <FaMoneyBillWave className="text-green-500" /> 
+                <span className="hidden sm:flex">Payment: </span>
+                {order?.paymentMode}
               </p>
 
               <p className="text-lg font-bold text-green-600 dark:text-green-400">

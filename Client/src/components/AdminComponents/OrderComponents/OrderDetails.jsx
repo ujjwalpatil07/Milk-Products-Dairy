@@ -205,11 +205,11 @@ export default function OrderDetails({ allOrders, loading }) {
             </table>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-4">
-            <div className="text-lg font-semibold">Total Amount: &#8377;{totalAmount}</div>
+          <div className="flex flex-wrap justify-between gap-4 pt-4">
+            <div className="text-lg font-semibold w-full sm:flex-1">Total Amount: &#8377;{totalAmount}</div>
 
             {status === "Pending" && (
-              <div className="space-x-4">
+              <div className="space-x-3 grid grid-cols-2 sm:flex w-full sm:w-fit">
                 <button
                   onClick={() => handleAcceptOrders(_id, owner?._id)}
                   disabled={isProcessing}

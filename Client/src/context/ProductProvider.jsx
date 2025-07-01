@@ -170,7 +170,6 @@ export const ProductProvider = ({ children }) => {
         );
     }, []);
 
-
     useEffect(() => {
         socket.on("product-stock-update", updateProducts);
         socket.on("review:add-success", handleAddReviewSuccess);
