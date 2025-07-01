@@ -32,7 +32,9 @@ export default function InventorySummary({
   lowStockCount,
   outOfStockProducts,
   expiringSoonCount,
+  loading,
 }) {
+
   const inventorySummaryData = [
     {
       name: "Total Stock Items",
@@ -82,19 +84,33 @@ export default function InventorySummary({
         className="flex flex-wrap sm:grid sm:grid-cols-2 gap-3 overflow-x-auto scrollbar-hide pb-2"
         variants={containerVariants}
       >
-        {inventorySummaryData.map((item, index) => (
-          <motion.div
-            key={index * 0.9}
-            variants={cardVariants}
-            className={`w-full sm:min-w-[220px] lg:min-w-0 flex items-center gap-3 p-3 rounded-lg ${item.bg}`}
-          >
-            <div className="text-2xl">{item.icon}</div>
-            <div className="truncate">
-              <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
-              <div className="text-lg font-bold whitespace-nowrap">{item.value}</div>
+        {loading
+          ? Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index * 0.8}
+              className="w-full sm:min-w-[220px] lg:min-w-0 flex items-center gap-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-500/10 animate-pulse"
+            >
+              <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+              <div className="flex flex-col gap-2 w-full">
+                <div className="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              </div>
             </div>
-          </motion.div>
-        ))}
+          ))
+          : inventorySummaryData.map((item, index) => (
+            <motion.div
+              key={index * 0.9}
+              variants={cardVariants}
+              className={`w-full sm:min-w-[220px] lg:min-w-0 flex items-center gap-3 p-3 rounded-lg ${item.bg}`}
+            >
+              <div className="text-2xl">{item.icon}</div>
+              <div className="truncate">
+                <div className="text-sm text-gray-500 dark:text-gray-300">{item.name}</div>
+                <div className="text-lg font-bold whitespace-nowrap">{item.value}</div>
+              </div>
+            </motion.div>
+          ))}
+
       </motion.div>
     </motion.div>
   );
@@ -105,4 +121,5 @@ InventorySummary.propTypes = {
   lowStockCount: PropTypes.number.isRequired,
   outOfStockProducts: PropTypes.number.isRequired,
   expiringSoonCount: PropTypes.number.isRequired,
+  loading: PropTypes.bool.isRequired
 };

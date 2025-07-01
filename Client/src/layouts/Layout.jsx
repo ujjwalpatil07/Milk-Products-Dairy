@@ -23,7 +23,7 @@ export default function Layout({ children }) {
         const handleScroll = () => {
             const scrollTop = scrollRef.current.scrollTop;
 
-            if (scrollTop > 5) {
+            if (scrollTop > 100) {
                 setShowHeaderExtras(true);
             } else {
                 setShowHeaderExtras(false);

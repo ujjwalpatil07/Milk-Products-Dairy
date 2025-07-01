@@ -15,7 +15,10 @@ export const getAdminOrders = async () => {
   return res.data;
 }
 
-
+export const fetchRecentOrders = async () => {
+  const res = await api.get("/order/recent-20");
+  return res?.data ?? [];
+};
 
 
 

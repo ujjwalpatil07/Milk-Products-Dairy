@@ -15,6 +15,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import CallIcon from '@mui/icons-material/Call';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
 import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
@@ -26,6 +27,7 @@ import { Bell, X } from 'lucide-react';
 import Slide from '@mui/material/Slide';
 import { removeUserNotification } from '../services/userProfileService';
 import { useSnackbar } from 'notistack';
+import UserProfileSidebar from './UserProfileSidebar';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -39,11 +41,13 @@ export default function Navbar() {
     const loginUser = localStorage.getItem("User");
 
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { authAdmin, handleAdminLogout } = useContext(AdminAuthContext);
+    const { authUser, authUserLoading, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
     const { notification, setNotification } = useContext(UserOrderContext);
+
     const [open, setOpen] = useState(false);
+    const [userProfileDrawer, setUserProfileDrawer] = useState(false);
     const [notificationLoadingIndex, setNotificationLoadingIndex] = useState(null);
     const [animate, setAnimate] = useState(false);
     const [notificationDialog, setNotificationDialog] = useState(false);
@@ -129,6 +133,47 @@ export default function Navbar() {
         }
     };
 
+
+    let renderUserSection;
+
+    if (authUserLoading) {
+        renderUserSection = (
+            <div className="flex items-center space-x-3 animate-pulse">
+                <div className="rounded-full bg-gray-300/70 dark:bg-gray-500/30 h-10 w-10 shadow"></div>
+            </div>
+        );
+
+    } else if (authUser) {
+        renderUserSection = (
+            <>
+                <Link to={`/user-profile`} className="hidden md:flex">
+                    <Avatar alt={authUser?.firstName} src={authUser?.photo} />
+                </Link>
+                <button onClick={() => setUserProfileDrawer(true)} className="md:hidden">
+                    <Avatar alt={authUser?.firstName} src={authUser?.photo} />
+                </button>
+            </>
+        );
+    } else {
+        renderUserSection = (
+            <div className="space-x-2 flex">
+                <button
+                    onClick={() => setOpenLoginDialog(true)}
+                    className="text-white bg-[#843E71] px-3 py-[0.4rem] rounded-sm"
+                >
+                    Login
+                </button>
+                <Link
+                    to="/signup"
+                    className="hidden sm:flex border text-[#843E71] border-[#843E71] dark:text-white dark:border-gray-500 px-3 py-[0.4rem] rounded-sm"
+                >
+                    Register
+                </Link>
+            </div>
+        );
+    }
+
+
     return (
         <>
             <nav className="sticky top-0 z-50 w-full shadow-md px-4 py-2 flex justify-between items-center transition-colors duration-300 bg-gray-100/70 text-black dark:bg-[#282828]/70 dark:text-white backdrop-blur-sm">
@@ -183,7 +228,7 @@ export default function Navbar() {
                         </button>
                     </div>
 
-                    <div className='hidden sm:flex bg-gray-500/10 hover:bg-gray-500/20 dark:bg-[#00000050] dark:hover:bg-[#00000090] rounded-full'>
+                    <div className='hidden sm:flex bg-gray-500/10 hover:bg-gray-500/20 dark:bg-[#00000050] dark:hover:bg-[#00000090] rounded-full shadow'>
                         <IconButton onClick={toggleTheme}>
                             {theme === 'light'
                                 ? <DarkModeIcon className="text-gray-700" />
@@ -192,20 +237,7 @@ export default function Navbar() {
                         </IconButton>
                     </div>
 
-                    {authUser ? (
-                        <Link to={`/user-profile`} sx={{ padding: "0px" }}>
-                            <Avatar alt={authUser?.firstName} src={authUser?.photo} />
-                        </Link>
-                    ) : (
-                        <div className='space-x-2 flex'>
-                            <button onClick={() => setOpenLoginDialog(true)} className={`text-white bg-[#843E71] px-3 py-[0.4rem] rounded-sm`}>
-                                Login
-                            </button>
-                            <Link to="/signup" className={`hidden sm:flex border text-[#843E71] border-[#843E71] dark:text-white dark:border-gray-500 px-3 py-[0.4rem] rounded-sm`}>
-                                Register
-                            </Link>
-                        </div>
-                    )}
+                    {renderUserSection}
                 </div>
             </nav>
 
@@ -363,6 +395,32 @@ export default function Navbar() {
                     )}
                 </div>
             </Dialog>
+
+            <SwipeableDrawer
+                anchor="top"
+                open={userProfileDrawer}
+                onClose={() => setUserProfileDrawer(false)}
+                onOpen={() => setUserProfileDrawer(true)}
+                className="md:hidden"
+                PaperProps={{
+                    sx: {
+                        width: '100%',
+                        backgroundColor: 'transparent',
+                    },
+                }}
+            >
+                <div className="dark:bg-black relative">
+
+                    <button
+                        onClick={() => setUserProfileDrawer(false)}
+                        className="flex justify-center items-center absolute top-3 right-3 transform text-[#6d286e] bg-[#762e7720] w-10 h-10 rounded text-xl backdrop-blur-md cursor-pointer z-50"
+                    >
+                        <X />
+                    </button>
+
+                    <UserProfileSidebar />
+                </div>
+            </SwipeableDrawer>
         </>
     );
 }

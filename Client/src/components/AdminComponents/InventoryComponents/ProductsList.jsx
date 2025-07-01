@@ -11,14 +11,8 @@ import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
 import { ThemeContext } from '../../../context/ThemeProvider';
 import {
-  Pagination,
-  Dialog,
-  DialogContent,
-  List,
-  ListItemButton,
-  ListItemText,
+  Pagination, Menu, MenuItem, IconButton
 } from "@mui/material";
-
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -51,8 +45,10 @@ export default function ProductsList({ products, loading }) {
   const [selectedProduct, setSelectedProduct] = useState({});
   const [productList, setProductList] = useState(products || []);
   const [filterType, setFilterType] = useState('Filter');
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
   const productsPerPage = 7;
 
   const { theme } = useContext(ThemeContext)
@@ -111,7 +107,14 @@ export default function ProductsList({ products, loading }) {
 
     setProductList(sortedProducts);
     setCurrentPage(1);
+  };
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   let content;
@@ -165,13 +168,14 @@ export default function ProductsList({ products, loading }) {
                     <motion.tr
                       key={product._id || index}
                       variants={rowVariants}
+
                       className={`border-b border-gray-600/40 dark:border-gray-500/70  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
                         }`}
                     >
                       <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
                         {highlightMatch(product.name, navbarInput)}
                       </td>
-                      <td className="py-2 px-3 whitespace-nowrap">₹ {product.price}</td>
+                      <td className="py-2 px-3 whitespace-nowrap">&#8377; {product.price}</td>
                       <td className="py-2 px-3 whitespace-nowrap">
                         {product.stock} {product.quantityUnit}
                       </td>
@@ -227,20 +231,19 @@ export default function ProductsList({ products, loading }) {
                 "&:hover": {
                   border: "2px solid #843E71",
                 },
-              },
-              "& .Mui-selected": {
-                backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}` ,
-                color: `${theme === "light" ? "#843E71" : "#fff"}`,
-                borderColor: "#843E71",
-                "&:hover": {
-                  backgroundColor: "#6e305e",
+                "& .Mui-selected": {
+                  backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}`,
+                  color: `${theme === "light" ? "#843E71" : "#fff"}`,
+                  borderColor: "#843E71",
+                  "&:hover": {
+                    backgroundColor: "#6e305e",
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
 
-        </div>
-
+          </div>
+        )}
 
       </>
     )
@@ -248,7 +251,7 @@ export default function ProductsList({ products, loading }) {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-500/20 rounded-xl p-4 md:p-6 shadow-md w-full">
+      <div className="bg-white dark:bg-gray-500/20 rounded p-4 md:p-6 shadow-md w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Products</h2>
 
@@ -264,59 +267,41 @@ export default function ProductsList({ products, loading }) {
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setShowFilterDropdown(prev => !prev)}
+                  onClick={handleClick}
                   className="flex items-center gap-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 cursor-pointer"
                   aria-haspopup="listbox"
-                  aria-expanded={showFilterDropdown}
                 >
                   <FilterIcon size={"18px"} />
                   <span>{filterType}</span>
                 </button>
 
-                {showFilterDropdown && (
-                  <Dialog
-                    open={showFilterDropdown}
-                    onClose={() => setShowFilterDropdown(false)}
-                    TransitionComponent={Transition}
-                    keepMounted
-                    fullWidth
-                    maxWidth="xs"
-                    PaperProps={{
+                <Menu
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  slotProps={{
+                    paper: {
                       sx: {
-                        backgroundColor: theme === "dark" ? "#374151" : "#fff",
-                        borderRadius: "10px",
-                        boxShadow: 3,
-                        position: "absolute",
-                        right: 0
+                        backgroundColor: "transparent",
                       },
-                    }}
-                  >
-                    <DialogContent sx={{ p: 0, maxHeight: 300, overflowY: "auto" }} className='scrollbar-hide'>
-                      <List dense>
-                        {filterOptions.map((filter) => (
-                          <ListItemButton
-                            key={filter.value}
-                            onClick={() => {
-                              handleFilter(filter.value);
-                              setShowFilterDropdown(false);
-                            }}
-                            sx={{
-                              px: 2,
-                              py: 1.5,
-                              color: theme === "dark" ? "#fff" : "#374151",
-                              "&:hover": {
-                                backgroundColor: theme === "dark" ? "#4b5563" : "#f3f4f6",
-                              },
-                            }}
-                          >
-                            <ListItemText primary={filter.label} />
-                          </ListItemButton>
-                        ))}
-                      </List>
-                    </DialogContent>
-                  </Dialog>
-
-                )}
+                    },
+                  }}
+                >
+                  <div className='space-y-3 p-3 bg-white text-gray-800 dark:bg-gray-500/50 backdrop-blur-md dark:text-white'>
+                    {filterOptions.map((filter) => (
+                      <button
+                        key={filter.value}
+                        onClick={() => {
+                          handleFilter(filter.value);
+                          handleClose();
+                        }}
+                        className="dark:hover:bg-gray-600 flex"
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+                </Menu>
               </div>
             </div>
           </div>

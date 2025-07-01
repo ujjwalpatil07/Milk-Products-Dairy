@@ -18,7 +18,6 @@ export default function MyOrders() {
   const { userOrders, orderLoading } = useContext(UserOrderContext);
   const { authUser } = useContext(UserAuthContext);
 
-
   const orderStats = {
     Pending: 0,
     Processing: 0,
@@ -35,13 +34,13 @@ export default function MyOrders() {
   });
 
   const statCards = [
-    { title: "All", count: userOrders?.length, color: "bg-gray-600", icon: <FaGlassWhiskey /> },
-    { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600", icon: <FaCheckCircle /> },
-    { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500", icon: <FaHourglassHalf /> },
-    { title: "Processing", count: orderStats.Processing, color: "bg-blue-400", icon: <FaBoxOpen /> },
-    { title: "Shipped", count: orderStats.Shipped, color: "bg-purple-500", icon: <FaShippingFast /> },
-    { title: "Delivered", count: orderStats.Delivered, color: "bg-green-600", icon: <FaCheckCircle /> },
-    { title: "Cancelled", count: orderStats.Cancelled, color: "bg-red-500", icon: <FaTimesCircle /> },
+    { title: "All", count: userOrders?.length, color: "bg-gray-600/30 text-gray-600", icon: <FaGlassWhiskey /> },
+    { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600/30 text-blue-600", icon: <FaCheckCircle /> },
+    { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500/30 text-yellow-500", icon: <FaHourglassHalf /> },
+    { title: "Processing", count: orderStats.Processing, color: "bg-blue-400/30 text-blue-400", icon: <FaBoxOpen /> },
+    { title: "Shipped", count: orderStats.Shipped, color: "bg-purple-500/30 text-purple-500", icon: <FaShippingFast /> },
+    { title: "Delivered", count: orderStats.Delivered, color: "bg-green-600/30 text-green-600", icon: <FaCheckCircle /> },
+    { title: "Cancelled", count: orderStats.Cancelled, color: "bg-red-500/30 text-red-500", icon: <FaTimesCircle /> },
   ];
 
   const [loading, setLoading] = useState(false);
@@ -275,21 +274,29 @@ export default function MyOrders() {
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
-
+            slotProps={{
+              paper: {
+                sx: {
+                  backgroundColor: "transparent",
+                },
+              },
+            }}
           >
-            {statCards.map((card) => (
-              <MenuItem key={card.title} onClick={() => handleSelect(card)} sx={{ paddingY: "2px", paddingX: "15px" }}>
-                <div
-                  className={`flex items-center justify-between w-40 px-3 py-2 rounded text-white ${card.color} }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {card.icon}
-                    <span className="font-medium">{card.title}</span>
+            <div className="bg-white dark:bg-black/80">
+              {statCards.map((card) => (
+                <MenuItem key={card.title} onClick={() => handleSelect(card)} sx={{ paddingY: "2px", paddingX: "15px" }}>
+                  <div
+                    className={`flex items-center justify-between w-40 px-3 py-2 rounded opacity-90 hover:opacity-100 ${card.color} }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {card.icon}
+                      <span className="font-medium">{card.title}</span>
+                    </div>
+                    <span className="text-sm font-semibold">{card.count}</span>
                   </div>
-                  <span className="text-sm font-semibold">{card.count}</span>
-                </div>
-              </MenuItem>
-            ))}
+                </MenuItem>
+              ))}
+            </div>
           </Menu>
         </div>
       </div>
@@ -331,7 +338,7 @@ export default function MyOrders() {
                   <th className="p-2">Product</th>
                   <th className="p-2 text-right">Qty</th>
                   <th className="p-2 text-right">Price</th>
-                  <th className="p-2 text-right">Total</th> 
+                  <th className="p-2 text-right">Total</th>
                 </tr>
               </thead>
               <tbody>

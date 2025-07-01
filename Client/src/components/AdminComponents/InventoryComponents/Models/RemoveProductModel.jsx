@@ -45,7 +45,7 @@ export default function RemoveProductModel({ open, onClose, selectedProduct }) {
       slotProps={{
         ...{
           paper: {
-            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded-xl !shadow-xl !w-full !max-w-lg !scrollbar-hide"
+            className: "!relative !bg-white dark:!bg-gray-500/20 !rounded !shadow-xl !w-full !max-w-lg !scrollbar-hide"
           },
           backdrop: {
             className: "!bg-black/40 !backdrop-blur-sm"
@@ -54,13 +54,13 @@ export default function RemoveProductModel({ open, onClose, selectedProduct }) {
       }}
     >
 
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t-xl">
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-500/20 px-6 pt-6 pb-4 rounded-t backdrop-blur-md">
         <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 text-gray-800 dark:text-gray-100">
           Do you want to remove this product?
         </h2>
       </div>
 
-      <div className="bg-gray-100 dark:bg-gray-500/20 p-4 rounded text-gray-800 dark:text-gray-200 shadow-sm space-y-2">
+      <div className="bg-gray-100 dark:bg-gray-500/20 p-4 text-gray-800 dark:text-gray-200 shadow-sm space-y-2">
         {[
           { label: "Name", value: selectedProduct?.name },
           { label: "Category", value: selectedProduct?.category },
@@ -81,7 +81,7 @@ export default function RemoveProductModel({ open, onClose, selectedProduct }) {
 
 
 
-      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-4 !py-5 rounded-b-xl">
+      <DialogActions className="sticky bottom-0 z-10 bg-white dark:bg-gray-500/20 !px-4 !py-5 rounded-b backdrop-blur-md">
         <button
           onClick={onClose}
           disabled={isRemoving}

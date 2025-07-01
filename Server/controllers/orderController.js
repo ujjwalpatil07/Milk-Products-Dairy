@@ -81,3 +81,18 @@ export const getAdminOrders = async (req, res) => {
     orders: admin.pendingOrders,
   });
 };
+
+export const getRecentOrders = async (req, res) => {
+  const recentOrders = await Order.find({})
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .populate({
+      path: "address",
+      select: "name streetAddress city state pincode",
+    })
+    .select("address productsData totalAmount status createdAt paymentMode");
+  res.status(200).json({
+    success: true,
+    orders: recentOrders,
+  });
+};
