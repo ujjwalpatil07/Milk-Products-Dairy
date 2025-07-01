@@ -6,7 +6,12 @@ import {
   Clock,
   AlertTriangle,
   ArrowRight,
+  Loader2,
+  Truck,
+  XCircle,
+  CheckCircle2,
 } from "lucide-react";
+
 import { fetchRecentOrders } from "../../../services/orderService";
 
 export default function OrdersPreview() {
@@ -29,15 +34,42 @@ export default function OrdersPreview() {
   }, []);
 
   const getStatusClass = (status) => {
-    if (status === "Delivered") return "bg-green-100 text-green-700";
-    if (status === "Pending") return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-700";
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100/10 text-yellow-500";
+      case "Processing":
+        return "bg-blue-100/10 text-blue-500";
+      case "Shipped":
+        return "bg-indigo-100/10 text-indigo-500";
+      case "Delivered":
+        return "bg-green-100/10 text-green-500";
+      case "Cancelled":
+        return "bg-red-100/10 text-red-500";
+      case "Confirmed":
+        return "bg-green-100/10 text-green-500";
+      default:
+        return "bg-gray-100/10 text-gray-500";
+    }
   };
 
+
   const getStatusIcon = (status) => {
-    if (status === "Delivered") return <PackageCheck size={14} className="mr-1" />;
-    if (status === "Pending") return <Clock size={14} className="mr-1" />;
-    return <AlertTriangle size={14} className="mr-1 text-red-600" />;
+    switch (status) {
+      case "Pending":
+        return <Clock size={14} className="mr-1 text-yellow-500" />;
+      case "Processing":
+        return <Loader2 size={14} className="mr-1 animate-spin text-blue-500" />;
+      case "Shipped":
+        return <Truck size={14} className="mr-1 text-indigo-500" />;
+      case "Delivered":
+        return <PackageCheck size={14} className="mr-1 text-green-600" />;
+      case "Cancelled":
+        return <XCircle size={14} className="mr-1 text-red-600" />;
+      case "Confirmed":
+        return <CheckCircle2 size={14} className="mr-1 text-green-500" />;
+      default:
+        return <AlertTriangle size={14} className="mr-1 text-gray-500" />;
+    }
   };
 
   let content;

@@ -10,7 +10,7 @@ export default function AdminProfile() {
   return (
     <div className="p-4 space-y-4 bg-white dark:bg-gray-500/20 rounded-sm min-h-screen m-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold ms-2">Admin Profile</h1>
+        <h1 className="text-lg sm:text-3xl font-bold ms-2">Admin Profile</h1>
       </div>
 
       <AdminProfileInfo />

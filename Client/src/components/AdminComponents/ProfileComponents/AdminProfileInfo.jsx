@@ -93,7 +93,7 @@ export default function AdminProfileInfo() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-500/20 p-3 md:p-6 rounded flex flex-col md:flex-row gap-6 transition-all duration-300 items-start md:items-center">
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex md:block flex-col gap-3">
         <Avatar
           src={previewImage}
           alt={formData.name || "Admin"}
