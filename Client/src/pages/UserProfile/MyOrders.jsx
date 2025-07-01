@@ -225,7 +225,7 @@ export default function MyOrders() {
               {order?.status === "Confirmed" && (
                 <button
                   onClick={() => setSelectedOrder(order)}
-                  className="px-4 py-1.5 text-sm font-semibold rounded bg-green-600 hover:bg-green-700 text-white"
+                  className="px-4 py-1.5 w-full sm:w-fit text-sm font-semibold rounded bg-green-600 hover:bg-green-700 text-white"
                 >
                   Order Received
                 </button>
