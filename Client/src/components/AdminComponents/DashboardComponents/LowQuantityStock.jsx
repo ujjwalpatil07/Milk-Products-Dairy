@@ -5,7 +5,7 @@ import UpdateProductModel from "../InventoryComponents/Models/UpdateProductModel
 export default function LowQuantityStock({ fetchedProducts, loading }) {
 
   const [products, setProducts] = useState([]);
-  const [updateModel, setUpdateModel] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({})
 
   useEffect(() => {
@@ -83,18 +83,18 @@ export default function LowQuantityStock({ fetchedProducts, loading }) {
 
               <button
                 onClick={() => {
-                  setSelectedProduct(product);
-                  setUpdateModel(true);
-                }}
-                className="absolute top-1.5 right-2 hidden group-hover:block bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-md transition"
+                  setSelectedProduct(product)
+                  setOpenUpdateModal(true)
+                } }
+                
               >
                 Add Stock
               </button>
             </div>
           ))}
 
-        {updateModel && (
-          <UpdateProductModel setUpdateModel={setUpdateModel} selectedProduct={selectedProduct} />
+        {openUpdateModal && (
+          <UpdateProductModel open={openUpdateModal} onClose={() => setOpenUpdateModal(false)} selectedProduct={selectedProduct}/>
         )}
       </div>
     </div>

@@ -29,6 +29,9 @@ const ProductSchema = new Schema(
     },
       
     description: { type: String },
+    inInventory: {
+      type : Boolean
+    },
 
     image: {
       type: [String],
