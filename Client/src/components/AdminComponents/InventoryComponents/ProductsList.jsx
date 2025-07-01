@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Slide from '@mui/material/Slide';
 import { ThemeContext } from '../../../context/ThemeProvider';
 import {
-  Pagination, Menu, MenuItem, IconButton
+  Pagination, Menu
 } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -52,8 +52,6 @@ export default function ProductsList({ products, loading }) {
   const productsPerPage = 7;
 
   const { theme } = useContext(ThemeContext)
-
-
 
   useEffect(() => {
     setProductList(products || []);
@@ -147,7 +145,7 @@ export default function ProductsList({ products, loading }) {
           ) : (
             <table className="min-w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-500 dark:border-gray-300 text-gray-600 dark:text-gray-300">
+                <tr className="border-b border-gray-200 dark:border-gray-500/20 text-gray-600 dark:text-gray-300">
                   <th className="pb-3 px-3 whitespace-nowrap">Products</th>
                   <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
                   <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
@@ -169,10 +167,9 @@ export default function ProductsList({ products, loading }) {
                       key={product._id || index}
                       variants={rowVariants}
 
-                      className={`border-b border-gray-600/40 dark:border-gray-500/70  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
-                        }`}
+                      className={`border-b border-gray-200 dark:border-gray-500/20`}
                     >
-                      <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
+                      <td className={`py-2 px-3 font-medium  ${isLowStock ? "text-red-500 animate-pulse" : "text-gray-700 dark:text-white"}`}>
                         {highlightMatch(product.name, navbarInput)}
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap">&#8377; {product.price}</td>
@@ -215,15 +212,15 @@ export default function ProductsList({ products, loading }) {
           )}
         </div>
 
-        <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+        <div className="p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
           <Pagination
             count={Math.ceil(productList?.length / productsPerPage)}
             page={currentPage}
             onChange={(event, value) => setCurrentPage(value)}
             variant="outlined"
             shape="rounded"
-            siblingCount={1} // hide middle siblings
-            boundaryCount={0} // show first and last
+            siblingCount={1}
+            boundaryCount={0}
             sx={{
               "& .MuiPaginationItem-root": {
                 color: "inherit",
@@ -239,12 +236,10 @@ export default function ProductsList({ products, loading }) {
                     backgroundColor: "#6e305e",
                   },
                 },
-              }}
-            />
-
-          </div>
-        )}
-
+              },
+            }}
+          />
+        </div>
       </>
     )
   }
@@ -310,11 +305,9 @@ export default function ProductsList({ products, loading }) {
         {content}
       </div>
 
-
       <AddProductModel open={openAddModal} onClose={() => setOpenAddModal(false)} />
       <UpdateProductModel open={openUpdateModal} onClose={() => setOpenUpdateModal(false)} selectedProduct={selectedProduct} />
       <RemoveModel open={openRemoveModel} onClose={() => setOpenRemoveModel(false)} selectedProduct={selectedProduct} />
-
     </>
   )
 }

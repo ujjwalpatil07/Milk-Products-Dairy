@@ -48,7 +48,7 @@ export default function AdminOrderProvider({ children }) {
                 }
             } catch (error) {
                 enqueueSnackbar(error?.response?.data?.message || "Failed to fetch orders, please try again!", { variant: "error" });
-            }finally{
+            } finally {
                 setAllOrdersLoading(false);
             }
         };
@@ -70,7 +70,6 @@ export default function AdminOrderProvider({ children }) {
 
     }, []);
 
-    
     const handleNewPendingOrder = ({ order }) => {
         setAdminOrders((prevOrders) => [...prevOrders, order]);
     };
@@ -83,18 +82,27 @@ export default function AdminOrderProvider({ children }) {
         );
     };
 
+    const handleOrderDelivered = ({ orderId }) => {
+        setAdminOrders((prev) =>
+            prev.map((order) =>
+                order._id === orderId ? { ...order, status: "Delivered" } : order
+            )
+        );
+    }
+
     useEffect(() => {
         socket.on("order:new-pending-order", handleNewPendingOrder);
         socket.on("order:accept-success", handleRemoveOrder);
         socket.on("order:reject-success", handleRemoveOrder);
         socket.on("admin:notification", handleAdminNotification)
+        socket.on("admin-order:delivered-success", handleOrderDelivered);
 
         return () => {
             socket.off("order:new-pending-order", handleNewPendingOrder);
             socket.off("order:accept-success", handleRemoveOrder);
             socket.off("order:reject-success", handleRemoveOrder);
             socket.off("admin:notification", handleAdminNotification)
-
+            socket.off("admin-order:delivered-success", handleOrderDelivered);
         }
     }, [handleAdminNotification]);
 
@@ -109,7 +117,7 @@ export default function AdminOrderProvider({ children }) {
         setOrderLoading,
         setAllOrdersLoading,
         setNotification
-    }), [adminOrders, orderLoading, allOrders, notification,allOrdersLoading]);
+    }), [adminOrders, orderLoading, allOrders, notification, allOrdersLoading]);
 
     return (
         <AdminOrderContext.Provider value={value}>

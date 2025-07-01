@@ -464,6 +464,8 @@ export const connectToSocket = (server) => {
               description: `Order #${order._id} delivered (${totalItems} items, ₹${order.totalAmount}).`,
               date,
             });
+
+            io.to(socketId).emit("admin-order:delivered-success", { orderId });
           }
         }
 

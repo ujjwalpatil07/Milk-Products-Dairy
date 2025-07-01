@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import UpdateProductModel from "../InventoryComponents/Models/UpdateProductModel";
+import { Plus } from "lucide-react";
 
 export default function LowQuantityStock({ fetchedProducts, loading }) {
 
@@ -57,7 +58,7 @@ export default function LowQuantityStock({ fetchedProducts, loading }) {
           : products.map((product, index) => (
             <div
               key={index * 0.9}
-              className="relative group flex items-center bg-white shadow-md rounded p-3 space-x-4 dark:bg-gray-500/30"
+              className="relative flex items-center bg-white shadow-md rounded p-3 space-x-4 dark:bg-gray-500/10"
             >
               <img
                 src={product.image?.[0] || "/placeholder.jpg"}
@@ -65,13 +66,13 @@ export default function LowQuantityStock({ fetchedProducts, loading }) {
                 className="w-16 h-16 object-cover rounded-md"
               />
               <div>
-                <h4 className="text-base font-semibold text-gray-800 dark:text-white">
+                <h4 className="text-base font-semibold text-gray-800 dark:text-white line-clamp-1">
                   {product.name}
                 </h4>
                 <h5
                   className={`text-sm ${product.stock < product.thresholdVal
-                      ? "text-red-600 dark:text-red-500 animate-pulse"
-                      : "text-gray-600 dark:text-gray-300"
+                    ? "text-red-600 dark:text-red-500 animate-pulse"
+                    : "text-gray-600 dark:text-gray-300"
                     }`}
                 >
                   Remaining Stock: {product.stock} {product.quantityUnit}
@@ -85,23 +86,23 @@ export default function LowQuantityStock({ fetchedProducts, loading }) {
                 onClick={() => {
                   setSelectedProduct(product)
                   setOpenUpdateModal(true)
-                } }
-                
+                }}
+                className="absolute bottom-3 right-3 bg-green-500/10 hover:bg-green-500/20 text-green-500 text-xs p-1.5 rounded shadow-md transition"
               >
-                Add Stock
+                <Plus size={16} />
               </button>
             </div>
           ))}
 
         {openUpdateModal && (
-          <UpdateProductModel open={openUpdateModal} onClose={() => setOpenUpdateModal(false)} selectedProduct={selectedProduct}/>
+          <UpdateProductModel open={openUpdateModal} onClose={() => setOpenUpdateModal(false)} selectedProduct={selectedProduct} />
         )}
       </div>
     </div>
-
   );
 }
 
 LowQuantityStock.propTypes = {
-  fetchedProducts: PropTypes.array
+  fetchedProducts: PropTypes.array,
+  loading: PropTypes.bool.isRequired
 };

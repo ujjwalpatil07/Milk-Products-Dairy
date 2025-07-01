@@ -27,7 +27,7 @@ const rowVariants = {
 export default function TopSellingStock({ topSellingStocks, loading }) {
 
   const [currentPage, setCurrentPage] = useState(1);
-  const {theme} = useContext(ThemeContext)
+  const { theme } = useContext(ThemeContext)
   const productsPerPage = 10;
 
   let content;
@@ -46,7 +46,7 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
       <div className="w-full overflow-x-auto scrollbar-hide">
         <table className="min-w-full table-auto text-left border-collapse">
           <thead>
-            <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
+            <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
               <th className="py-3 px-4">Product Name</th>
               <th className="py-3 px-4">Total Quantity Sold</th>
               <th className="py-3 px-4">Stock Remaining</th>
@@ -60,32 +60,55 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
             animate="visible"
             variants={containerVariants}
           >
-            {currentProducts?.map((product, index) => {
-              const isLowStock = product?.stock < product?.thresholdVal;
-              return (
-                <motion.tr
-                  key={index * 0.9}
-                  variants={rowVariants}
-                  className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
-                    } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
+            {loading
+              ? Array.from({ length: 5 }).map((_, index) => (
+                <tr
+                  key={index * 0.69}
+                  className="animate-pulse border-b dark:border-gray-700"
                 >
-                  <td className="py-3 px-4 font-medium">{product?.name}</td>
                   <td className="py-3 px-4">
-                    {product?.totalQuantitySold} {product?.quantityUnit}
+                    <div className="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded" />
                   </td>
                   <td className="py-3 px-4">
-                    {product?.stock} {product?.quantityUnit}
+                    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded" />
                   </td>
-                  <td className="py-3 px-4">₹ {product?.price}</td>
-                  <td className="py-3 px-4">{product?.discount} &#37;</td>
-                </motion.tr>
-              );
-            })}
+                  <td className="py-3 px-4">
+                    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded" />
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="h-4 w-16 bg-gray-300 dark:bg-gray-600 rounded" />
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="h-4 w-12 bg-gray-300 dark:bg-gray-600 rounded" />
+                  </td>
+                </tr>
+              ))
+              : currentProducts?.map((product, index) => {
+                const isLowStock = product?.stock < product?.thresholdVal;
+                return (
+                  <motion.tr
+                    key={index * 0.9}
+                    variants={rowVariants}
+                    className={`text-sm text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
+                  >
+                    <td className={`${isLowStock && "text-red-500 animate-pulse"} py-3 px-4 font-medium`}>{product?.name}</td>
+                    <td className="py-3 px-4">
+                      {product?.totalQuantitySold} {product?.quantityUnit}
+                    </td>
+                    <td className="py-3 px-4">
+                      {product?.stock} {product?.quantityUnit}
+                    </td>
+                    <td className="py-3 px-4">&#8377; {product?.price}</td>
+                    <td className="py-3 px-4">{product?.discount} &#37;</td>
+                  </motion.tr>
+                );
+              })}
+
           </motion.tbody>
         </table>
       </div>
     )
-    
+  }
 
   return (
     <motion.div
@@ -107,7 +130,7 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
           onChange={(event, value) => setCurrentPage(value)}
           variant="outlined"
           shape="rounded"
-          siblingCount={1} 
+          siblingCount={1}
           boundaryCount={0}
           sx={{
             "& .MuiPaginationItem-root": {
@@ -127,69 +150,6 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
             },
           }}
         />
-      <div className="w-full overflow-x-auto scrollbar-hide">
-        <table className="min-w-full table-auto text-left border-collapse">
-          <thead>
-            <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-              <th className="py-3 px-4">Product Name</th>
-              <th className="py-3 px-4">Total Quantity Sold</th>
-              <th className="py-3 px-4">Stock Remaining</th>
-              <th className="py-3 px-4">Current Price</th>
-              <th className="py-3 px-4">Discount</th>
-            </tr>
-          </thead>
-
-          <motion.tbody
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            {loading
-              ? Array.from({ length: 5 }).map((_, index) => (
-                <tr
-                  key={index * 0.5}
-                  className="animate-pulse text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors"
-                >
-                  <td className="py-3 px-4">
-                    <div className="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="h-4 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="h-4 w-12 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  </td>
-                </tr>
-              ))
-              : topSellingStocks.map((product, index) => {
-                const isLowStock = product?.stock < product?.thresholdVal;
-                return (
-                  <motion.tr
-                    key={index * 0.9}
-                    variants={rowVariants}
-                    className={`text-sm text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
-                  >
-                    <td className={`${isLowStock && "text-red-500 animate-pulse"} py-3 px-4 font-medium`}>{product?.name}</td>
-                    <td className="py-3 px-4">
-                      {product?.totalQuantitySold} {product?.quantityUnit}
-                    </td>
-                    <td className="py-3 px-4">
-                      {product?.stock} {product?.quantityUnit}
-                    </td>
-                    <td className="py-3 px-4">₹ {product?.price}</td>
-                    <td className="py-3 px-4">{product?.discount} &#37;</td>
-                  </motion.tr>
-                );
-              })}
-
-          </motion.tbody>
-        </table>
       </div>
     </motion.div>
   );

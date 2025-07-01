@@ -8,22 +8,39 @@ import { AdminAuthContext } from "../../../context/AuthProvider";
 import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterOrdersBySearch } from "../../../utils/filterOrders";
 import { socket } from "../../../socket/socket";
+import { Menu } from "@mui/material";
+import { FilterIcon } from "lucide-react";
 
 export default function OrderDetails({ allOrders, loading }) {
-
   const { enqueueSnackbar } = useSnackbar();
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
   const { authAdmin } = useContext(AdminAuthContext);
+
   const [statusFilter, setStatusFilter] = useState("All");
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
   const [sortOption, setSortOption] = useState("latest");
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
+  // Apply sorting when data or sort option changes
   useEffect(() => {
-    setLocalOrders(allOrders);
-  }, [allOrders]);
+    if (!allOrders?.length) return;
+
+    const sorted = [...allOrders];
+    if (sortOption === "latest") {
+      sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortOption === "oldest") {
+      sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else if (sortOption === "amountHigh") {
+      sorted.sort((a, b) => b.totalAmount - a.totalAmount);
+    } else if (sortOption === "amountLow") {
+      sorted.sort((a, b) => a.totalAmount - b.totalAmount);
+    }
+    setLocalOrders(sorted);
+  }, [allOrders, sortOption]);
 
   const handleOrderUpdateFailed = useCallback(({ message, status }) => {
     const action = status === "Cancelled" ? "cancel" : "accept";
@@ -47,20 +64,14 @@ export default function OrderDetails({ allOrders, loading }) {
     };
   }, [handleOrderUpdateFailed, handleOrderUpdateSuccess]);
 
-  const handleAcceptOrders = async (orderId, userId) => {
-
+  const handleAcceptOrders = (orderId, userId) => {
     if (!authAdmin?._id) {
       enqueueSnackbar("Unauthorized: Please login as admin.", { variant: "error" });
       return;
     }
 
-    if (!orderId) {
-      enqueueSnackbar("Invalid order ID.", { variant: "error" });
-      return;
-    }
-
-    if (!userId) {
-      enqueueSnackbar("Invalid user ID.", { variant: "error" });
+    if (!orderId || !userId) {
+      enqueueSnackbar("Invalid order/user ID.", { variant: "error" });
       return;
     }
 
@@ -74,20 +85,14 @@ export default function OrderDetails({ allOrders, loading }) {
     });
   };
 
-  const handleRejectOrders = async (orderId, userId) => {
-
+  const handleRejectOrders = (orderId, userId) => {
     if (!authAdmin?._id) {
       enqueueSnackbar("Unauthorized: Please login as admin.", { variant: "error" });
       return;
     }
 
-    if (!orderId) {
-      enqueueSnackbar("Invalid order ID.", { variant: "error" });
-      return;
-    }
-
-    if (!userId) {
-      enqueueSnackbar("Invalid user ID.", { variant: "error" });
+    if (!orderId || !userId) {
+      enqueueSnackbar("Invalid order/user ID.", { variant: "error" });
       return;
     }
 
@@ -101,106 +106,70 @@ export default function OrderDetails({ allOrders, loading }) {
     });
   };
 
-  const handleSortOrders = useCallback(() => {
-    const sorted = [...allOrders];
-    if (sortOption === "latest") {
-      sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    } else if (sortOption === "amountHigh") {
-      sorted.sort((a, b) => b.totalAmount - a.totalAmount);
-    } else if (sortOption === "amountLow") {
-      sorted.sort((a, b) => a.totalAmount - b.totalAmount);
-    }
-    setLocalOrders(sorted);
-  }, [allOrders, sortOption]);
-
-  useEffect(() => {
-    handleSortOrders();
-  }, [allOrders, handleSortOrders]);
-
-  const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
-  const statusFilteredOrders =
-    statusFilter === "All"
-      ? filteredOrders
-      : filteredOrders.filter((order) => order.status === statusFilter);
+  const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   const filterOptions = [
-    { value: "latest", label: "Order Date: Newest First" },
-    { value: "oldest", label: "Order Date: Oldest First" },
-    { value: "amountHigh", label: "Total Amount: High to Low" },
-    { value: "amountLow", label: "Total Amount: Low to High" },
+    { value: "latest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "amountHigh", label: "High to Low Amount" },
+    { value: "amountLow", label: "Low to High Amount" },
   ];
+
+  const filteredOrders = filterOrdersBySearch(localOrders, debouncedSearchText);
+  const statusFilteredOrders = statusFilter === "All"
+    ? filteredOrders
+    : filteredOrders.filter((order) => order.status === statusFilter);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "Pending": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300";
+      case "Confirmed": return "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300";
+      case "Cancelled": return "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300";
+      default: return "bg-gray-200 text-gray-800 dark:bg-gray-700/20 dark:text-gray-300";
+    }
+  };
 
   let content;
   if (loading) {
     content = (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
-        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
+        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]" />
         <span className="text-xl">Loading orders...</span>
       </div>
     );
-  } else if (statusFilteredOrders?.length === 0) {
+  } else if (!statusFilteredOrders?.length) {
     content = (
       <div className="text-center text-gray-500 dark:text-gray-300 py-4">
-        No orders found.
+        No orders found for selected filter or search.
       </div>
     );
   } else {
-
-
     content = statusFilteredOrders.map((order) => {
-      const address = order?.address;
+      const { address, productsData, totalAmount, status, createdAt, _id } = order;
       const owner = address?.owner;
-      const products = order?.productsData;
 
-      const getStatusBadgeClass = (status) => {
-        switch (status) {
-          case "Pending":
-            return "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300";
-          case "Confirmed":
-            return "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300";
-          case "Cancelled":
-            return "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300";
-          default:
-            return "bg-gray-200 text-gray-800 dark:bg-gray-700/20 dark:text-gray-300";
-        }
-      };
-      
+      const isProcessing = processingId?.orderId === _id;
 
       return (
-        <div
-          key={order._id}
-          className="relative bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg w-full max-w-6xl mx-auto space-y-3"
-        >
-
+        <div key={_id} className="relative bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg space-y-3 w-full max-w-6xl mx-auto">
           <div className="absolute top-3 right-3 text-right">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusBadgeClass(order?.status)}`}
-            >
- 
-              {order?.status}
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusBadgeClass(status)}`}>
+              {status}
             </span>
             <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              {new Date(order?.createdAt).toLocaleString()}
+              {new Date(createdAt).toLocaleString()}
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={owner?.photo}
-                alt={owner?.firstName}
-                className="w-12 h-12 rounded-full object-cover border"
-              />
-              <div>
-                <p className="font-semibold">
-                  {highlightMatch(owner?.firstName, navbarInput)} {highlightMatch(owner?.lastName, navbarInput)}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-300">
-                  {owner?.mobileNo}
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <img src={owner?.photo} alt={owner?.firstName} className="w-12 h-12 rounded-full object-cover border" />
+            <div>
+              <p className="font-semibold">
+                {highlightMatch(owner?.firstName, navbarInput)} {highlightMatch(owner?.lastName, navbarInput)}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-300">{owner?.mobileNo}</p>
             </div>
-
           </div>
 
           <div>
@@ -223,15 +192,13 @@ export default function OrderDetails({ allOrders, loading }) {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product, idx) => (
-                  <tr key={idx * 0.9} className="border-b border-gray-300 dark:border-gray-700">
+                {productsData.map((product, idx) => (
+                  <tr key={product?.productId?._id || idx} className="border-b border-gray-300 dark:border-gray-700">
                     <td className="p-2">{product?.productId?._id}</td>
                     <td className="p-2">{product?.productId?.name}</td>
                     <td className="p-2">{product?.productQuantity}</td>
                     <td className="p-2">&#8377;{product?.productPrice}</td>
-                    <td className="p-2">
-                      &#8377;{product?.productQuantity * product?.productPrice}
-                    </td>
+                    <td className="p-2">&#8377;{product?.productQuantity * product?.productPrice}</td>
                   </tr>
                 ))}
               </tbody>
@@ -239,38 +206,27 @@ export default function OrderDetails({ allOrders, loading }) {
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-4">
-            <div className="text-lg font-semibold">
-              Total Amount: &#8377;{order?.totalAmount}
-            </div>
-            {order?.status === "Pending" ? (
+            <div className="text-lg font-semibold">Total Amount: &#8377;{totalAmount}</div>
+
+            {status === "Pending" && (
               <div className="space-x-4">
                 <button
-                  onClick={() => handleAcceptOrders(order?._id, owner?._id)}
-                  disabled={!!processingId}
-                  className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order?._id
-                    ? "bg-green-600/50 dark:bg-green-700/40"
-                    : "bg-green-600 dark:bg-green-700/50"
-                    }`}
+                  onClick={() => handleAcceptOrders(_id, owner?._id)}
+                  disabled={isProcessing}
+                  className={`px-3 py-1 rounded transition text-white ${isProcessing && processingId.status === "Accept" ? "bg-green-600/50" : "bg-green-600"} dark:bg-green-700`}
                 >
-                  {(processingId?.orderId === order?._id && processingId?.status === "Accept")
-                    ? "Accepting..."
-                    : "Accept"}
+                  {isProcessing && processingId.status === "Accept" ? "Accepting..." : "Accept"}
                 </button>
 
                 <button
-                  onClick={() => handleRejectOrders(order?._id, owner?._id)}
-                  disabled={!!processingId}
-                  className={`px-3 py-1 rounded transition text-white disabled:cursor-not-allowed ${processingId?.orderId === order._id
-                    ? "bg-red-600/50 dark:bg-red-700/40"
-                    : "bg-red-600 dark:bg-red-700/50"
-                    }`}
+                  onClick={() => handleRejectOrders(_id, owner?._id)}
+                  disabled={isProcessing}
+                  className={`px-3 py-1 rounded transition text-white ${isProcessing && processingId.status === "Reject" ? "bg-red-600/50" : "bg-red-600"} dark:bg-red-700`}
                 >
-                  {(processingId?.orderId === order._id && processingId?.status === "Reject")
-                    ? "Rejecting..."
-                    : "Reject"}
+                  {isProcessing && processingId.status === "Reject" ? "Rejecting..." : "Reject"}
                 </button>
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       );
@@ -279,48 +235,81 @@ export default function OrderDetails({ allOrders, loading }) {
 
   return (
     <div className="bg-white dark:bg-gray-500/20 rounded-lg p-4 shadow-md w-full overflow-x-auto flex flex-col gap-y-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
-
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <ReceiptLongOutlinedIcon className="text-[#843E71]" />
+      <div className="flex flex-nowrap justify-between items-start md:items-center gap-4 border-b border-gray-300 dark:border-gray-700 pb-4">
+        <h2 className="sm:text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2 whitespace-nowrap">
+          <ReceiptLongOutlinedIcon className="text-[#843E71] !hidden sm:flex" />
           Orders Section
         </h2>
+
         <div>
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="rounded-md px-3 py-2 text-sm bg-gray-200 dark:bg-gray-500/10 text-black dark:text-white"
+          <button
+            type="button"
+            onClick={handleClick}
+            className="flex items-center gap-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 transition dark:bg-gray-500/10 dark:text-white dark:hover:bg-gray-500"
+            aria-haspopup="listbox"
           >
-            {filterOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} className="dark:bg-black/50">{opt.label}</option>
-            ))}
-          </select>
+            <FilterIcon size={18} className="!hidden sm:flex" />
+            <span className="text-sm line-clamp-1">
+              {filterOptions.find((f) => f.value === sortOption)?.label || "Select Filter"}
+            </span>
+          </button>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            slotProps={{
+              paper: {
+                sx: {
+                  backgroundColor: "transparent",
+                  boxShadow: "none",
+                },
+              },
+            }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            transformOrigin={{ vertical: "top", horizontal: "left" }}
+          >
+            <div className="flex flex-col space-y-1 p-2 bg-white dark:bg-gray-500/20 dark:text-white backdrop-blur-md rounded-md shadow-md text-sm">
+              {filterOptions.map((filter) => (
+                <button
+                  key={filter.value}
+                  onClick={() => {
+                    setSortOption(filter.value);
+                    handleClose();
+                  }}
+                  className={`text-start px-3 py-2 w-full rounded hover:bg-gray-100 dark:hover:bg-gray-600 ${sortOption === filter?.value ? "font-semibold text-indigo-600 dark:text-indigo-400" : ""
+                    }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </Menu>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 text-sm font-medium text-gray-600 dark:text-white mb-4">
-        {["All", "Pending", "Confirmed", "Cancelled"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-full transition-all duration-200
-        ${statusFilter === status
-                ? "bg-[#843E71] text-white shadow"
-                : "bg-gray-200 dark:bg-gray-500/10 hover:bg-gray-300 dark:hover:bg-gray-500/30 text-gray-800 dark:text-white"}
-      `}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
 
+      <div className="flex flex-nowrap w-full overflow-auto gap-2 text-sm font-medium text-gray-600 dark:text-white mb-4 scrollbar-hide">
+        {["All", "Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Confirmed"]
+          .map((status) => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-4 py-2 rounded-full transition-all duration-200 ${statusFilter === status
+                ? "bg-[#843E71] text-white shadow"
+                : "bg-gray-200 dark:bg-gray-500/10 hover:bg-gray-300 dark:hover:bg-gray-500/30 text-gray-800 dark:text-white"
+                }`}
+            >
+              {status}
+            </button>
+          ))}
+      </div>
 
       {content}
     </div>
   );
-
 }
 
 OrderDetails.propTypes = {
-  orders: PropTypes.array.isRequired,
+  allOrders: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
 };

@@ -129,7 +129,7 @@ export default function OverallInventory({
 
 OverallInventory.propTypes = {
   totalCategories: PropTypes.number.isRequired,
-  totalStock: PropTypes.number.isRequired,
+  totalProducts: PropTypes.number.isRequired,
   lowStockCount: PropTypes.number.isRequired,
   outOfStockProducts: PropTypes.number.isRequired,
   expiringSoonCount: PropTypes.number.isRequired,
