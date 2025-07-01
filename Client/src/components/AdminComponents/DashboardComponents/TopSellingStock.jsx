@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import PropTypes from "prop-types"
+import { Pagination } from "@mui/material";
+import { ThemeContext } from "../../../context/ThemeProvider";
 // Animation Variants
 const containerVariants = {
   hidden: {},
@@ -26,6 +28,10 @@ const rowVariants = {
 
 export default function TopSellingStock({ topSellingStocks }) {
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const {theme} = useContext(ThemeContext)
+  const productsPerPage = 10;
+
   let content;
   if (topSellingStocks.length === 0) {
     content = (
@@ -33,50 +39,54 @@ export default function TopSellingStock({ topSellingStocks }) {
         No data available
       </div>
     )
-  }else {
-content = (
-  <div className="w-full overflow-x-auto scrollbar-hide">
-    <table className="min-w-full table-auto text-left border-collapse">
-      <thead>
-        <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
-          <th className="py-3 px-4">Product Name</th>
-          <th className="py-3 px-4">Total Quantity Sold</th>
-          <th className="py-3 px-4">Stock Remaining</th>
-          <th className="py-3 px-4">Current Price</th>
-          <th className="py-3 px-4">Discount</th>
-        </tr>
-      </thead>
+  } else {
 
-      <motion.tbody
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        {topSellingStocks.map((product, index) => {
-          const isLowStock = product?.stock < product?.thresholdVal;
-          return (
-            <motion.tr
-              key={index * 0.9}
-              variants={rowVariants}
-              className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
-                } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
-            >
-              <td className="py-3 px-4 font-medium">{product?.name}</td>
-              <td className="py-3 px-4">
-                {product?.totalQuantitySold} {product?.quantityUnit}
-              </td>
-              <td className="py-3 px-4">
-                {product?.stock} {product?.quantityUnit}
-              </td>
-              <td className="py-3 px-4">₹ {product?.price}</td>
-              <td className="py-3 px-4">{product?.discount} &#37;</td>
-            </motion.tr>
-          );
-        })}
-      </motion.tbody>
-    </table>
-  </div>
-)
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = topSellingStocks?.slice(indexOfFirstProduct, indexOfLastProduct);
+    content = (
+      <div className="w-full overflow-x-auto scrollbar-hide">
+        <table className="min-w-full table-auto text-left border-collapse">
+          <thead>
+            <tr className="text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400 border-b dark:border-gray-700">
+              <th className="py-3 px-4">Product Name</th>
+              <th className="py-3 px-4">Total Quantity Sold</th>
+              <th className="py-3 px-4">Stock Remaining</th>
+              <th className="py-3 px-4">Current Price</th>
+              <th className="py-3 px-4">Discount</th>
+            </tr>
+          </thead>
+
+          <motion.tbody
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+          >
+            {currentProducts?.map((product, index) => {
+              const isLowStock = product?.stock < product?.thresholdVal;
+              return (
+                <motion.tr
+                  key={index * 0.9}
+                  variants={rowVariants}
+                  className={`${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : ""
+                    } text-sm text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600/20 transition-colors`}
+                >
+                  <td className="py-3 px-4 font-medium">{product?.name}</td>
+                  <td className="py-3 px-4">
+                    {product?.totalQuantitySold} {product?.quantityUnit}
+                  </td>
+                  <td className="py-3 px-4">
+                    {product?.stock} {product?.quantityUnit}
+                  </td>
+                  <td className="py-3 px-4">₹ {product?.price}</td>
+                  <td className="py-3 px-4">{product?.discount} &#37;</td>
+                </motion.tr>
+              );
+            })}
+          </motion.tbody>
+        </table>
+      </div>
+    )
   }
   return (
     <motion.div
@@ -90,6 +100,36 @@ content = (
       </h2>
 
       {content}
+
+      <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+        <Pagination
+          count={Math.ceil(topSellingStocks?.length / productsPerPage)}
+          page={currentPage}
+          onChange={(event, value) => setCurrentPage(value)}
+          variant="outlined"
+          shape="rounded"
+          siblingCount={1} 
+          boundaryCount={0}
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "inherit",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                border: "2px solid #843E71",
+              },
+            },
+            "& .Mui-selected": {
+              backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}`,
+              color: `${theme === "light" ? "#843E71" : "#fff"}`,
+              borderColor: "#843E71",
+              "&:hover": {
+                backgroundColor: "#6e305e",
+              },
+            },
+          }}
+        />
+
+      </div>
     </motion.div>
   );
 }

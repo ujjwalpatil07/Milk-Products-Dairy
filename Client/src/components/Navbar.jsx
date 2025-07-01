@@ -19,7 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
-import { UserAuthContext } from "../context/AuthProvider"
+import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from '../context/CartProvider';
 import { UserOrderContext } from '../context/UserOrderProvider';
 import { Bell, X } from 'lucide-react';
@@ -40,6 +40,7 @@ export default function Navbar() {
 
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { authUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
+    const { authAdmin, handleAdminLogout } = useContext(AdminAuthContext);
     const { cartItems } = useContext(CartContext);
     const { notification, setNotification } = useContext(UserOrderContext);
     const [open, setOpen] = useState(false);
@@ -68,13 +69,21 @@ export default function Navbar() {
         { label: 'Contact Us', icon: <CallIcon sx={{ fontSize: '1.2rem' }} />, path: '/contact-us' },
     ];
 
-    const handleLogout = () => {
-        setOpen(false);
-        handleUserLogout();
-        setOpenLoginDialog(true);
-        enqueueSnackbar("User Logged Out Successfully", { variant: "success" });
-        navigate("/");
-    }
+    // const handleLogout = () => {
+    //     setOpen(false);
+    //     handleUserLogout();
+    //     setOpenLoginDialog(true);
+    //     enqueueSnackbar("User Logged Out Successfully", { variant: "success" });
+    //     navigate("/");
+    // }
+
+    // const adminLogout = () => {
+    //     setOpen(false);
+    //     handleAdminLogout();
+    //     setOpenLoginDialog(true);
+    //     enqueueSnackbar("Admin Logged Out Successfully", { variant: "success" });
+    //     navigate("/");
+    // }
 
     const handleUserCart = () => {
         setOpen(false);
@@ -211,8 +220,8 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    <hr className='text-gray-500/40'/>
-                    
+                    <hr className='text-gray-500/40' />
+
                     <div className='flex-1 space-y-4'>
 
                         {navItems.map((item, idx) =>
@@ -242,17 +251,26 @@ export default function Navbar() {
                             My Orders
                         </button>
 
-                        {!authUser && (
+                        {!authUser && !authAdmin ? (
                             <Link to="/login" onClick={toggleDrawer(false)} className={linkStyle}>
                                 <LoginIcon sx={{ fontSize: '1.2rem' }} /> Login
                             </Link>
-                        )}
-
-                        {authUser && (
-                            <button onClick={handleLogout} className={linkStyle}>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    if (authAdmin) {
+                                        handleAdminLogout();
+                                    } else {
+                                        handleUserLogout();
+                                    }
+                                }}
+                                className={linkStyle}
+                            >
                                 <LogoutIcon sx={{ fontSize: '1.2rem' }} /> Logout
                             </button>
                         )}
+
+
                     </div>
                 </Box>
             </Drawer>

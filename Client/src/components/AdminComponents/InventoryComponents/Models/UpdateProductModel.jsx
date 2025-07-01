@@ -36,6 +36,7 @@ const categories = [
 const quantityUnits = ["Litre", "Ml", "Kg", "Gram", "Pack"];
 
 export default function UpdateProductModel({ open, onClose, selectedProduct }) {
+
   const { enqueueSnackbar } = useSnackbar();
 
   const [productDetails, setProductDetails] = useState({
@@ -417,7 +418,7 @@ export default function UpdateProductModel({ open, onClose, selectedProduct }) {
           Cancel
         </button>
         <button onClick={handleUpdateProduct} disabled={isUpdating}
-          className=" bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-3 py-1 rounded hover:bg-green-300/80"
+          className=" bg-green-200 text-black dark:bg-blue-800/60 dark:hover:bg-blue-800/70 dark:text-white px-3 py-1 rounded hover:bg-green-300/80"
         >
           {isUpdating ? "Updating..." : "Update"}
         </button>

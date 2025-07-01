@@ -60,7 +60,7 @@ export const ProductsStock = ({ fetchedProducts }) => {
     <div className="w-full h-fit bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Products Stock</h2>
       <hr className="my-2 border-gray-200 dark:border-gray-600" />
-      {chartData?.datasets?.data ? (
+      {chartData ? (
         <Doughnut data={chartData} options={options} />
       ) : (
         <div>No stocks listed</div>
