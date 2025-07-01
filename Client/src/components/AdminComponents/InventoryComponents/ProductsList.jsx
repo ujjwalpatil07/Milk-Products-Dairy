@@ -147,13 +147,13 @@ export default function ProductsList({ products, loading }) {
           ) : (
             <table className="min-w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300">
-                  <th className="sm:w-[25%] pb-3 px-3 whitespace-nowrap">Products</th>
-                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Selling Price</th>
-                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Quantity</th>
-                  <th className="sm:w-[15%] pb-3 px-3 whitespace-nowrap">Threshold Value</th>
-                  <th className="sm:w-[20%] pb-3 px-3 whitespace-nowrap">Category</th>
-                  <th className="sm:w-[10%] pb-3 px-3 whitespace-nowrap">Actions</th>
+                <tr className="border-b border-gray-500 dark:border-gray-300 text-gray-600 dark:text-gray-300">
+                  <th className="pb-3 px-3 whitespace-nowrap">Products</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Category</th>
+                  <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <motion.tbody
@@ -168,9 +168,11 @@ export default function ProductsList({ products, loading }) {
                     <motion.tr
                       key={product._id || index}
                       variants={rowVariants}
-                      className={`border-b dark:border-gray-700  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"}
-                  `}>
-                      <td className={`py-2 px-3 font-medium text-gray-700 dark:text-white ${isLowStock && "text-red-500 animate-pulse"}`}>
+
+                      className={`border-b border-gray-600/40 dark:border-gray-500/70  ${isLowStock ? "bg-red-100 dark:bg-red-800/30 animate-pulse" : "hover:bg-gray-50 dark:hover:bg-gray-600/20"
+                        }`}
+                    >
+                      <td className="py-2 px-3 font-medium text-gray-700 dark:text-white">
                         {highlightMatch(product.name, navbarInput)}
                       </td>
                       <td className="py-2 px-3 whitespace-nowrap">&#8377; {product.price}</td>
@@ -213,21 +215,21 @@ export default function ProductsList({ products, loading }) {
           )}
         </div>
 
-        {productList.length > productsPerPage && (
-          <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
-            <Pagination
-              count={Math.ceil(productList.length / productsPerPage)}
-              page={currentPage}
-              onChange={(event, value) => setCurrentPage(value)}
-              variant="outlined"
-              shape="rounded"
-              sx={{
-                "& .MuiPaginationItem-root": {
-                  color: "inherit",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    border: "2px solid #843E71",
-                  },
+        <div className=" p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
+          <Pagination
+            count={Math.ceil(productList?.length / productsPerPage)}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            variant="outlined"
+            shape="rounded"
+            siblingCount={1} // hide middle siblings
+            boundaryCount={0} // show first and last
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "inherit",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  border: "2px solid #843E71",
                 },
                 "& .Mui-selected": {
                   backgroundColor: `${theme === "dark" ? "#843E71" : "#fff"}`,

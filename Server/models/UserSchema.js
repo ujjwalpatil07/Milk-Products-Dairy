@@ -15,14 +15,22 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       unique: true,
-      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+      match: [
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email format. Example: user@example.com",
+      ],
     },
-
+    
     password: {
       type: String,
       required: true,
-      min: [8, "Password must be at lest 8 characters"],
-      max: [20, "Password too long, please enter less than 20 characters"],
+      validate: {
+        validator: function (value) {
+          return /^(?=.*[A-Za-z])(?=.*[\d\W]).{8,}$/.test(value);
+        },
+        message:
+          "Password must be at least 8 characters long and include at least one letter and one number or symbol.",
+      },
     },
 
     firstName: {
