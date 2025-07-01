@@ -20,7 +20,7 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import logoDarkMode from "../assets/logoDarkMode.png";
 import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
-import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider"
+import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from '../context/CartProvider';
 import { UserOrderContext } from '../context/UserOrderProvider';
 import { Bell, X } from 'lucide-react';
@@ -41,7 +41,6 @@ export default function Navbar() {
     const loginUser = localStorage.getItem("User");
 
     const { theme, toggleTheme } = useContext(ThemeContext);
-    const { authAdmin, handleAdminLogout } = useContext(AdminAuthContext);
     const { authUser, authUserLoading, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems } = useContext(CartContext);
     const { notification, setNotification } = useContext(UserOrderContext);
@@ -73,21 +72,13 @@ export default function Navbar() {
         { label: 'Contact Us', icon: <CallIcon sx={{ fontSize: '1.2rem' }} />, path: '/contact-us' },
     ];
 
-    // const handleLogout = () => {
-    //     setOpen(false);
-    //     handleUserLogout();
-    //     setOpenLoginDialog(true);
-    //     enqueueSnackbar("User Logged Out Successfully", { variant: "success" });
-    //     navigate("/");
-    // }
-
-    // const adminLogout = () => {
-    //     setOpen(false);
-    //     handleAdminLogout();
-    //     setOpenLoginDialog(true);
-    //     enqueueSnackbar("Admin Logged Out Successfully", { variant: "success" });
-    //     navigate("/");
-    // }
+    const handleLogout = () => {
+        setOpen(false);
+        handleUserLogout();
+        setOpenLoginDialog(true);
+        enqueueSnackbar("User Logged Out Successfully", { variant: "success" });
+        navigate("/");
+    }
 
     const handleUserCart = () => {
         setOpen(false);
@@ -252,8 +243,8 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    <hr className='text-gray-500/40' />
-
+                    <hr className='text-gray-500/40'/>
+                    
                     <div className='flex-1 space-y-4'>
 
                         {navItems.map((item, idx) =>
@@ -283,26 +274,17 @@ export default function Navbar() {
                             My Orders
                         </button>
 
-                        {!authUser && !authAdmin ? (
+                        {!authUser && (
                             <Link to="/login" onClick={toggleDrawer(false)} className={linkStyle}>
                                 <LoginIcon sx={{ fontSize: '1.2rem' }} /> Login
                             </Link>
-                        ) : (
-                            <button
-                                onClick={() => {
-                                    if (authAdmin) {
-                                        handleAdminLogout();
-                                    } else {
-                                        handleUserLogout();
-                                    }
-                                }}
-                                className={linkStyle}
-                            >
+                        )}
+
+                        {authUser && (
+                            <button onClick={handleLogout} className={linkStyle}>
                                 <LogoutIcon sx={{ fontSize: '1.2rem' }} /> Logout
                             </button>
                         )}
-
-
                     </div>
                 </Box>
             </Drawer>
