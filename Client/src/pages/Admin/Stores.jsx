@@ -99,7 +99,7 @@ const { enqueueSnackbar } = useSnackbar();
 
                                 <div className="flex items-end justify-between gap-3">
                                     <Link
-                                        to={`/admin/store/${store?._id}/orders-history`}
+                                        to={`/admin/customers/${store?._id}/orders-history`}
                                         className="flex items-center gap-1 text-sm bg-[#843E71] text-white px-3 py-1.5 rounded-md shadow hover:bg-[#6c2f5c] transition"
                                     >
                                         <VisibilityIcon fontSize="small" />

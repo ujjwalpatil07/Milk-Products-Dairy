@@ -197,8 +197,8 @@ export default function OrderDetails({ allOrders, loading }) {
                     <td className="p-2">{product?.productId?._id}</td>
                     <td className="p-2">{product?.productId?.name}</td>
                     <td className="p-2">{product?.productQuantity}</td>
-                    <td className="p-2">&#8377;{product?.productPrice}</td>
-                    <td className="p-2">&#8377;{product?.productQuantity * product?.productPrice}</td>
+                    <td className="p-2">&#8377;{(product?.productPrice || 0).toFixed(2)}</td>
+                    <td className="p-2">&#8377;{(product?.productQuantity * product?.productPrice).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

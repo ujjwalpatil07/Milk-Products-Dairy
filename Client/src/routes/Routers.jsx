@@ -75,8 +75,8 @@ export default function Routers() {
                 <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout>} />
                 <Route path="/admin/inventory" element={<AdminLayout><Inventory /></AdminLayout>} />
                 <Route path="/admin/orders" element={<AdminLayout><Orders /></AdminLayout>} />
-                <Route path="/admin/store" element={<AdminLayout><Stores /></AdminLayout>} />
-                <Route path="/admin/store/:userId/orders-History" element={<AdminLayout><StoreOrdersHistory /></AdminLayout>} />
+                <Route path="/admin/customers" element={<AdminLayout><Stores /></AdminLayout>} />
+                <Route path="/admin/customers/:userId/orders-History" element={<AdminLayout><StoreOrdersHistory /></AdminLayout>} />
 
                 <Route path="/about" element={<Layout><AboutPage /></Layout>} />
                 <Route path="/products/:productId?" element={<Layout><ProductPage /></Layout>} />

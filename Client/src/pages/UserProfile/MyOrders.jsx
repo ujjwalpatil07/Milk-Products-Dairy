@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { MenuItem, Button, Menu, Dialog } from "@mui/material";
+import { Dialog } from "@mui/material";
 import { FaHourglassHalf, FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaMoneyBillWave, FaGlassWhiskey, FaShoppingCart } from "react-icons/fa";
 import CloseIcon from '@mui/icons-material/Close';
 import { UserOrderContext } from "../../context/UserOrderProvider";
@@ -34,7 +34,7 @@ export default function MyOrders() {
   });
 
   const statCards = [
-    { title: "All", count: userOrders?.length, color: "bg-gray-600/30 text-gray-600", icon: <FaGlassWhiskey /> },
+    { title: "All", count: userOrders?.length, color: "bg-gray-600/30 text-gray-300", icon: <FaGlassWhiskey /> },
     { title: "Confirmed", count: orderStats.Confirmed, color: "bg-blue-600/30 text-blue-600", icon: <FaCheckCircle /> },
     { title: "Pending", count: orderStats.Pending, color: "bg-yellow-500/30 text-yellow-500", icon: <FaHourglassHalf /> },
     { title: "Processing", count: orderStats.Processing, color: "bg-blue-400/30 text-blue-400", icon: <FaBoxOpen /> },
@@ -46,16 +46,6 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(statCards[0]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleStatusTypeUpdate = ({ success, message }) => {
     if (success) {
@@ -75,21 +65,15 @@ export default function MyOrders() {
     }
   }, []);
 
-
-  const handleSelect = (card) => {
-    setSelectedStatus(card);
-    handleClose();
-  };
-
   const handleOrderReceived = () => {
 
     if (!selectedOrder) {
-      enqueueSnackbar("", { variant: "error" });
+      enqueueSnackbar("No order selected!", { variant: "error" });
       return;
     }
 
     if (!authUser) {
-      enqueueSnackbar("", { variant: "error" })
+      enqueueSnackbar("User not authenticated!", { variant: "error" });
       return;
     }
 
@@ -149,7 +133,7 @@ export default function MyOrders() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
                 {getStatusIcon(order?.status)}
-                <span className="font-semibold text-lg">{order?.status === "Cancelled" ? "Rejected" : order?.status}</span>
+                <span className="font-semibold text-lg">{order?.status}</span>
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-300">
                 {new Date(order?.createdAt).toLocaleDateString("en-GB", {
@@ -190,9 +174,9 @@ export default function MyOrders() {
                       </td>
                       <td className="p-2 md:px-4 md:py-2 break-words">{product?.productId?.name}</td>
                       <td className="p-2 md:px-4 md:py-2 break-words">{product?.productQuantity}</td>
-                      <td className="p-2 md:px-4 md:py-2 break-words">&#8377;{product?.productPrice} / {product?.productId?.quantityUnit}</td>
+                      <td className="p-2 md:px-4 md:py-2 break-words">&#8377;{(product?.productPrice || 0).toFixed(2)} / {product?.productId?.quantityUnit}</td>
                       <td className="p-2 md:px-4 md:py-2 font-semibold text-gray-700 dark:text-white break-words">
-                        &#8377;{product?.productQuantity * product?.productPrice}
+                        &#8377;{(product?.productQuantity * product?.productPrice).toFixed(2)}
                       </td>
                     </tr>
                   ))}
@@ -213,7 +197,7 @@ export default function MyOrders() {
 
             <div className="flex flex-row flex-wrap justify-between items-center gap-3 mt-4 border-t pt-3">
               <p className="font-semibold text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                <FaMoneyBillWave className="text-green-500" /> 
+                <FaMoneyBillWave className="text-green-500" />
                 <span className="hidden sm:flex">Payment: </span>
                 {order?.paymentMode}
               </p>
@@ -252,54 +236,33 @@ export default function MyOrders() {
 
   return (
     <>
-      <div className="flex justify-between items-center sticky top-0 mb-4 ">
-        <h2 className="w-fit !h-fit flex justify-between items-centertext-xl font-bold backdrop-blur-md px-2 py-1 rounded">My Orders</h2>
+      <div className="flex justify-between items-center sticky top-0 mb-4 gap-5 z-90">
+        <h2 className="w-fit !h-fit flex justify-between items-centertext-xl font-bold backdrop-blur-md px-2 py-1 rounded whitespace-nowrap">My Orders</h2>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <Button
-            id="basic-button"
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}
-            className="!capitalize !rounded-md !shadow !p-0"
-          >
-            <div className={`flex items-center text-white rounded gap-2 px-2 py-1 ${selectedStatus?.color}`} >
-              {selectedStatus?.icon}
-              <span>{selectedStatus?.title}</span>
-              {selectedStatus?.count}
-            </div>
-          </Button>
+        <div className="flex overflow-auto flex-col sm:flex-row sm:items-center sm:justify-between gap-3 scrollbar-hide">
 
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            slotProps={{
-              paper: {
-                sx: {
-                  backgroundColor: "transparent",
-                },
-              },
-            }}
-          >
-            <div className="bg-white dark:bg-black/80">
-              {statCards.map((card) => (
-                <MenuItem key={card.title} onClick={() => handleSelect(card)} sx={{ paddingY: "2px", paddingX: "15px" }}>
-                  <div
-                    className={`flex items-center justify-between w-40 px-3 py-2 rounded opacity-90 hover:opacity-100 ${card.color} }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {card.icon}
-                      <span className="font-medium">{card.title}</span>
-                    </div>
-                    <span className="text-sm font-semibold">{card.count}</span>
-                  </div>
-                </MenuItem>
-              ))}
-            </div>
-          </Menu>
+          <div className="flex overflow-auto flex-col sm:flex-row sm:items-center sm:justify-between gap-3 scrollbar-hide">
+            {statCards.map((card, idx) => {
+              const isSelected = selectedStatus?.title === card.title;
+              return (
+                <button
+                  key={card.title || idx}
+                  onClick={() => setSelectedStatus(card)}
+                  className={`
+          flex items-center gap-2 rounded-full px-3 py-1.5 min-w-fit
+          transition-all duration-200 border backdrop-blur-md  
+          ${card.color}
+          ${isSelected ? "opacity-100 shadow-md" : "opacity-70 hover:opacity-90"}
+        `}
+                >
+                  {card.icon}
+                  <span className="font-medium">{card.title}</span>
+                  <span className="text-sm font-semibold">{card.count}</span>
+                </button>
+              );
+            })}
+          </div>
+
         </div>
       </div>
 

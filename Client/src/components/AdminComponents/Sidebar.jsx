@@ -34,7 +34,7 @@ export default function Sidebar() {
         { label: "Dashboard", icon: <DashboardIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/dashboard" },
         { label: "Inventory", icon: <InventoryIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/inventory" },
         { label: "Orders", icon: <ReceiptLongIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/orders", orderCount: adminOrders?.length || 0 },
-        { label: "Manage Store", icon: <StoreIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/store" },
+        { label: "Manage Customers", icon: <StoreIcon sx={{ fontSize: "1.2rem" }} />, to: "/admin/customers" },
     ];
 
     const closeSidebar = () => {
