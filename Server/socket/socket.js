@@ -56,7 +56,9 @@ export const connectToSocket = (server) => {
       adminSocketMap.get(adminId).add(socket.id);
     });
 
-    socket.on("admin:send-message-to-user", async ({ userId, title, description, date }) => {
+    socket.on(
+      "admin:send-message-to-user",
+      async ({ userId, title, description, date }) => {
         try {
           if (!userId || !title || !description) {
             return socket.emit("admin:send-message-status", {
@@ -999,6 +1001,24 @@ export const connectToSocket = (server) => {
           message:
             error?.message || "Something went wrong while updating product",
         });
+      }
+    });
+
+    socket.on("client:logout", ({ userId, adminId }) => {
+      if (userId && userSocketMap.has(userId)) {
+        const sockets = userSocketMap.get(userId);
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          userSocketMap.delete(userId);
+        }
+      }
+
+      if (adminId && adminSocketMap.has(adminId)) {
+        const sockets = adminSocketMap.get(adminId);
+        sockets.delete(socket.id);
+        if (sockets.size === 0) {
+          adminSocketMap.delete(adminId);
+        }
       }
     });
 

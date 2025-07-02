@@ -305,16 +305,15 @@ export default function Navbar() {
                             m: 0,
                             maxHeight: "300px",
                             backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
-                            // Responsive right and width
                             right: {
-                                xs: 30,      // right: 0 on small screens
-                                sm: 100,      // right: 0 on small-medium screens
-                                md: 150     // right: 150px on medium and above
+                                xs: 30,    
+                                sm: 100,   
+                                md: 150   
                             },
                             width: {
-                                xs: '300px', // width: 300px on small screens
+                                xs: '300px',
                                 sm: '300px',
-                                md: '350px'  // width: 350px on medium and above
+                                md: '350px' 
                             }
                         },
                     },

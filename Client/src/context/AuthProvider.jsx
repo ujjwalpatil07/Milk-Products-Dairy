@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, createContext } from "react";
 import { getUserById } from "../services/userService";
 import { getAdminById } from "../services/adminService";
+import { socket } from "../socket/socket";
 
 export const UserAuthContext = createContext();
 export const AdminAuthContext = createContext();
@@ -68,11 +69,19 @@ export const AuthProvider = ({ children }) => {
     }, [authAdmin]);
 
     const handleUserLogout = () => {
+
+        if (socket && authUser?._id) {
+            socket.emit("client:logout", { userId: authUser._id });
+        }
         setAuthUser(null);
         localStorage.removeItem("User");
     }
 
     const handleAdminLogout = () => {
+
+        if (socket && authAdmin?._id) {
+            socket.emit("client:logout", { adminId: authAdmin._id });
+        }
         setAuthAdmin(null);
         localStorage.removeItem("Admin");
     }
