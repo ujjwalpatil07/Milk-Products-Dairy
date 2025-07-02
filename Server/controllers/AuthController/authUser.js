@@ -162,7 +162,7 @@ export const removeUserNotification = async (req, res) => {
 
 export const getAllCustomers = async (req, res) => {
   const customers = await User.find({})
-    .select("firstName lastName email gender mobileNo orders")
+    .select("firstName lastName email gender mobileNo orders photo")
     .lean();
 
   res.status(200).json({

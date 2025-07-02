@@ -20,14 +20,14 @@ export default function CartPage() {
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const { authUser, deliveryAddress } = useContext(UserAuthContext);
-    const { cartItems } = useContext(CartContext);
+    const { cartItems, removeFromCart } = useContext(CartContext);
     const { products, productLoading } = useContext(ProductContext);
 
     const [open, setOpen] = useState(false);
 
     const cartDetails = useMemo(
-        () => getCartProductDetails(cartItems, products),
-        [cartItems, products]
+        () => getCartProductDetails(cartItems, products, removeFromCart),
+        [cartItems, products, removeFromCart]
     );
 
     const { subtotal, totalAmount, totalSaving } = useMemo(() => {

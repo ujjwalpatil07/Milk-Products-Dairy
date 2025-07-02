@@ -56,6 +56,52 @@ export const connectToSocket = (server) => {
       adminSocketMap.get(adminId).add(socket.id);
     });
 
+    socket.on("admin:send-message-to-user", async ({ userId, title, description, date }) => {
+        try {
+          if (!userId || !title || !description) {
+            return socket.emit("admin:send-message-status", {
+              success: false,
+              message: "Missing required fields.",
+            });
+          }
+
+          const user = await User.findById(userId);
+          if (!user) {
+            return socket.emit("admin:send-message-status", {
+              success: false,
+              message: "User not found.",
+            });
+          }
+
+          await addNotification(user, {
+            title,
+            description,
+            date,
+          });
+
+          socket.emit("admin:send-message-status", {
+            success: true,
+            message: "Message sent and notification added successfully.",
+          });
+
+          if (userSocketMap.has(userId)) {
+            for (const socketId of userSocketMap.get(userId)) {
+              io.to(socketId).emit("user:notification", {
+                title,
+                description,
+                date,
+              });
+            }
+          }
+        } catch (error) {
+          socket.emit("admin:send-message-status", {
+            success: false,
+            message: error?.message || "Internal server error.",
+          });
+        }
+      }
+    );
+
     socket.on("place-new-order", async (data) => {
       const { address, productsData, paymentMode, totalAmount, userId, date } =
         data.orderData;

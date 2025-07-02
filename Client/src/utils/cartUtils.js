@@ -1,4 +1,4 @@
-export const getCartProductDetails = (cartItems, products) => {
+export const getCartProductDetails = (cartItems, products, removeFromCart) => {
   const productMap = new Map();
 
   for (const product of products) {
@@ -10,7 +10,10 @@ export const getCartProductDetails = (cartItems, products) => {
   return cartItems
     .map((item) => {
       const product = productMap.get(item.productId);
-      if (!product) return null;
+      if (!product) {
+        removeFromCart?.(item.productId);
+        return null;
+      }
 
       return {
         id: product?._id,

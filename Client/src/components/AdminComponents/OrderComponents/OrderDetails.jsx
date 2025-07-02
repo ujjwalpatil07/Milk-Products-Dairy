@@ -8,7 +8,7 @@ import { AdminAuthContext } from "../../../context/AuthProvider";
 import { SidebarContext } from "../../../context/SidebarProvider";
 import { filterOrdersBySearch } from "../../../utils/filterOrders";
 import { socket } from "../../../socket/socket";
-import { Menu } from "@mui/material";
+import { Avatar, Menu } from "@mui/material";
 import { FilterIcon } from "lucide-react";
 
 export default function OrderDetails({ allOrders, loading }) {
@@ -163,7 +163,7 @@ export default function OrderDetails({ allOrders, loading }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <img src={owner?.photo} alt={owner?.firstName} className="w-12 h-12 rounded-full object-cover border" />
+            <Avatar src={owner?.photo} alt={owner?.firstName} className="!w-10 !h-10" />
             <div>
               <p className="font-semibold">
                 {highlightMatch(owner?.firstName, navbarInput)} {highlightMatch(owner?.lastName, navbarInput)}
