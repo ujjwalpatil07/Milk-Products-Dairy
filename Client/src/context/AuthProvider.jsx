@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, createContext } from "react";
+import React, { useEffect, useMemo, useState, createContext, useCallback } from "react";
 import { getUserById } from "../services/userService";
 import { getAdminById } from "../services/adminService";
 import { socket } from "../socket/socket";
@@ -68,23 +68,23 @@ export const AuthProvider = ({ children }) => {
         return () => window.removeEventListener("localStorageChange", fetchAdminData);
     }, [authAdmin]);
 
-    const handleUserLogout = () => {
+    const handleUserLogout = useCallback(() => {
 
         if (socket && authUser?._id) {
             socket.emit("client:logout", { userId: authUser._id });
         }
         setAuthUser(null);
         localStorage.removeItem("User");
-    }
+    }, [authUser?._id]);
 
-    const handleAdminLogout = () => {
+    const handleAdminLogout = useCallback(() => {
 
         if (socket && authAdmin?._id) {
             socket.emit("client:logout", { adminId: authAdmin._id });
         }
         setAuthAdmin(null);
         localStorage.removeItem("Admin");
-    }
+    }, [authAdmin?._id]);
 
     const value1 = useMemo(() => ({
         authAdmin,
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
         setAuthAdmin,
         setAuthAdminLoading,
         handleAdminLogout,
-    }), [authAdmin, authAdminLoading]);
+    }), [authAdmin, authAdminLoading, handleAdminLogout]);
 
     const value2 = useMemo(() => ({
         authUser,
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
         setAuthUserLoading,
         setOpenLoginDialog,
         handleUserLogout
-    }), [authUser, deliveryAddress, authUserLoading, openLoginDialog]);
+    }), [authUser, deliveryAddress, authUserLoading, openLoginDialog, handleUserLogout]);
 
     return (
         <AdminAuthContext.Provider value={value1}>

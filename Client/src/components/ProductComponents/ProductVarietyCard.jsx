@@ -23,7 +23,7 @@ import { addToWishlist } from "../../services/userProfileService";
 import { useSnackbar } from 'notistack';
 
 export default function ProductVarietyCard({ id, image, name, discount, rating, likes, price, minQuantity, stock, quantityUnit }) {
-const { enqueueSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
 
     const { authUser, setAuthUser } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
@@ -47,7 +47,7 @@ const { enqueueSnackbar } = useSnackbar();
 
     const handleAddProduct = (productId, price) => {
         if (quantity <= 0) {
-            enqueueSnackbar("Please select quantity.", {variant: "error"});
+            enqueueSnackbar("Please select quantity.", { variant: "error" });
             return;
         }
         if (quantity > stock) {
@@ -57,7 +57,7 @@ const { enqueueSnackbar } = useSnackbar();
 
         addToCart(productId, quantity, price);
         setQuantity(0);
-        enqueueSnackbar("Product added to cart!", {variant: "success"});
+        enqueueSnackbar("Product added to cart!", { variant: "success" });
     }
 
     const handleLikeProduct = async (productId) => {
@@ -67,7 +67,7 @@ const { enqueueSnackbar } = useSnackbar();
         }
 
         if (localLikes.includes(authUser._id)) {
-            enqueueSnackbar("You already liked this product.", {variant: "info"});
+            enqueueSnackbar("You already liked this product.", { variant: "info" });
             return;
         }
 
@@ -120,6 +120,10 @@ const { enqueueSnackbar } = useSnackbar();
         } finally {
             setWishlistLoading(false);
         }
+    };
+
+    const showSnackbar = (message, variant = "info") => {
+        enqueueSnackbar(message, { variant });
     };
 
     let wishlistIconContent;
@@ -248,8 +252,13 @@ const { enqueueSnackbar } = useSnackbar();
                         >
                             <span>
                                 <button
-                                    onClick={() => setQuantity(prev => Math.max(0, prev - (minQty || 1)))}
-                                    disabled={quantity <= 0}
+                                    onClick={() => {
+                                        if (quantity <= 0) {
+                                            showSnackbar("Minimum quantity reached", "warning");
+                                        } else {
+                                            setQuantity(prev => Math.max(0, prev - (minQty || 1)));
+                                        }
+                                    }}
                                     className="w-6 h-6 rounded-md flex items-center justify-center bg-red-500/20 hover:bg-red-500/30 text-red-500 disabled:opacity-50"
                                 >
                                     <RemoveIcon sx={{ fontSize: "1.2rem" }} />
@@ -266,7 +275,13 @@ const { enqueueSnackbar } = useSnackbar();
                             onChange={(e) => {
                                 const value = Number(e.target.value);
                                 const maxQty = stock - (existing?.quantity || 0);
-                                if (value <= maxQty && value >= 0) setQuantity(value);
+                                if (value > maxQty) {
+                                    showSnackbar("Exceeds available stock", "error");
+                                } else if (value < 0) {
+                                    showSnackbar("Quantity cannot be negative", "error");
+                                } else {
+                                    setQuantity(value);
+                                }
                             }}
                         />
 
@@ -281,15 +296,20 @@ const { enqueueSnackbar } = useSnackbar();
                         >
                             <span>
                                 <button
-                                    disabled={quantity + (existing?.quantity || 0) >= stock}
-                                    onClick={() => setQuantity(prev => prev + (minQty || 1))}
+                                    onClick={() => {
+                                        const currentTotal = quantity + (existing?.quantity || 0);
+                                        if (currentTotal >= stock) {
+                                            showSnackbar("No more stock available", "warning");
+                                        } else {
+                                            setQuantity(prev => prev + (minQty || 1));
+                                        }
+                                    }}
                                     className="w-6 h-6 rounded-md flex items-center justify-center bg-green-500/20 hover:bg-green-500/30 text-green-500 disabled:opacity-50"
                                 >
                                     <AddIcon sx={{ fontSize: "1.2rem" }} />
                                 </button>
                             </span>
                         </Tooltip>
-
                     </div>
 
                     <button
