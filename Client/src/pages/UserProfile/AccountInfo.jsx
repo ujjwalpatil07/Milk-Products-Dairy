@@ -80,7 +80,27 @@ export default function AccountInfo() {
     setEditData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const validateInputs = () => {
+    const { firstName, lastName, gender, mobileNo, username, address } = editData;
+    return (
+      !!firstName &&
+      !!lastName &&
+      !!gender &&
+      !!mobileNo &&
+      !!username &&
+      !!address?.streetAddress &&
+      !!address?.city &&
+      !!address?.pincode
+    );
+  };
+  
+
   const handleSave = async () => {
+    if (!validateInputs()) {
+      enqueueSnackbar("Please fill out all required fields", { variant: "warning" });
+      return;
+    }
+
     try {
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(editData.mobileNo)) {
@@ -148,6 +168,7 @@ export default function AccountInfo() {
                     name={field?.name}
                     value={field?.value}
                     {...(field?.inputProps || { onChange: handleInputChange })}
+                    required
                   />
                 ) : (
                   <p className="p-2 border border-gray-400 rounded bg-gray-100 dark:bg-gray-500/50 hover:cursor-not-allowed">{field.display}</p>

@@ -24,41 +24,52 @@ export default function LoginDialog() {
     const [loading, setLoading] = useState(false);
     const [loginType, setLoginType] = useState("user");
 
+    const handleUserLogin = async () => {
+        const res = await loginUser(email, password);
+        if (res?.success) {
+            if (!res?.filledBasicInfo) {
+                navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
+                setOpenLoginDialog(false);
+            } else {
+                localStorage.setItem("User", JSON.stringify(res?.user));
+                handleAdminLogout();
+                enqueueSnackbar("Login Successful!", { variant: "success" });
+                navigate("/home");
+                setOpenLoginDialog(false);
+                setEmail("");
+                setPassword("");
+            }
+        } else {
+            enqueueSnackbar("Login failed, please try again.", { variant: "error" });
+        }
+    };
+
+    const handleAdminLogin = async () => {
+        const res = await loginAdmin(email, password);
+        if (res?.admin) {
+            localStorage.setItem("Admin", JSON.stringify(res.admin));
+            handleUserLogout();
+            enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
+            setEmail("");
+            setPassword("");
+            setOpenLoginDialog(false);
+            if (!location.pathname.startsWith("/admin")) {
+                navigate("/admin/dashboard");
+            }
+        } else {
+            enqueueSnackbar("Admin login failed.", { variant: "error" });
+        }
+    };
+
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
-
         setLoading(true);
-
         try {
             if (loginType === "user") {
-                const data = await loginUser(email, password);
-                if (data?.user) {
-                    localStorage.setItem("User", JSON.stringify(data.user));
-                    handleAdminLogout();
-                    enqueueSnackbar("Login Successful!", { variant: "success" });
-                    setOpenLoginDialog(false);
-                    setEmail("");
-                    setPassword("");
-                } else {
-                    enqueueSnackbar("User login failed.", { variant: "error" });
-                }
+                await handleUserLogin();
             } else {
-                const data = await loginAdmin(email, password);
-                if (data?.admin) {
-                    localStorage.setItem("Admin", JSON.stringify(data.admin));
-                    handleUserLogout();
-                    enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
-                    setEmail("");
-                    setPassword("");
-                    setOpenLoginDialog(false);
-                    if (!location.pathname.startsWith("/admin")) {
-                        navigate("/admin/dashboard");
-                    }
-                } else {
-                    enqueueSnackbar("Admin login failed.", { variant: "error" });
-                }
+                await handleAdminLogin();
             }
-
         } catch (error) {
             enqueueSnackbar(error?.response?.data?.message || "Server error or invalid credentials.", { variant: "error" });
         } finally {

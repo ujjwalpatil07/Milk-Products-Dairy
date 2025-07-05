@@ -1,7 +1,7 @@
 // ProfileInfoInput.jsx
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { TextField, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { maharashtraCities } from "../../../data/cities";
 import { AdminAuthContext } from "../../../context/AuthProvider";
@@ -10,9 +10,23 @@ import { submitSignupForm } from "../../../services/userProfileService";
 
 export default function ProfileInfoInput() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
+
+  const userId = location?.state?.user?._id
+  const [viaLogin] = useState(location?.state?.viaLogin === true);
+
+  const hasShownSnackbar = useRef(false);
+
+  useEffect(() => {
+    if (viaLogin && !hasShownSnackbar.current) {
+      enqueueSnackbar("Fill the basic info before proceeding", { variant: "info" });
+      hasShownSnackbar.current = true;
+    }
+  }, [viaLogin, enqueueSnackbar, location.pathname, navigate]);
+
 
   const getTextFieldStyles = (theme) => ({
     input: {
@@ -86,12 +100,15 @@ export default function ProfileInfoInput() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const userId = JSON.parse(localStorage.getItem("User"))?._id;
-      if (!userId) {
+
+      const userIdInLocalStorage = JSON.parse(localStorage.getItem("User"))?._id;
+      console.log(viaLogin)
+      if (!viaLogin && !userIdInLocalStorage) {
         enqueueSnackbar("User not logged in, please login!", { variant: "error" });
         navigate("/login");
         return;
       }
+
 
       const formData = new FormData();
       formData.append("id", userId);
@@ -103,12 +120,17 @@ export default function ProfileInfoInput() {
       if (data?.success) {
         localStorage.setItem("User", JSON.stringify(data?.user));
         handleAdminLogout();
-        enqueueSnackbar("Profile created successfully!", { variant: "success" });
+        if (viaLogin) {
+          enqueueSnackbar("Basic details submitted !", { variant: "success" });
+        } else {
+          enqueueSnackbar("Profile created successfully!", { variant: "success" });
+        }
         navigate("/home");
       } else {
         enqueueSnackbar("Something went wrong!", { variant: "error" });
       }
     } catch (err) {
+      console.log(err)
       enqueueSnackbar(err?.response?.data?.message || "Server error occurred!", { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -139,19 +161,18 @@ export default function ProfileInfoInput() {
               accept="image/*"
               id="photoInput"
               onChange={handlePhotoChange}
-              
               className="hidden"
             />
           </div>
 
           {/* Input Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <TextField label="First Name" name="firstName" value={profileInfo.firstName} onChange={handleInputChange}  fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
-            <TextField label="Last Name" name="lastName" value={profileInfo.lastName} onChange={handleInputChange}  fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
+            <TextField label="First Name" name="firstName" value={profileInfo.firstName} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
+            <TextField label="Last Name" name="lastName" value={profileInfo.lastName} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <TextField label="Phone Number" name="mobileNo" value={profileInfo.mobileNo} onChange={handleInputChange}  fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
+            <TextField label="Phone Number" name="mobileNo" value={profileInfo.mobileNo} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
             <select
               name="gender"
               required
@@ -166,9 +187,9 @@ export default function ProfileInfoInput() {
             </select>
           </div>
 
-          <TextField label="Username" name="username" value={profileInfo.username} onChange={handleInputChange}  fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5"/>
-          <TextField label="Shop Name" name="shopName" value={profileInfo.shopName} onChange={handleInputChange} fullWidth sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5"/>
-          <TextField label="Address" name="streetAddress" value={profileInfo.address.streetAddress} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5"/>
+          <TextField label="Username" name="username" value={profileInfo.username} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
+          <TextField label="Shop Name" name="shopName" value={profileInfo.shopName} onChange={handleInputChange} fullWidth sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
+          <TextField label="Address" name="streetAddress" value={profileInfo.address.streetAddress} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <select
@@ -191,13 +212,13 @@ export default function ProfileInfoInput() {
 
           <div className="flex flex-col gap-2 mt-4 text-sm font-medium whitespace-break-spaces">
             <label className={`flex items-center gap-2 ${isLoading ? "cursor-not-allowed opacity-70" : ""}`}>
-              <input type="checkbox" className="accent-[#843E71]" required  />
+              <input type="checkbox" className="accent-[#843E71]" required />
               I agree to all
               <span className="text-[#FF8682] whitespace-nowrap"> Terms </span> and
               <span className="text-[#FF8682] whitespace-break-spaces"> Privacy Policies</span>
             </label>
             <label className={`flex items-center gap-2 ${isLoading ? "cursor-not-allowed opacity-70" : ""}`}>
-              <input type="checkbox" className="accent-[#843E71]"  />
+              <input type="checkbox" className="accent-[#843E71]" />
               Subscribe to all offers and updates
             </label>
           </div>

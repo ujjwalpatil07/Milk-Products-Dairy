@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signupUser } from "../../../services/userService";
+import { generateOtp, signupUser } from "../../../services/userService";
 import { useSnackbar } from "notistack";
-import { DialogContent } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
@@ -24,8 +23,20 @@ export default function UserSignUp() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+
+
+  const isValidPassword = (password) => {
+    return /^(?=.*\d).{8,}$/.test(password); // 8 chars, 1 number
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const otp = generateOtp()
+
+    if (!isValidPassword(formData?.password)) {
+      enqueueSnackbar("Password must be at least 8 characters and contain a number.", { variant: "error" });
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       return enqueueSnackbar("Passwords do not match", { variant: "error" });
@@ -33,11 +44,10 @@ export default function UserSignUp() {
 
     try {
       setIsLoading(true);
-
-      const res = await signupUser(formData);
+      const res = await signupUser(formData, otp);
       if (res?.success) {
         enqueueSnackbar("OTP sent successfully", { variant: "success" });
-        navigate("/signup/otp-verification", { state: { formData } });
+        navigate("/signup/otp-verification", { state: { formData, otp } });
         setFormData({ email: "", password: "", confirmPassword: "" });
       }
     } catch (error) {

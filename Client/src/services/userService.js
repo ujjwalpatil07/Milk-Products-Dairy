@@ -1,9 +1,10 @@
 import api from "./api";
-import { sendOtpEmail } from "./sendOtp";
+import { sendOtpEmail } from "./sentOtp";
 
 export const loginUser = async (email, password) => {
   const res = await api.post("/u/login", { email, password });
-  return res.data;
+  console.log(res.data);
+  return res?.data;
 };
 
 export const generateOtp = () => {
