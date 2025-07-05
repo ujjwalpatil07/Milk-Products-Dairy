@@ -52,7 +52,6 @@ export default function OrdersPreview() {
     }
   };
 
-
   const getStatusIcon = (status) => {
     switch (status) {
       case "Pending":
