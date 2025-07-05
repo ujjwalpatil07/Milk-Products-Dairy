@@ -11,6 +11,21 @@ export const signUpUser = async (req, res) => {
       .json({ success: false, message: "All fields are required" });
   }
 
+  if (password !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password doesn't match" });
+  }
+
+  const isPasswordValidated = /^(?=.*\d).{8,}$/.test(password);
+  console.log(isPasswordValidated);
+
+  if (!isPasswordValidated) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Password format doesn't match." });
+  }
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res
@@ -26,12 +41,20 @@ export const signUpUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ success : false, message: "Missing fields." });
+  }
+
   const user = await User.findOne({ email });
 
   if (!user) {
     return res
       .status(400)
-      .json({ message: "Invalid Email, Please Enter Valid Email." });
+      .json({
+        success: false,
+        message: "Invalid Email, Please Enter Valid Email.",
+      });
   }
 
   const isMatched = await bcryptjs.compare(password, user.password);
@@ -39,12 +62,31 @@ export const loginUser = async (req, res) => {
   if (!isMatched) {
     return res
       .status(400)
-      .json({ message: "Wrong Password, Please Enter Correct Password" });
+      .json({
+        success: false,
+        message: "Wrong Password, Please Enter Correct Password",
+      });
   }
 
+  let isfilledBasicInfo;
+  if (
+    !user.firstName ||
+    !user.lastName ||
+    !user.gender ||
+    !user.mobileNo ||
+    !user.address
+  ) {
+    isfilledBasicInfo = false;
+  } else {
+    isfilledBasicInfo = true;
+  }
+
+
   res.status(200).json({
+    success: true,
     message: "Login Successful",
     user: { _id: user?._id, email },
+    filledBasicInfo: isfilledBasicInfo,
   });
 };
 
@@ -77,17 +119,25 @@ export const handleInfoInput = async (req, res) => {
 
   const photoUrl = req.file?.url || req.file?.path;
 
-  if (!photoUrl) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Photo upload failed" });
+  let photo;
+  if (photoUrl) {
+    photo = photoUrl;
+  } else if (profileInfo?.gender === "Male") {
+    photo =
+      "https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg?semt=ais_hybrid&w=740";
+  } else if (profileInfo?.gender === "Female") {
+    photo =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcQ6xalcUqiwlcrMkGuc7NJW6txojdE57QMw&s";
+  } else {
+    photo =
+      "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBIgACEQEDEQH/xAAaAAEAAwEBAQAAAAAAAAAAAAAAAgMEAQUH/8QALRABAAICAAMHAwQDAQAAAAAAAAECAxEEITESFUFRU2GRE3GBMjNS0QVCoSL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A+4gAAAAAAjNojrMAkITlr5ufVr5/8BYIRkrPSYTjmAAAAAAAAAAAAArvlrXpzn2QyZd8q9PNUCdslreOkAAAAdiZjpMw4AtrmncRaPyui0W6MjtbTWdwDWIY7xaPfxTAAAAAAAUZr7nsx08U8tuzXXjLOAAACGfLXDTtW/EeYJuvIy8TlyzO7ajyhCt70ndbWj7SD2Ri4XjJtMUzTuZ6WbQAAdidTuGmlotXfiyp47dm2waQAAAARvOqzIKMk7vKAAAAPN/yF5tnmvhWI09J5nH0mvETaelogGcAB6/DX+pgpaeunkPX4ak04elZ662CwAAAGnFO6c+sJqME6mYXgAAIZp/8SmrzfokGcAAABVxGGM2Psz1jnE+S0mYiNzMa9wePlw5MVtXrP3johETL17cRgjlbJX7RO0a8Tw8dLxH4Bm4XhJm0Xyxqsc4rPi3o1yY7/ovWftKQAAAAJ4v3IaWbF+5DSAAAhljdJTAYx20amY8pcABi/wAhm1H0q9Z52/oHeI43szNcOpn+UsV8l8k7taZn3lEAAA91+HisuPUTPar5WUAPXwZqZqbrPOOsT4LHjYsk4rxanWPB7FLxekWr0mAdABZhjd/s0KsEctrQAAAAUZ684mFTXaO1GmW0dmdSDjyeLmZ4nJ93rMuXgoyZLX7cx2p3rQPOG7u+vqT8Hd9fUn4BhG7u+vqT8Hd9fUn4BhG7u+vqT8Hd9fUn4BhenwE74aPaZVd319SfhpwYvo4+xFt8970Cx2I3OnF2Gn+0/gFtY7NYh0AAAAAEMlItHv5pgMkxMTqXGq9ItHPr5qL0mv8AYIAAAAAADsRvotpi8bfAI48e+c9GgAAAAAAAAAAAQtirPtKucM+ErwGacV/I+nf+LSAzxitPhpOuGPGVoDlaxXpDoAAAAAAAAAAAAAAAAAAAAAAAAAAA/9k=";
   }
 
   const updatedUser = await User.findByIdAndUpdate(
     id,
     {
       ...profileInfo,
-      photo: photoUrl,
+      photo: photo,
     },
     { new: true }
   );

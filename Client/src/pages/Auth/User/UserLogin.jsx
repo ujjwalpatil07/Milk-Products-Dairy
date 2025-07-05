@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { AdminAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
-import { DialogContent } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
@@ -36,17 +35,23 @@ export default function UserLogin() {
     try {
 
       const { email, password } = formData;
-      const data = await loginUser(email, password);
+      const res = await loginUser(email, password);
 
-      if (data?.user) {
-        localStorage.setItem("User", JSON.stringify(data.user));
-        handleAdminLogout();
-        enqueueSnackbar("Login Successful!", { variant: "success" });
-        navigate("/home");
+      if (res?.success) {
+        if (!res?.filledBasicInfo) {
+          navigate("/signup/info-input", {state : {user : res?.user, viaLogin : !res?.filledBasicInfo}});
+        }else{
+          localStorage.setItem("User", JSON.stringify(res?.user));
+          handleAdminLogout();
+          enqueueSnackbar("Login Successful!", { variant: "success" });
+          navigate("/home");
+        }
+
       } else {
         enqueueSnackbar("Login failed, please try again.", { variant: "error" });
       }
     } catch (error) {
+      console.log(error);
       enqueueSnackbar(error?.response?.data?.message || "Server error or invalid credentials.", { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -55,7 +60,6 @@ export default function UserLogin() {
   };
 
   const loginType = "user"
-
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
