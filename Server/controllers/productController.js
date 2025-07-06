@@ -55,7 +55,7 @@ export const likeProduct = async (req, res) => {
 export const getRecentReview = async (req, res) => {
   const reviews = await Review.find()
     .sort({ createdAt: -1 })
-    .limit(20)
+    .limit(25)
     .populate("userId", "username photo") 
     .lean();
 

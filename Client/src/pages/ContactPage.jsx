@@ -3,6 +3,7 @@ import { LocationOn, Phone, Email } from "@mui/icons-material";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useSnackbar } from "notistack";
+import company from "../data/company.json";
 
 export default function ContactPage() {
 
@@ -40,7 +41,7 @@ export default function ContactPage() {
         }
 
         if (!message.trim()) {
-            enqueueSnackbar("Please enter your message.", { variant: "error"} );
+            enqueueSnackbar("Please enter your message.", { variant: "error" });
             return;
         }
 
@@ -59,20 +60,35 @@ export default function ContactPage() {
                 className="md:w-1/2 space-y-4 p-3"
             >
                 <h2 className="text-2xl font-bold text-[#843E71]">Contact Information</h2>
+
                 <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
                     <LocationOn className="text-[#843E71]" sx={{ fontSize: "1.3rem" }} />
-                    <span>Shed no. A-31, Datri Mala, Ambad, MIDC Ambad, Nashik, Maharashtra 422010</span>
+                    <a
+                        href={company.googleMaps}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                    >
+                        {company.address.line}, {company.address.city}, {company.address.state} - {company.address.pincode}
+                    </a>
                 </div>
+
                 <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
                     <Phone className="text-[#843E71]" sx={{ fontSize: "1.3rem" }} />
-                    <span>+91 92091 43657</span>
+                    <a href={`tel:${company.phone}`} className="hover:underline">
+                        {company.phone}
+                    </a>
                 </div>
+
                 <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
                     <Email className="text-[#843E71]" sx={{ fontSize: "1.3rem" }} />
-                    <span>contact@madhurdairy.com</span>
+                    <a href={`mailto:${company.email}`} className="hover:underline">
+                        {company.email}
+                    </a>
                 </div>
+
                 <p className="text-sm mt-4 text-gray-600 dark:text-gray-400">
-                    We are here to assist you. Please fill out the form to get in touch or ask your query directly.
+                    {company.supportText}
                 </p>
             </motion.div>
 

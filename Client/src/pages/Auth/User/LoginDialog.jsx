@@ -1,11 +1,12 @@
 import React, { useContext, useState } from "react";
+import { useSnackbar } from "notistack";
 import { Dialog, DialogContent } from "@mui/material";
 import Slide from '@mui/material/Slide';
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { loginAdmin } from "../../../services/adminService";
-import { useSnackbar } from "notistack";
+import company from "../../../data/company.json";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -91,7 +92,7 @@ export default function LoginDialog() {
                     Welcome to
                 </h2>
                 <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
-                    Madhur Dairy & Daily Needs
+                    { company?.name }
                 </h1>
 
                 <div className="mb-4 flex justify-center">

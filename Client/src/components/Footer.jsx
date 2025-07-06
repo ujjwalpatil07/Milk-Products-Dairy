@@ -1,7 +1,5 @@
 import { useContext, memo } from "react";
 import { ThemeContext } from "../context/ThemeProvider";
-import logoDarkMode from "../assets/logoDarkMode.png";
-import logoLightMode from "../assets/logoLightMode.png";
 
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -9,6 +7,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import company from "../data/company.json";
+import { Twitter, YouTube } from "@mui/icons-material";
 
 const containerVariants = {
   hidden: {},
@@ -31,7 +31,16 @@ const itemVariants = {
 function Footer() {
   const { theme } = useContext(ThemeContext);
 
-  const currentLogo = theme === "light" ? logoLightMode : logoDarkMode;
+  const currentLogo = theme === "light" ? company?.logoLightTheme : company?.logoDaraTheme;
+
+  const socialIcons = [
+    { key: "facebook", Icon: FacebookIcon, className: "hover:text-blue-600" },
+    { key: "instagram", Icon: InstagramIcon, className: "hover:text-pink-500" },
+    { key: "linkedin", Icon: LinkedInIcon, className: "hover:text-blue-500" },
+    { key: "twitter", Icon: Twitter, className: "hover:text-blue-500" },
+    { key: "youtube", Icon: YouTube, className: "hover:text-red-500" }
+  ];
+
 
   return (
     <footer className="bg-white dark:bg-[#1c1c1c] text-gray-800 dark:text-gray-200 transition-colors duration-300">
@@ -51,18 +60,27 @@ function Footer() {
               loading="lazy"
             />
             <h2 className="text-lg font-semibold">
-              Madhur Dairy & Daily Needs
+              {company?.name}
             </h2>
             <div className="flex gap-4 text-xl">
-              <a href="https://facebook.com" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
-                <FacebookIcon className="hover:text-blue-600 transition-colors" />
-              </a>
-              <a href="https://instagram.com" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-                <InstagramIcon className="hover:text-pink-500 transition-colors" />
-              </a>
-              <a href="https://linkedin.com" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-                <LinkedInIcon className="hover:text-blue-500 transition-colors" />
-              </a>
+              <div className="flex gap-4 text-xl">
+                {/* eslint-disable-next-line no-unused-vars */}
+                {socialIcons.map(({ key, Icon, className }) =>
+                  company?.socials?.[key] ? (
+                    <a
+                      key={key}
+                      href={company.socials[key]}
+                      aria-label={key}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+
+                      <Icon className={`${className} transition-colors`} />
+                    </a>
+                  ) : null
+                )}
+              </div>
+
             </div>
           </motion.div>
 
@@ -123,7 +141,7 @@ function Footer() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          &copy; {new Date().getFullYear()} Madhur Dairy & Daily Needs. All rights reserved.
+          &copy; {new Date().getFullYear()} {company?.name}. All rights reserved.
         </motion.div>
       </div>
     </footer>

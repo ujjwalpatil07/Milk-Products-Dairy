@@ -4,7 +4,10 @@ export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
 
-    const [theme, setTheme] = useState(localStorage.getItem('theme'));
+    const [theme, setTheme] = useState(() => {
+        const savedTheme = localStorage.getItem("theme");
+        return savedTheme === "dark" || savedTheme === "light" ? savedTheme : "light";
+    });
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -23,14 +26,14 @@ export const ThemeProvider = ({ children }) => {
     const value = useMemo(() => ({
         theme,
         toggleTheme
-    }), [theme])
+    }), [theme]);
 
     return (
         <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     )
-} 
+}
 
 
 ThemeProvider.propTypes = {

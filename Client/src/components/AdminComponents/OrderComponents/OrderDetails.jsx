@@ -16,7 +16,7 @@ export default function OrderDetails({ allOrders, loading }) {
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
   const { authAdmin } = useContext(AdminAuthContext);
 
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("Pending");
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);

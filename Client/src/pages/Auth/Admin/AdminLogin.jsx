@@ -1,12 +1,12 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginAdmin } from "../../../services/adminService";
-import { UserAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
 import { DialogContent } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-
+import { loginAdmin } from "../../../services/adminService";
+import { UserAuthContext } from "../../../context/AuthProvider";
+import company from "../../../data/company.json";
 
 export default function AdminLogin() {
 
@@ -64,7 +64,7 @@ export default function AdminLogin() {
           Welcome to
         </h2>
         <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
-          Madhur Dairy & Daily Needs
+          { company?.name }
         </h1>
 
         <div className="mb-4 mt-3 flex justify-center">

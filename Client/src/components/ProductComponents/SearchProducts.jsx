@@ -16,11 +16,10 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { ProductContext } from "../../context/ProductProvider";
 import { ThemeContext } from "../../context/ThemeProvider";
 import ProductList from "./ProductList";
-import logoLightMode from "../../assets/logoLightMode.png";
-import logoDarkMode from "../../assets/logoDarkMode.png";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "../../context/CartProvider";
+import company from "../../data/company.json";
 
 export default function SearchProducts({ query, handleInputChange }) {
 
@@ -42,13 +41,15 @@ export default function SearchProducts({ query, handleInputChange }) {
     };
 
     const handleCart = () => {
-        if(!authUser) {
+        if (!authUser) {
             setOpenLoginDialog(true);
             return;
         }
 
         navigate("/cart");
     }
+
+    const displayLogo = (theme === "light" ? company?.logoLightTheme : company?.logoDaraTheme);
     const navbarClass1 = "sticky top-0 left-0 z-60 w-full px-2 bg-white dark:bg-[#1d1d1d] transition-colors duration-300";
 
     return (
@@ -70,7 +71,7 @@ export default function SearchProducts({ query, handleInputChange }) {
                         {
                             (showHeaderExtras) && <Link to="/" className="hidden sm:flex">
                                 <img
-                                    src={theme === 'light' ? logoLightMode : logoDarkMode}
+                                    src={displayLogo}
                                     alt="logo"
                                     loading='lazy'
                                     className="h-10 sm:h-12 object-cover rounded-md"
