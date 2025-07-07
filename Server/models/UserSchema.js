@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
         "Invalid email format. Example: user@example.com",
       ],
     },
-    
+
     password: {
       type: String,
       required: true,
@@ -31,6 +31,12 @@ const UserSchema = new mongoose.Schema(
         message:
           "Password must be at least 8 characters long and include at least one letter and one number or symbol.",
       },
+    },
+
+    isGoogleUser: { type: Boolean, default: false },
+
+    fullName : {
+      type: String,
     },
 
     firstName: {

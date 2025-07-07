@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import User from "../../models/UserSchema.js";
 import bcryptjs from "bcryptjs";
+import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const signUpUser = async (req, res) => {
   const { email, password, confirmPassword } = req.body;
@@ -43,29 +47,25 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ success : false, message: "Missing fields." });
+    return res.status(400).json({ success: false, message: "Missing fields." });
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "Invalid Email, Please Enter Valid Email.",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Email, Please Enter Valid Email.",
+    });
   }
 
   const isMatched = await bcryptjs.compare(password, user.password);
 
   if (!isMatched) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "Wrong Password, Please Enter Correct Password",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "Wrong Password, Please Enter Correct Password",
+    });
   }
 
   let isfilledBasicInfo;
@@ -81,13 +81,52 @@ export const loginUser = async (req, res) => {
     isfilledBasicInfo = true;
   }
 
-
   res.status(200).json({
     success: true,
     message: "Login Successful",
     user: { _id: user?._id, email },
     filledBasicInfo: isfilledBasicInfo,
   });
+};
+
+export const loginWithGoogle = async (req, res) => {
+  const { token } = req.body;
+
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  const { email, name, picture } = payload;
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not registered for this email." });
+  }
+
+  res.status(200).json({ success: true});
+};
+
+export const verifyUser = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Email not found." });
+  }
+
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not found" });
+  }
+
+  res
+    .status(200)
+    .json({ success: true, message: "User verified", email: user?.email });
 };
 
 export const verifyOtp = async (req, res) => {
@@ -115,9 +154,9 @@ export const verifyOtp = async (req, res) => {
 export const handleInfoInput = async (req, res) => {
   const { id } = req.body;
 
-  const profileInfo = JSON.parse(req.body.profileInfo);
+  const profileInfo = JSON.parse(req?.body?.profileInfo);
 
-  const photoUrl = req.file?.url || req.file?.path;
+  const photoUrl = req?.file?.url || req?.file?.path;
 
   let photo;
   if (photoUrl) {
@@ -219,4 +258,37 @@ export const getAllCustomers = async (req, res) => {
     success: true,
     customers,
   });
+};
+
+export const resetPassword = async (req, res) => {
+  let { email, password, confirmPassword } = req.body;
+
+  if (!email || !password || !confirmPassword) {
+    return res.status(400).json({ success: false, message: "Fields missing" });
+  }
+
+  if (password !== confirmPassword) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Password and confirmpassword must be same",
+      });
+  }
+
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not found" });
+  }
+
+  const hashedPass = await bcryptjs.hash(password, 10);
+
+  user.password = hashedPass;
+
+  await user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password reset successfully" });
 };

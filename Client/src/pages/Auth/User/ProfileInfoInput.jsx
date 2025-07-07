@@ -15,7 +15,6 @@ export default function ProfileInfoInput() {
   const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
-  const userId = location?.state?.user?._id
   const [viaLogin] = useState(location?.state?.viaLogin === true);
 
   const hasShownSnackbar = useRef(false);
@@ -102,7 +101,6 @@ export default function ProfileInfoInput() {
     try {
 
       const userIdInLocalStorage = JSON.parse(localStorage.getItem("User"))?._id;
-      console.log(viaLogin)
       if (!viaLogin && !userIdInLocalStorage) {
         enqueueSnackbar("User not logged in, please login!", { variant: "error" });
         navigate("/login");
@@ -111,7 +109,7 @@ export default function ProfileInfoInput() {
 
 
       const formData = new FormData();
-      formData.append("id", userId);
+      formData.append("id", userIdInLocalStorage);
       formData.append("profileInfo", JSON.stringify(profileInfo));
       if (selectedFile) formData.append("photo", selectedFile);
 

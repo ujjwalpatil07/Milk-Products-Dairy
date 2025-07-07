@@ -16,7 +16,7 @@ export const sendOtpEmail = async (email, otp) => {
       },
       publicKey
     );
-    return { success: true, response };
+    return { success: true, otp: otp, response };
   } catch (error) {
     return { success: false, error };
   }
