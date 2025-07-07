@@ -24,6 +24,7 @@ export default function CartPage() {
     const { products, productLoading } = useContext(ProductContext);
 
     const [open, setOpen] = useState(false);
+    const [highlightedItems, setHighlightedItems] = useState([]);
 
     const cartDetails = useMemo(
         () => getCartProductDetails(cartItems, products, removeFromCart),
@@ -40,8 +41,22 @@ export default function CartPage() {
     }
 
     const handleProceedCheckout = () => {
+
         if (!deliveryAddress) {
             enqueueSnackbar("Please select a delivery address before proceeding to checkout.", { variant: "error" })
+            return;
+        }
+
+        const outOfStockItems = cartDetails?.filter(item => item?.selectedQuantity > item?.stock);
+
+        if (outOfStockItems?.length > 0) {
+            const outOfStockIds = outOfStockItems?.map(item => item?.id);
+            setHighlightedItems(outOfStockIds);
+
+            setTimeout(() => {
+                setHighlightedItems([]);
+            }, 3000);
+
             return;
         }
 
@@ -152,7 +167,11 @@ export default function CartPage() {
             >
                 <motion.div layout className="space-y-3 w-full md:flex-1">
                     {cartDetails.map((item, idx) => (
-                        <ProductCard key={idx * 0.55} item={item} />
+                        <ProductCard
+                            key={idx * 0.55}
+                            item={item}
+                            highlightOutOfStock={highlightedItems?.includes(item?.id)}
+                        />
                     ))}
                 </motion.div>
 
@@ -210,7 +229,7 @@ export default function CartPage() {
                             <span className="ml-1 text-gray-600 dark:text-gray-100 font-bold"> &#8377; {formatNumberWithCommas(subtotal)}</span>
                         </p>
 
-                        
+
 
                         <p className="text-lg font-bold text-[#843E71] dark:text-[#cc5eaf]">
                             Final Total:
@@ -225,6 +244,7 @@ export default function CartPage() {
                         >
                             Proceed to Checkout
                         </button>
+
                         <p className="text-green-600/80 mt-2 ms-2">
                             You will save
                             <span className="ml-1 font-bold ">&#8377;{formatNumberWithCommas(totalSaving)} </span>on this order.

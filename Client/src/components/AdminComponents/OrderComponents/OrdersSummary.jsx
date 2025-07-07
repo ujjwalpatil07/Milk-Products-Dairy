@@ -32,37 +32,43 @@ export default function OrdersSummary({
   totalOrders,
   totalRecievedOrders,
   totalCanceledOrders,
+  handleStatusFilter,
 }) {
   const orderSummaryData = [
     {
-      name: "Total Orders",
+      name: "Pending Orders",
       value: totalOrders,
       icon: <ShoppingCart size={28} className="text-green-600" />,
       bg: "bg-green-100 dark:bg-green-800/30",
+      status: "Pending",
     },
     {
       name: "Total Orders Recieved",
       value: totalRecievedOrders,
       icon: <BookCheck size={28} className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
+      status: "All",
     },
     {
       name: "Total Returned Orders",
       value: 0,
       icon: <Undo2 size={28} className="text-orange-600" />,
       bg: "bg-orange-100 dark:bg-orange-800/30",
+      status: "All",
     },
     {
       name: "Total Canceled Orders",
       value: totalCanceledOrders,
       icon: <Ban size={28} className="text-red-600" />,
       bg: "bg-red-100 dark:bg-red-800/30",
+      status: "Cancelled",
     },
     {
       name: "Total Drafted Orders",
       value: 0,
       icon: <NotepadTextDashedIcon size={28} className="text-blue-600" />,
       bg: "bg-blue-100 dark:bg-blue-800/30",
+      status: "All",
     },
   ];
 
@@ -80,7 +86,8 @@ export default function OrdersSummary({
           <motion.div
             key={index * 0.9}
             variants={cardVariants}
-            className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg}`}
+            className={`min-w-[220px] sm:min-w-0 flex items-center gap-4 p-4 rounded-lg ${item.bg} cursor-pointer`}
+            onClick={() => handleStatusFilter(item.status)}
           >
             <div className="text-2xl shrink-0">{item.icon}</div>
             <div className="flex flex-col">
@@ -102,4 +109,5 @@ OrdersSummary.propTypes = {
   totalOrders: PropTypes.number.isRequired,
   totalRecievedOrders: PropTypes.number.isRequired,
   totalCanceledOrders: PropTypes.number.isRequired,
+  handleStatusFilter: PropTypes.func.isRequired,
 };

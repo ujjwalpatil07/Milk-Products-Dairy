@@ -40,6 +40,7 @@ export default function OrderCheckoutPage() {
   const [open, setOpen] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState(null);
+  const [highlightedItems, setHighlightedItems] = useState([]);
 
   const orderPlaceConfirmation = useCallback((data) => {
     enqueueSnackbar(data.message || 'Order placed successfully!', { variant: 'success' });
@@ -73,10 +74,33 @@ export default function OrderCheckoutPage() {
     return calculateCartTotals(cartDetails);
   }, [cartDetails]);
 
+  const handleStockExceeds = () => {
+    const outOfStockIds = cartDetails
+      .filter(item => item?.selectedQuantity > item?.stock)
+      .map(item => item?.id);
+
+    if (outOfStockIds?.length > 0) {
+      setHighlightedItems(outOfStockIds);
+
+      setTimeout(() => {
+        setHighlightedItems([]);
+      }, 4000);
+
+      return true;
+    }
+    return false;
+  }
+
   const handlePaymentMode = () => {
     if (!deliveryAddress) {
-
       enqueueSnackbar("Please select a delivery address before proceeding to checkout.", { variant: "error" });
+      return;
+    }
+
+    if (handleStockExceeds()) {
+      enqueueSnackbar("Some products exceed available stock. Please adjust quantities.", {
+        variant: "warning",
+      });
       return;
     }
 
@@ -84,6 +108,13 @@ export default function OrderCheckoutPage() {
   };
 
   const handlePlaceOrder = async (selectedMode) => {
+
+    if (handleStockExceeds()) {
+      enqueueSnackbar("Some products exceed available stock. Please adjust quantities.", {
+        variant: "warning",
+      });
+      return;
+    }
 
     setSelectedPaymentMode(selectedMode);
 
@@ -251,17 +282,19 @@ export default function OrderCheckoutPage() {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4, duration: 0.4 }}
-          className="bg-white dark:bg-gray-500/20 rounded-lg p-4"
+          className="bg-white dark:bg-gray-500/20 rounded-lg"
         >
-          <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
+          <h2 className="text-lg font-semibolds p-3 sm:p-4">Order Summary</h2>
 
           {cartDetails.map((item, idx) => {
             const { discountedPrice, saved } = getDiscountedPrice(item.price, item.discount);
+            const shouldAnimate = highlightedItems?.includes(item?.id);
 
             return (
               <div
                 key={item.id || idx}
-                className="flex justify-between py-2 border-b border-dashed border-gray-500/50"
+                className={`flex justify-between p-3 sm:p-4 border-b border-dashed border-gray-500/50 rounded transition ${shouldAnimate ? "animate-pulse ring-1 ring-red-500 bg-red-500/10" : ""
+                  }`}
               >
                 <div>
                   <p className="font-medium">{item.name}</p>
@@ -289,7 +322,7 @@ export default function OrderCheckoutPage() {
             );
           })}
 
-          <div className="pt-4 text-sm text-gray-800 dark:text-gray-100 space-y-2 font-medium">
+          <div className="p-3 sm:p-4 text-sm text-gray-800 dark:text-gray-100 space-y-2 font-medium">
             <p>Total MRP: <span className="float-right text-gray-600 dark:text-gray-200 font-bold">&#8377;{formatNumberWithCommas(subtotal)}</span></p>
             <p className="text-green-500 dark:text-green-600">You Saved: <span className="float-right text-green-500 dark:text-green-600">&#8377;{formatNumberWithCommas(totalSaving)}</span></p>
             <p className="text-lg font-bold text-gray-600 dark:text-[#cc5eaf]">Final Payable: <span className="float-right text-gray-600 dark:text-[#cc5eaf]">&#8377;{formatNumberWithCommas(totalAmount)}</span></p>

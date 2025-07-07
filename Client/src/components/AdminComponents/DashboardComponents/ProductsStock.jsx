@@ -54,8 +54,6 @@ export const ProductsStock = ({ fetchedProducts }) => {
     },
   };
 
-  console.log(chartData)
-
   return (
     <div className="w-full h-fit bg-white dark:bg-gray-500/20 rounded-sm p-4">
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Products Stock</h2>
