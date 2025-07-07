@@ -80,7 +80,7 @@ export default function OtpVerification() {
         <div id="otp-input" className="flex justify-between mt-8 space-x-2">
           {otp.map((digit, index) => (
             <input
-              key={index}
+              key={index * 0.6}
               type="text"
               maxLength="1"
               value={digit}
