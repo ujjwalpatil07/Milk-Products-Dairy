@@ -242,17 +242,17 @@ export default function MyOrders() {
 
         <div className="flex overflow-auto flex-col sm:flex-row sm:items-center sm:justify-between gap-3 scrollbar-hide">
 
-          <div className="flex overflow-auto flex-col sm:flex-row sm:items-center sm:justify-between gap-3 scrollbar-hide">
-            {statCards.map((card, idx) => {
-              const isSelected = selectedStatus?.title === card.title;
+          <div className="flex overflow-auto flex-row sm:items-center sm:justify-between gap-3 scrollbar-hide">
+            {statCards?.map((card, idx) => {
+              const isSelected = selectedStatus?.title === card?.title;
               return (
                 <button
-                  key={card.title || idx}
+                  key={card?.title || idx}
                   onClick={() => setSelectedStatus(card)}
                   className={`
           flex items-center gap-2 rounded-full px-3 py-1.5 min-w-fit
           transition-all duration-200 border backdrop-blur-md  
-          ${card.color}
+          ${card?.color}
           ${isSelected ? "opacity-100 shadow-md" : "opacity-70 hover:opacity-90"}
         `}
                 >

@@ -1,18 +1,19 @@
-import { lazy, Suspense, useContext, useState } from "react";
+import { lazy, Suspense, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import heroImage from "../assets/heroImage.png"
 import { offerings, products } from "../data/products";
 
-import { testimonials } from "../data/productGoodness ";
 import { UserAuthContext } from "../context/AuthProvider";
 import OfferingCard from "../components/HomeComponents/OfferingCard";
 import OfferingProductCard from "../components/HomeComponents/OfferingProductCard";
+import { fetchRecentReviews } from "../services/productServices";
+import company from "../data/company.json";
 
 const Marquee = lazy(() => import("react-fast-marquee"));
 const DairyProductsCarousel = lazy(() => import("../components/HomeComponents/DairyProductsCarousel"));
-const TestimonialCard = lazy(() => import("../components/HomeComponents/TestimonialCard"));
+const ReviewCard = lazy(() => import("../components/HomeComponents/ReviewCard"));
 const ProductProcess = lazy(() => import("../components/ProductProcess"));
 
 
@@ -21,6 +22,24 @@ export default function HomePage() {
 
     const { authUser } = useContext(UserAuthContext);
     const [productCount, setProductCount] = useState(8);
+
+    const [customerReviews, setCustomerReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await fetchRecentReviews();;
+                setCustomerReviews(res?.reviews || []);
+            } catch (err) {
+                console.error("Error fetching reviews", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReviews();
+    }, []);
 
     const handleLoadMore = () => {
         setProductCount((prev) => prev + 3);
@@ -54,14 +73,16 @@ export default function HomePage() {
                         <div className="text-center">
                             {authUser && (
                                 <>
-                                    <h1
-                                        className="text-lg sm:text-xl md:text-5xl font-bold md:mb-2 text-yellow-100"
-                                    >
-                                        Hi{" "}
-                                        <span className="text-[#FFEB3B]">
-                                            {authUser?.firstName} {authUser?.lastName}
-                                        </span>
-                                    </h1>
+                                    {
+                                        authUser?.firstName && <h1
+                                            className="text-lg sm:text-xl md:text-5xl font-bold md:mb-2 text-yellow-100"
+                                        >
+                                            Hi{" "}
+                                            <span className="text-[#FFEB3B]">
+                                                {authUser?.firstName} {authUser?.lastName}
+                                            </span>
+                                        </h1>
+                                    }
 
                                     <h2
                                         className="text-lg md:text-3xl text-white"
@@ -72,14 +93,13 @@ export default function HomePage() {
                             )}
 
                             <h1 className="text-lg sm:text-2xl md:text-7xl font-bold mb-4 bg-gradient-to-t from-[#00ce03] to-white bg-clip-text text-transparent drop-shadow-md">
-                                Madhur Dairy and Daily Needs
+                                { company?.name }
                             </h1>
 
                             <p
-                                className="hidden sm:flex text-sm md:text-2xl max-w-2xl mx-auto text-gray-100"
+                                className="hidden sm:flex text-sm md:text-2xl max-w-2xl mx-auto justify-center text-gray-100"
                             >
-                                Pure goodness in every drop — nourishing your family with love, care,
-                                and the freshest dairy delights.
+                                { company?.tagline }
                             </p>
                         </div>
                     </motion.div>
@@ -200,16 +220,27 @@ export default function HomePage() {
                 <h2 className="text-2xl md:text-4xl font-bold text-center text-gray-900 dark:text-white mb-6">
                     What Our Customers Say
                 </h2>
-                <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading testimonials...</div>}>
-                    <Marquee gradient={false} speed={20}>
-                        <div className="flex gap-10 p-3">
-                            {testimonials.map((testimonial, index) => (
-                                <TestimonialCard key={index * 0.6} {...testimonial} />
-                            ))}
-                        </div>
-                    </Marquee>
-                </Suspense>
 
+                {loading ? (
+                    <div className="text-center py-5 text-gray-400">Loading testimonials...</div>
+                ) : (
+                    <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading testimonials...</div>}>
+                        <Marquee gradient={false} speed={20}>
+                            <div className="flex gap-10 p-3">
+                                {customerReviews.map((review) => (
+                                    <ReviewCard
+                                        key={review._id}
+                                        userImage={review?.userId?.photo || "/default-user.png"}
+                                        name={review?.userId?.username || "Anonymous"}
+                                        message={review.message}
+                                        rating={review.rating}
+                                        likesCount={review.likes?.length || 0}
+                                    />
+                                ))}
+                            </div>
+                        </Marquee>
+                    </Suspense>
+                )}
             </section>
 
             <Suspense fallback={<div className="text-center py-5 text-gray-400">Loading product process...</div>}>

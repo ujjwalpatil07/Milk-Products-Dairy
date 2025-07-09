@@ -1,4 +1,5 @@
 import api from "./api";
+
 export const updateUserProfilePhoto = async (formData, onUploadProgress) => {
   const res = await api.post("/user-profile/edit-profilePhoto", formData, {
     headers: { "Content-Type": "multipart/form-data" },

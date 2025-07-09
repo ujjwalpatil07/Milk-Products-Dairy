@@ -11,7 +11,7 @@ import { getDiscountedPrice } from "../../utils/helper";
 import { formatNumberWithCommas } from "../../utils/format";
 
 
-export default function ProductCard({ item }) {
+export default function ProductCard({ item, highlightOutOfStock }) {
 
     const { id, name, image, price, selectedQuantity, quantityUnit, type, stock, discount } = item;
     const { removeFromCart, updateCartItem } = useContext(CartContext);
@@ -50,7 +50,7 @@ export default function ProductCard({ item }) {
     const isOutOfStock = stock < newQty;
 
     return (
-        <div className={`w-full rounded-lg p-2 flex items-center gap-4 transition relative dark:bg-gray-500/20 bg-white ${isOutOfStock && "opacity-60"}`}>
+        <div className={`w-full rounded-lg p-2 flex items-center gap-4 transition relative dark:bg-gray-500/20 bg-white ${isOutOfStock && "opacity-60"}  ${highlightOutOfStock && "ring-1 ring-red-500 !bg-red-500/10 animate-pulse"}`}>
             <div className="h-22 w-22 md:w-32 md:h-32 flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
                 {image ? (
                     <img src={image} alt={name} className="w-full h-full object-cover" />
@@ -140,4 +140,5 @@ ProductCard.propTypes = {
         stock: PropTypes.number.isRequired,
         discount: PropTypes.number.isRequired,
     }).isRequired,
+    highlightOutOfStock: PropTypes.bool.isRequired,
 };    

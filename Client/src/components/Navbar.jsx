@@ -17,8 +17,6 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
-import logoDarkMode from "../assets/logoDarkMode.png";
-import logoLightMode from "../assets/logoLightMode.png";
 import { ThemeContext } from '../context/ThemeProvider';
 import { UserAuthContext } from "../context/AuthProvider"
 import { CartContext } from '../context/CartProvider';
@@ -28,6 +26,7 @@ import Slide from '@mui/material/Slide';
 import { removeUserNotification } from '../services/userProfileService';
 import { useSnackbar } from 'notistack';
 import UserProfileSidebar from './UserProfileSidebar';
+import company from "../data/company.json";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -124,6 +123,7 @@ export default function Navbar() {
         }
     };
 
+    const displayLogo = (theme === "light" ? company?.logoLightTheme : company?.logoDaraTheme);
 
     let renderUserSection;
 
@@ -177,7 +177,7 @@ export default function Navbar() {
 
                     <Link to="/">
                         <img
-                            src={theme === 'light' ? logoLightMode : logoDarkMode}
+                            src={displayLogo}
                             alt="logo"
                             loading='lazy'
                             className="h-10 sm:h-12 object-cover rounded-md"
@@ -236,7 +236,7 @@ export default function Navbar() {
                 <Box className={`w-64 p-4 flex flex-col gap-4 h-full overflow-auto bg-gray-100 text-black dark:bg-[#282828] dark:text-white'}`}>
                     <Link to="/">
                         <img
-                            src={theme === 'light' ? logoLightMode : logoDarkMode}
+                            src={displayLogo}
                             alt="logo"
                             loading='lazy'
                             className="h-12 sm:h-12 object-cover rounded-md"

@@ -34,3 +34,13 @@ export const fetchCustomers = async () => {
   const res = await api.get("/u/customers");
   return res?.data ?? [];
 };
+
+export const handleUpdateAdminPassword = async (adminId, newPassword, serverOtp, userOtp) => {
+  const res = await api.post("/admin/update-password", { 
+    adminId,
+    newPassword, 
+    serverOtp,
+    userOtp,
+  });
+  return res?.data;
+}

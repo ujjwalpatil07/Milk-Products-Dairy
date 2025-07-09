@@ -8,6 +8,7 @@ import { faqs, products } from "../data/products";
 import ProductCard from "../components/LandingComponents/ProductCard";
 import { features } from "../data/productGoodness ";
 import { UserAuthContext } from "../context/AuthProvider";
+import company from "../data/company.json";
 
 const QuestionAnswer = lazy(() => import("../components/LandingComponents/QuestionAnswer"));
 const FeatureCard = lazy(() => import("../components/LandingComponents/FeatureCard"));
@@ -40,13 +41,13 @@ export default function LandingPage() {
                         Welcome to
                     </h1>
                     <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 bg-clip-text text-transparent">
-                        Madhur Dairy & Daily Needs
+                        {company?.name}
                     </h1>
                     <p className="text-xl md:text-2xl mb-6 font-semibold text-white">
-                        Bringing Nature's Best, Straight to Your Home
+                        {company?.tagline}
                     </p>
                     <p className="max-w-2xl mx-auto mb-8 text-lg md:text-xl leading-relaxed text-white">
-                        From farm-fresh milk to creamy ghee, soft paneer to delicious sweets — savor the pure taste of tradition in every bite.
+                        {company?.description}
                     </p>
                     <Link
                         to={authUser ? "/home" : "/login"}
@@ -98,9 +99,9 @@ export default function LandingPage() {
 
             <section className="max-w-6xl mx-auto px-4 pb-10 pt-5">
                 <h1
-                    className="text-2xl md:text-4xl font-bold text-center mb-5"
+                    className="text-2xl md:text-4xl font-bold text-center mb-5 max-w-130 mx-auto"
                 >
-                    Why Choose Madhur Dairy & <br /> Daily Needs ?
+                    Why Choose {company?.name}
                 </h1>
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">

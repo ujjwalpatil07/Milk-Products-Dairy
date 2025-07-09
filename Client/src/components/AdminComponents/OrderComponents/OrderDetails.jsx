@@ -10,13 +10,13 @@ import { filterOrdersBySearch } from "../../../utils/filterOrders";
 import { socket } from "../../../socket/socket";
 import { Avatar, Menu } from "@mui/material";
 import { FilterIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
-export default function OrderDetails({ allOrders, loading }) {
+export default function OrderDetails({ allOrders, loading, statusFilter, handleStatusFilter }) {
   const { enqueueSnackbar } = useSnackbar();
   const { navbarInput, highlightMatch } = useContext(SidebarContext);
   const { authAdmin } = useContext(AdminAuthContext);
 
-  const [statusFilter, setStatusFilter] = useState("All");
   const [debouncedSearchText] = useDebounce(navbarInput, 300);
   const [localOrders, setLocalOrders] = useState([]);
   const [processingId, setProcessingId] = useState(null);
@@ -165,9 +165,9 @@ export default function OrderDetails({ allOrders, loading }) {
           <div className="flex items-center gap-4">
             <Avatar src={owner?.photo} alt={owner?.firstName} className="!w-10 !h-10" />
             <div>
-              <p className="font-semibold">
+              <Link to={`/admin/customers/${owner?._id}/orders-history`} className="font-semibold">
                 {highlightMatch(owner?.firstName, navbarInput)} {highlightMatch(owner?.lastName, navbarInput)}
-              </p>
+              </Link>
               <p className="text-sm text-gray-500 dark:text-gray-300">{owner?.mobileNo}</p>
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function OrderDetails({ allOrders, loading }) {
           .map((status) => (
             <button
               key={status}
-              onClick={() => setStatusFilter(status)}
+              onClick={() => handleStatusFilter(status)}
               className={`px-4 py-2 rounded-full transition-all duration-200 ${statusFilter === status
                 ? "bg-[#843E71] text-white shadow"
                 : "bg-gray-200 dark:bg-gray-500/10 hover:bg-gray-300 dark:hover:bg-gray-500/30 text-gray-800 dark:text-white"
@@ -312,4 +312,6 @@ export default function OrderDetails({ allOrders, loading }) {
 OrderDetails.propTypes = {
   allOrders: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
+  statusFilter: PropTypes.string.isRequired,
+  handleStatusFilter: PropTypes.func.isRequired,
 };

@@ -3,7 +3,6 @@ import { sendOtpEmail } from "./sentOtp";
 
 export const loginUser = async (email, password) => {
   const res = await api.post("/u/login", { email, password });
-  console.log(res.data);
   return res?.data;
 };
 

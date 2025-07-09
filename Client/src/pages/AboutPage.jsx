@@ -1,7 +1,7 @@
 import ProductProcess from "../components/ProductProcess";
 import dairyImage from "../assets/dairyImage.png";
-import { aboutUs } from "../data/productGoodness ";
 import AboutCard from "../components/AboutComponents/AboutCard";
+import aboutData from "../data/about.json";
 
 export default function AboutPage() {
   return (
@@ -31,7 +31,7 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {aboutUs.map((card, index) => (
+        {aboutData.map((card, index) => (
           <AboutCard key={index * 0.8} {...card} reverse={index % 2 === 0} />
         ))}
       </section>

@@ -12,7 +12,7 @@ export const SidebarProvider = ({ children }) => {
     if (!term) return text;
 
     const regex = new RegExp(`(${term})`, "gi");
-    const parts = text.split(regex);
+    const parts = (text || "")?.split(regex);
 
     return parts.map((part, i) =>
       part.toLowerCase() === term.toLowerCase() ? (
