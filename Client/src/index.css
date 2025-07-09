@@ -5,6 +5,7 @@ body {
   font-family: "Nunito", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
+  top: 0px !important;
 }
 
 .hide-input-spin::-webkit-outer-spin-button,
@@ -48,3 +49,11 @@ body {
     opacity: 0;
   }
 }
+
+/* .goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body>.skiptranslate {
+  display: none !important;
+} */

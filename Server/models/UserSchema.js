@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -20,17 +20,27 @@ const UserSchema = new mongoose.Schema(
         "Invalid email format. Example: user@example.com",
       ],
     },
-    
+
+    isGoogleUser: { type: Boolean, default: false },
+
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.isGoogleUser;
+      },
       validate: {
         validator: function (value) {
+          // Allow null for Google users
+          if (this.isGoogleUser && !value) return true;
           return /^(?=.*[A-Za-z])(?=.*[\d\W]).{8,}$/.test(value);
         },
         message:
           "Password must be at least 8 characters long and include at least one letter and one number or symbol.",
       },
+    },
+
+    fullName: {
+      type: String,
     },
 
     firstName: {

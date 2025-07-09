@@ -34,6 +34,8 @@ import { useContext, useEffect } from "react";
 import { socket } from "../socket/socket";
 import AdminProfile from "../pages/Admin/AdminProfile";
 import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider";
+import ForgetPassword from "../pages/Auth/User/ForgetPassword";
+import ResetPassword from "../pages/Auth/User/ResetPassword";
 
 export default function Routers() {
 
@@ -60,6 +62,8 @@ export default function Routers() {
                 <Route path="/home" element={<Layout><HomePage /></Layout>} />
 
                 <Route path="/login" element={<UserLogin />} />
+                <Route path="/login/forget-password" element={<ForgetPassword />} />
+                <Route path="/login/reset-password" element={<ResetPassword/>} />
                 <Route path="/signup" element={<UserSignUp />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
 

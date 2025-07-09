@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import GoogleLogin from "./GoogleLogin";
 import { loginUser } from "../../../services/userService";
 import { AdminAuthContext } from "../../../context/AuthProvider";
 import company from "../../../data/company.json";
@@ -40,8 +41,9 @@ export default function UserLogin() {
 
       if (res?.success) {
         if (!res?.filledBasicInfo) {
-          navigate("/signup/info-input", {state : {user : res?.user, viaLogin : !res?.filledBasicInfo}});
-        }else{
+          localStorage.setItem("User", JSON.stringify(res?.user));
+          navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
+        } else {
           localStorage.setItem("User", JSON.stringify(res?.user));
           handleAdminLogout();
           enqueueSnackbar("Login Successful!", { variant: "success" });
@@ -64,12 +66,12 @@ export default function UserLogin() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-      <motion.div 
+      <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100, opacity: 0 }}
-        transition={ {duration: 0.8, ease: "easeOut"} }
-      className="p-6 bg-white dark:bg-gray-900 rounded-md w-lg">
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="p-6 bg-white dark:bg-gray-900 rounded-md w-lg">
         <h2 className="text-lg font-semibold text-center text-gray-800 dark:text-gray-200">
           Welcome to
         </h2>
@@ -140,9 +142,10 @@ export default function UserLogin() {
 
           <div className="text-sm flex justify-between font-semibold text-right mb-3 text-[#843E71]">
             <div className="flex justify-center text-black dark:text-gray-300 hover:underline">
-              <input type="checkbox" className="me-2" /> Remember me
+              <input type="checkbox" id="remember" className="me-2" />
+              <label htmlFor="remember">Remember me</label>
             </div>
-            <Link to="/forget" className="hover:underline">
+            <Link to="/login/forget-password" className="hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -176,12 +179,9 @@ export default function UserLogin() {
           <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
         </div>
 
-        <div className="flex w-full justify-between pt-2">
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-            <i className="fa-brands fa-facebook"></i>
-          </div>
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-            <i className="fa-brands fa-google"></i>
+        <div className=" w-full flex justify-center pt-2">
+          <div className="w-1/2">
+            <GoogleLogin />
           </div>
         </div>
       </motion.div>

@@ -11,6 +11,7 @@ export default function OtpVerification() {
   const { enqueueSnackbar } = useSnackbar();
 
   const formData = location?.state?.formData;
+  const sentOtp = location?.state?.otp;
 
   useEffect(() => {
     if (!formData) {
@@ -41,6 +42,10 @@ export default function OtpVerification() {
     const enteredOtp = otp.join("");
     if (enteredOtp.length !== 5) {
       enqueueSnackbar("Please enter a valid 5-digit OTP", { variant: "error" });
+      return;
+    } else if (enteredOtp !== sentOtp) {
+      console.log(sentOtp, enteredOtp)
+      enqueueSnackbar("Please enter a correct otp.", { variant: "error" })
       return;
     }
 
@@ -74,13 +79,13 @@ export default function OtpVerification() {
 
         <h1 className="text-3xl font-semibold mt-6 text-[#843E71] dark:text-white">Verify OTP</h1>
         <p className="text-sm mt-4 text-gray-600 dark:text-gray-300">
-          An authentication code has been sent to your email. Enter the 5-digit OTP below to verify.
+          An authentication code has been sent to {formData?.email} email. Enter the 5-digit OTP below to verify.
         </p>
 
         <div id="otp-input" className="flex justify-between mt-8 space-x-2">
           {otp.map((digit, index) => (
             <input
-              key={index * 0.6}
+              key={index * 0.9}
               type="text"
               maxLength="1"
               value={digit}
@@ -88,7 +93,7 @@ export default function OtpVerification() {
               onKeyDown={(e) => handleKeyDown(e, index)}
               ref={(el) => (inputRefs.current[index] = el)}
               className={`${loading ? "cursor-not-allowed" : "cursor-text"} h-14 w-12 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-center text-xl focus:outline-none focus:ring-2 focus:ring-[#843E71] transition`}
-              />
+            />
           ))}
         </div>
 
@@ -114,9 +119,9 @@ export default function OtpVerification() {
 
       <div className="hidden md:flex w-[50%] h-full justify-center items-center">
         <img
-          src="https://img.freepik.com/free-vector/otp-concept-illustration_114360-7882.jpg"
+          src="https://useme.in/web/assets/images/what-now/your-privacy.png"
           alt="OTP Illustration"
-          className="w-[80%] max-h-[400px] object-contain dark:invert"
+          className="w-[80%] max-h-[400px] object-contain "
         />
       </div>
     </div>
