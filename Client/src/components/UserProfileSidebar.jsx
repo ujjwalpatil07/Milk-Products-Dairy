@@ -3,7 +3,6 @@ import {
     MdOutlineAccountCircle,
     MdLocationOn,
     MdShoppingCart,
-    MdDelete,
     MdFavorite,
     MdPayment,
     MdArrowForward,
@@ -13,11 +12,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserAuthContext } from "../context/AuthProvider";
 import { updateUserProfilePhoto } from "../services/userProfileService";
 import { enqueueSnackbar } from "notistack";
+import LanguageModalSidebar from "./LanguageModalSidebar";
+
 
 export default function UserProfileSidebar() {
 
     const location = useLocation();
     const navigate = useNavigate();
+
     const { authUser, setAuthUser, handleUserLogout, setOpenLoginDialog } = useContext(UserAuthContext);
 
     const [selectedFile, setSelectedFile] = useState(null);
@@ -28,7 +30,7 @@ export default function UserProfileSidebar() {
 
     useEffect(() => {
         if (authUser?.photo) {
-            setPhotoUrl(authUser.photo);
+            setPhotoUrl(authUser?.photo);
         }
     }, [authUser]);
 
@@ -92,7 +94,7 @@ export default function UserProfileSidebar() {
                 <div className="relative w-24 h-24">
                     <img
                         src={photoUrl || null}
-                        alt="User"
+                        alt={photoUrl}
                         className="rounded-full w-24 h-24 object-cover border"
                     />
 
@@ -159,11 +161,7 @@ export default function UserProfileSidebar() {
                     </Link>
                 ))}
 
-                <button
-                    className={`w-full flex items-center gap-2 px-4 py-2 text-left rounded text-red-500 transition duration-300`}
-                >
-                    <MdDelete /> Delete Account
-                </button>
+                <LanguageModalSidebar />
 
                 <button
                     onClick={handleLogout}
@@ -172,6 +170,9 @@ export default function UserProfileSidebar() {
                     Log out <MdArrowForward />
                 </button>
             </nav>
+
         </aside>
+
+
     );
 };

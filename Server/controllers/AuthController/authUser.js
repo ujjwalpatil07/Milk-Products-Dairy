@@ -92,21 +92,62 @@ export const loginUser = async (req, res) => {
 export const loginWithGoogle = async (req, res) => {
   const { token } = req.body;
 
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Google token is required",
+    });
+  }
+
+  // Verify Google token
   const ticket = await client.verifyIdToken({
     idToken: token,
     audience: process.env.GOOGLE_CLIENT_ID,
   });
 
   const payload = ticket.getPayload();
-  const { email, name, picture } = payload;
+  const { email, name} = payload;
 
+  // Check if user already exists
   let user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(400).json({ success: false, message: "User not registered for this email." });
+    // Create a new user
+    const nameParts = name?.split(" ") || [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    user = new User({
+      email: email,
+      firstName : firstName,
+      lastName: lastName,
+      isGoogleUser: true,
+      password: null,
+    });
+
+    await user.save();
   }
 
-  res.status(200).json({ success: true});
+  // Check for basic info filled
+  const isfilledBasicInfo = Boolean(
+    user.firstName &&
+      user.lastName &&
+      user.gender &&
+      user.mobileNo &&
+      user.address
+  );
+
+  // // Optional: Create JWT token if needed for frontend auth
+  // const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  //   expiresIn: "7d",
+  // });
+
+  res.status(200).json({
+    success: true,
+    message: "Google login successful",
+    user: { _id: user._id, email },
+    filledBasicInfo: isfilledBasicInfo,
+  });
 };
 
 export const verifyUser = async (req, res) => {

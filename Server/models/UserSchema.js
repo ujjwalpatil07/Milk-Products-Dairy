@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -21,11 +21,17 @@ const UserSchema = new mongoose.Schema(
       ],
     },
 
+    isGoogleUser: { type: Boolean, default: false },
+
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.isGoogleUser;
+      },
       validate: {
         validator: function (value) {
+          // Allow null for Google users
+          if (this.isGoogleUser && !value) return true;
           return /^(?=.*[A-Za-z])(?=.*[\d\W]).{8,}$/.test(value);
         },
         message:
@@ -33,9 +39,7 @@ const UserSchema = new mongoose.Schema(
       },
     },
 
-    isGoogleUser: { type: Boolean, default: false },
-
-    fullName : {
+    fullName: {
       type: String,
     },
 

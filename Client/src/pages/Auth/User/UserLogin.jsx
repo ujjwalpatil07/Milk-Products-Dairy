@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
-import { GoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser, loginWithGoogle } from "../../../services/userService";
+import { loginUser } from "../../../services/userService";
 import { AdminAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import GoogleLogin from "./GoogleLogin";
 
 export default function UserLogin() {
 
@@ -180,25 +180,7 @@ export default function UserLogin() {
 
         <div className=" w-full flex justify-center pt-2">
           <div className="w-1/2">
-            <GoogleLogin
-              width="100%"
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const res = await loginWithGoogle(credentialResponse)
-                  if (res?.success) {
-                    localStorage.setItem("User", JSON.stringify(res?.data?.user));
-                    enqueueSnackbar("Google Login Successful", { variant: "success" });
-                    navigate("/home");
-                  } else {
-                    enqueueSnackbar("Google login failed", { variant: "error" });
-                  }
-                } catch (err) {
-                  console.error(err);
-                  enqueueSnackbar("Error logging in with Google", { variant: "error" });
-                }
-              }}
-              onError={() => enqueueSnackbar("Google Sign In Failed", { variant: "error" })}
-            />
+            <GoogleLogin />
           </div>
         </div>
       </motion.div>

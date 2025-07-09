@@ -4,10 +4,11 @@ import { generateOtp, signupUser } from "../../../services/userService";
 import { useSnackbar } from "notistack";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import GoogleLogin from "./GoogleLogin";
 
 export default function UserSignUp() {
   const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();  
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +23,6 @@ export default function UserSignUp() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-
 
   const isValidPassword = (password) => {
     return /^(?=.*\d).{8,}$/.test(password); // 8 chars, 1 number
@@ -196,12 +195,9 @@ export default function UserSignUp() {
         </div>
 
         {/* Social login */}
-        <div className="flex w-full justify-between mt-4">
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
-            <i className="fa-brands fa-facebook"></i>
-          </div>
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] dark:text-white transition cursor-pointer">
-            <i className="fa-brands fa-google"></i>
+        <div className=" w-full flex justify-center pt-2">
+          <div className="w-1/2">
+            <GoogleLogin/>
           </div>
         </div>
       </motion.div>
