@@ -146,7 +146,7 @@ export default function OrderDetails({ allOrders, loading, statusFilter, handleS
     );
   } else {
     content = statusFilteredOrders.map((order) => {
-      const { address, productsData, totalAmount, status, createdAt, _id } = order;
+      const { address, productsData, totalAmount, status, createdAt, _id, paymentMode } = order;
       const owner = address?.owner;
 
       const isProcessing = processingId?.orderId === _id;
@@ -206,7 +206,10 @@ export default function OrderDetails({ allOrders, loading, statusFilter, handleS
           </div>
 
           <div className="flex flex-wrap justify-between gap-4 pt-4">
-            <div className="text-lg font-semibold w-full sm:flex-1">Total Amount: &#8377;{totalAmount}</div>
+            <div className="w-full flex justify-between items-center sm:flex-1 space-x-2">
+              <span className="text-lg font-semibold">Total Amount: &#8377;{totalAmount}</span>
+              <span className="text-green-500 line-clamp-1">{paymentMode}</span>
+            </div>
 
             {status === "Pending" && (
               <div className="space-x-3 grid grid-cols-2 sm:flex w-full sm:w-fit">
