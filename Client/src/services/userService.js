@@ -7,7 +7,6 @@ export const loginUser = async (email, password) => {
 };
 
 export const loginWithGoogle = async (credentialResponse) => {
-  // console.log(credentialResponse)
   const res = await api.post("/u/google-login", {
     token: credentialResponse.credential,
   });

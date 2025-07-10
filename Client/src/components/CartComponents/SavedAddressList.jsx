@@ -1,46 +1,85 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 import PropTypes from "prop-types";
-import { getSavedAddresses } from "../../services/userProfileService";
+import { addNewAddress, getSavedAddresses } from "../../services/userProfileService";
 import { UserAuthContext } from "../../context/AuthProvider";
 import { Close } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import { useSnackbar } from 'notistack';
+import NewAddressModel from "../../pages/UserProfile/Models/NewAddressModel";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 
 export default function SavedAddressList({ open, handleDialogStatus }) {
-const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const { authUser, setDeliveryAddress } = useContext(UserAuthContext);
 
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [newAddress, setNewAddress] = useState({
+    addressType: "Home",
+    name: "",
+    phone: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+  const [newAddressModel, setNewAddressModel] = useState(false);
+  const [newAddressLoading, setNewAddressLoading] = useState(false);
+
+
   const handleSelectAddress = (address) => {
     handleDialogStatus(false);
-    localStorage.setItem("deliveryAddress", JSON.stringify(address));
     setDeliveryAddress(address);
   };
 
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const data = await getSavedAddresses(authUser?._id);
-        setAddresses(data?.userAddresses || []);
-      } catch (err) {
-        enqueueSnackbar(err?.response?.message || "Failed to fetch addresses", {variant: "error"});
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchAddresses = useCallback(async () => {
+    try {
+      const data = await getSavedAddresses(authUser?._id);
+      setAddresses(data?.userAddresses || []);
+    } catch (err) {
+      enqueueSnackbar(err?.response?.message || "Failed to fetch addresses", { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
+  }, [authUser?._id, enqueueSnackbar]);
 
+  useEffect(() => {
     if (authUser) fetchAddresses();
-  }, [authUser, enqueueSnackbar]);
+  }, [authUser, fetchAddresses]);
+
+  const addAddress = async (e) => {
+    e.preventDefault();
+    setNewAddressLoading(true);
+    try {
+      const data = await addNewAddress(authUser?._id, newAddress);
+      if (data?.success) {
+        setNewAddress({
+          addressType: "Home",
+          name: "",
+          phone: "",
+          streetAddress: "",
+          city: "",
+          state: "",
+          pincode: "",
+        });
+        setAddresses(prev => [...prev, data?.address]);
+        setDeliveryAddress(data?.address);
+        enqueueSnackbar("New address added successfully", { variant: "success" });
+        setNewAddressModel(false);
+      }
+    } catch {
+      enqueueSnackbar("Failed to add address", { variant: "error" });
+    } finally {
+      setNewAddressLoading(false);
+    }
+  };
 
   let addressContent;
   if (loading) {
@@ -95,37 +134,68 @@ const { enqueueSnackbar } = useSnackbar();
   }
 
   return (
-    <Dialog
-      open={open}
-      slots={{
-        transition: Transition,
-      }}
-      keepMounted
-      onClose={() => handleDialogStatus(false)}
-      fullWidth="Full width"
-      maxWidth="sm"
-      aria-describedby="alert-dialog-slide-description"
-    >
-      <div className=" dark:bg-black/80 !max-w-5xl">
-        <div className="p-3 sticky top-0 left-0 text-gray-800 dark:text-gray-100 mb-4 flex justify-between backdrop-blur-md bg-white/70 dark:bg-black/30 z-10">
-          <h2 className="text-xl font-semibold">Saved Addresses</h2>
-          <button
-            onClick={() => handleDialogStatus(false)}
-            className="hover:bg-gray-500/20 dark:hover:bg-gray-500/50 border border-gray-500/50 dark:border-gray-500 h-7 w-7 rounded-full flex justify-center items-center"
-          >
-            <Close sx={{ fontSize: "1.2rem" }} />
-          </button>
+    <>
+      <Dialog
+        open={open}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => handleDialogStatus(false)}
+        fullWidth="Full width"
+        maxWidth="sm"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <div className=" dark:bg-black/80 !max-w-5xl">
+          <div className="p-3 sticky top-0 left-0 text-gray-800 dark:text-gray-100 mb-4 flex justify-between backdrop-blur-md bg-white/70 dark:bg-black/30 z-10">
+            <h2 className="text-xl font-semibold">Saved Addresses</h2>
+            <button
+              onClick={() => handleDialogStatus(false)}
+              className="hover:bg-gray-500/20 dark:hover:bg-gray-500/50 border border-gray-500/50 dark:border-gray-500 h-7 w-7 rounded-full flex justify-center items-center"
+            >
+              <Close sx={{ fontSize: "1.2rem" }} />
+            </button>
+          </div>
+
+          {addressContent}
+
+          <div className="w-full flex justify-center">
+            <button onClick={() => setNewAddressModel(true)} className="w-fit px-3 py-2 bg-[#843E71] text-white rounded">Add New Address</button>
+          </div>
+
+          <br />
         </div>
+      </Dialog>
 
-        {addressContent}
-
-        <div className="w-full flex justify-center">
-          <Link to={"/user-profile/addresses"} className="w-fit px-3 py-1 bg-blue-500 text-white rounded-lg">Add New Address</Link>
-        </div>
-
-        <br />
-      </div>
-    </Dialog>
+      <Dialog
+        open={newAddressModel}
+        slots={{
+          transition: Transition,
+        }}
+        keepMounted
+        onClose={() => setNewAddressModel(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: "transparent",
+              boxShadow: 24,
+              borderRadius: 1,
+            },
+          },
+        }}
+        fullWidth="Full width"
+        maxWidth="sm"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <NewAddressModel
+          newAddress={newAddress}
+          setNewAddress={setNewAddress}
+          setNewAddressModel={setNewAddressModel}
+          addAddress={addAddress}
+          loading={newAddressLoading}
+        />
+      </Dialog>
+    </>
   );
 }
 

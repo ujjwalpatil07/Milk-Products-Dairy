@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, createContext, useCallback } from 
 import { getUserById } from "../services/userService";
 import { getAdminById } from "../services/adminService";
 import { socket } from "../socket/socket";
+import { getSavedAddresses } from "../services/userProfileService";
 
 export const UserAuthContext = createContext();
 export const AdminAuthContext = createContext();
@@ -19,22 +20,26 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUserData = async () => {
-
             try {
                 setAuthUserLoading(true);
                 const localUser = JSON.parse(localStorage.getItem("User"));
 
-                if (localUser?._id && authUser?._id !== localUser?._id) {
-                    const data = await getUserById(localUser?._id)
-                    const user = data?.user;
+                if (localUser?._id && authUser?._id !== localUser._id) {
+                    const userData = await getUserById(localUser._id);
+                    const user = userData?.user;
 
                     if (user) {
                         setAuthUser(user);
                     }
+
+                    const addressData = await getSavedAddresses(localUser._id);
+                    const firstAddress = addressData?.userAddresses?.[0] || null;
+                    setDeliveryAddress(firstAddress);
                 }
             } catch (error) {
                 console.error("User fetch failed", error);
                 setAuthUser(null);
+                setDeliveryAddress(null);
             } finally {
                 setAuthUserLoading(false);
             }

@@ -21,7 +21,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function MyAddresses() {
 
   const { enqueueSnackbar } = useSnackbar();
-  const { authUser, authUserLoading } = useContext(UserAuthContext);
+  const { authUser, authUserLoading, deliveryAddress, setDeliveryAddress } = useContext(UserAuthContext);
 
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -93,6 +93,10 @@ export default function MyAddresses() {
       if (data?.success) {
         getAddresses();
         enqueueSnackbar("Address removed successfully", { variant: "success" });
+
+        if(address?._id === deliveryAddress?._id) {
+          setDeliveryAddress(null);
+        }
       }
     } catch {
       enqueueSnackbar("Failed to remove address", { variant: "error" });
@@ -150,7 +154,7 @@ export default function MyAddresses() {
       </div>
 
     )
-  }else {
+  } else {
     content = (
       <div className="space-y-4">
         {addresses.map((item) => (
