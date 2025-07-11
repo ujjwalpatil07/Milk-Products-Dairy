@@ -1,13 +1,14 @@
 import express from "express"
 import wrapAsync from "../../utils/wrapAsync.js"
 import { loginUser, signUpUser, verifyOtp, handleInfoInput, getUser, removeUserNotification, getAllCustomers, verifyUser, resetPassword, loginWithGoogle } from "../../controllers/AuthController/authUser.js";
-import {upload} from "../../config/cloudinary.js"
+import { upload } from "../../config/cloudinary.js"
+import { loginLimiter } from "../../middlewares/rateLimiter.js"
 
 const router = express.Router();
 
 router.post("/signup", wrapAsync(signUpUser));
 
-router.post("/login", wrapAsync(loginUser));
+router.post("/login", loginLimiter, wrapAsync(loginUser));
 
 router.post("/google-login", wrapAsync(loginWithGoogle));
 
