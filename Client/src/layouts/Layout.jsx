@@ -3,7 +3,6 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
-import LoginDialog from "../pages/Auth/User/LoginDialog";
 import { ProductContext } from "../context/ProductProvider";
 
 export default function Layout({ children }) {
@@ -43,17 +42,13 @@ export default function Layout({ children }) {
     }, [setShowHeaderExtras]);
 
     return (
-        <>
-            <div ref={scrollRef} className="h-screen scroll-smooth flex flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
-                <Navbar />
-                <main className="flex-1">
-                    {children}
-                </main>
-                <Footer />
-            </div>
-
-            <LoginDialog />
-        </>
+        <div ref={scrollRef} className="h-screen scroll-smooth flex flex-col overflow-y-auto overflow-x-hidden bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300">
+            <Navbar />
+            <main className="flex-1">
+                {children}
+            </main>
+            <Footer />
+        </div>
     )
 }
 

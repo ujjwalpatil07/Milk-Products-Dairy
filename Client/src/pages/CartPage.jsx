@@ -19,7 +19,7 @@ export default function CartPage() {
 
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
-    const { authUser, deliveryAddress } = useContext(UserAuthContext);
+    const { authUser, deliveryAddress, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems, removeFromCart } = useContext(CartContext);
     const { products, productLoading } = useContext(ProductContext);
 
@@ -77,9 +77,9 @@ export default function CartPage() {
             <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
                 <h2 className="text-xl font-semibold text-gray-700 dark:text-white">You're not logged in.</h2>
                 <p className="text-gray-500 mb-4 dark:text-gray-300">Please log in to view your cart.</p>
-                <Link to={"/login"} className="text-blue-500 hover:text-blue-600" >
+                <button onClick={() => setOpenLoginDialog(true)} className="text-blue-500 hover:text-blue-600" >
                     Go to Login
-                </Link>
+                </button>
             </div>
         );
     }

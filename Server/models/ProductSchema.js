@@ -24,7 +24,7 @@ const ProductSchema = new Schema(
         "Ice Cream",
         "Shrikhand",
         "Whey Protein",
-        "Dairy-Based Sweets ",
+        "Dairy-Based Sweets",
       ],
     },
       
