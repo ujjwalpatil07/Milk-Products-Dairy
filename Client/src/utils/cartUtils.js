@@ -1,6 +1,8 @@
 export const getCartProductDetails = (cartItems, products, removeFromCart) => {
   const productMap = new Map();
 
+  if (!cartItems?.length || !products?.length) return [];
+
   for (const product of products) {
     productMap.set(product._id?.toString(), {
       ...product,
