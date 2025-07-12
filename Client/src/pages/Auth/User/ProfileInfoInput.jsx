@@ -4,7 +4,7 @@ import { TextField, Button } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../../context/ThemeProvider";
 import { maharashtraCities } from "../../../data/cities";
-import { AdminAuthContext } from "../../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
 import { submitSignupForm } from "../../../services/userProfileService";
 
@@ -12,6 +12,7 @@ export default function ProfileInfoInput() {
   const navigate = useNavigate();
   const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
+  const { fetchUserData } = useContext(UserAuthContext);
   const { handleAdminLogout } = useContext(AdminAuthContext);
   const { theme } = useContext(ThemeContext);
 
@@ -107,7 +108,6 @@ export default function ProfileInfoInput() {
         return;
       }
 
-
       const formData = new FormData();
       formData.append("id", userIdInLocalStorage);
       formData.append("profileInfo", JSON.stringify(profileInfo));
@@ -117,9 +117,10 @@ export default function ProfileInfoInput() {
 
       if (data?.success) {
         localStorage.setItem("User", JSON.stringify(data?.user));
+        await fetchUserData(data?.user?._id);
         handleAdminLogout();
         if (viaLogin) {
-          enqueueSnackbar("Basic details submitted !", { variant: "success" });
+          enqueueSnackbar("Basic details submitted!", { variant: "success" });
         } else {
           enqueueSnackbar("Profile created successfully!", { variant: "success" });
         }

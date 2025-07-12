@@ -18,60 +18,52 @@ export const AuthProvider = ({ children }) => {
     const storedAddress = JSON.parse(localStorage.getItem("deliveryAddress"));
     const [deliveryAddress, setDeliveryAddress] = useState(storedAddress || null);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                setAuthUserLoading(true);
-                const localUser = JSON.parse(localStorage.getItem("User"));
+    const fetchUserData = useCallback(async (userId) => {
+        try {
+            setAuthUserLoading(true);
+            if (userId) {
+                const userData = await getUserById(userId);
+                const user = userData?.user;
 
-                if (localUser?._id && authUser?._id !== localUser._id) {
-                    const userData = await getUserById(localUser._id);
-                    const user = userData?.user;
-
-                    if (user) {
-                        setAuthUser(user);
-                    }
-
-                    const addressData = await getSavedAddresses(localUser._id);
-                    const firstAddress = addressData?.userAddresses?.[0] || null;
-                    setDeliveryAddress(firstAddress);
+                if (user) {
+                    setAuthUser(user);
                 }
-            } catch (error) {
-                console.error("User fetch failed", error);
-                setAuthUser(null);
-                setDeliveryAddress(null);
-            } finally {
-                setAuthUserLoading(false);
+
+                const addressData = await getSavedAddresses(userId);
+                const firstAddress = addressData?.userAddresses?.[0] || null;
+                setDeliveryAddress(firstAddress);
             }
-        };
-
-        fetchUserData();
-
-        window.addEventListener("localStorageChange", fetchUserData);
-        return () => window.removeEventListener("localStorageChange", fetchUserData);
-    }, [authUser]);
+        } catch {
+            setAuthUser(null);
+            setDeliveryAddress(null);
+        } finally {
+            setAuthUserLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchAdminData = async () => {
-            try {
-                setAuthAdminLoading(true);
-                const localAdmin = JSON.parse(localStorage.getItem("Admin"));
-                if (localAdmin?._id && localAdmin?._id !== authAdmin?._id) {
-                    const data = await getAdminById(localAdmin?._id);
-                    setAuthAdmin(data?.admin);
-                }
-            } catch {
-                setAuthAdmin(null);
-            } finally {
-                setAuthAdminLoading(false);
+        const localUser = JSON.parse(localStorage.getItem("User"));
+        if (localUser?._id) fetchUserData(localUser?._id);
+    }, [fetchUserData]);
+
+    const fetchAdminData = useCallback(async (adminId) => {
+        try {
+            setAuthAdminLoading(true);
+            if (adminId) {
+                const data = await getAdminById(adminId);
+                setAuthAdmin(data?.admin);
             }
-        };
+        } catch {
+            setAuthAdmin(null);
+        } finally {
+            setAuthAdminLoading(false);
+        }
+    }, []);
 
-        fetchAdminData();
-
-        window.addEventListener("localStorageChange", fetchAdminData);
-        return () => window.removeEventListener("localStorageChange", fetchAdminData);
-    }, [authAdmin]);
+    useEffect(() => {
+        const localAdmin = JSON.parse(localStorage.getItem("Admin"));
+        if (localAdmin?._id) fetchAdminData(localAdmin?._id);
+    }, [fetchAdminData]);
 
     const handleUserLogout = useCallback(() => {
 
@@ -97,7 +89,8 @@ export const AuthProvider = ({ children }) => {
         setAuthAdmin,
         setAuthAdminLoading,
         handleAdminLogout,
-    }), [authAdmin, authAdminLoading, handleAdminLogout]);
+        fetchAdminData
+    }), [authAdmin, authAdminLoading, handleAdminLogout, fetchAdminData]);
 
     const value2 = useMemo(() => ({
         authUser,
@@ -108,8 +101,9 @@ export const AuthProvider = ({ children }) => {
         setDeliveryAddress,
         setAuthUserLoading,
         setOpenLoginDialog,
-        handleUserLogout
-    }), [authUser, deliveryAddress, authUserLoading, openLoginDialog, handleUserLogout]);
+        handleUserLogout,
+        fetchUserData
+    }), [authUser, deliveryAddress, authUserLoading, openLoginDialog, handleUserLogout, fetchUserData]);
 
     return (
         <AdminAuthContext.Provider value={value1}>

@@ -18,8 +18,8 @@ export default function LoginDialog() {
     const location = useLocation();
     const { enqueueSnackbar } = useSnackbar();
 
-    const { openLoginDialog, setOpenLoginDialog, handleUserLogout } = useContext(UserAuthContext);
-    const { handleAdminLogout } = useContext(AdminAuthContext);
+    const { openLoginDialog, setOpenLoginDialog, handleUserLogout, fetchUserData } = useContext(UserAuthContext);
+    const { handleAdminLogout, fetchAdminData } = useContext(AdminAuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -28,11 +28,14 @@ export default function LoginDialog() {
     const handleUserLogin = async () => {
         const res = await loginUser(email, password);
         if (res?.success) {
+
+            localStorage.setItem("User", JSON.stringify(res?.user));
+            await fetchUserData(res?.user?._id);
+
             if (!res?.filledBasicInfo) {
                 navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
                 setOpenLoginDialog(false);
             } else {
-                localStorage.setItem("User", JSON.stringify(res?.user));
                 handleAdminLogout();
                 enqueueSnackbar("Login Successful!", { variant: "success" });
                 navigate("/home");
@@ -48,12 +51,16 @@ export default function LoginDialog() {
     const handleAdminLogin = async () => {
         const res = await loginAdmin(email, password);
         if (res?.admin) {
+            
             localStorage.setItem("Admin", JSON.stringify(res.admin));
+            await fetchAdminData(res.admin?._id);
+
             handleUserLogout();
             enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
             setEmail("");
             setPassword("");
             setOpenLoginDialog(false);
+
             if (!location.pathname.startsWith("/admin")) {
                 navigate("/admin/dashboard");
             }

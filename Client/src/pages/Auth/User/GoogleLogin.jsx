@@ -3,24 +3,29 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { FaGoogle } from "react-icons/fa"; // optional icon
 import { loginWithGoogle } from "../../../services/userService";
 import { useSnackbar } from "notistack";
-import { AdminAuthContext } from "../../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export default function GoogleLogin() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
+  const { fetchUserData } = useContext(UserAuthContext);
 
   const login = useGoogleLogin({
     onSuccess: (credentialResponse) => {
-      loginWithGoogle(credentialResponse)
-        .then((res) => {
+      const handleGoogleLogin = async () => {
+        try {
+          const res = await loginWithGoogle(credentialResponse);
           if (res?.success) {
+            localStorage.setItem("User", JSON.stringify(res?.user));
+            await fetchUserData(res?.user?._id);
+
             if (!res?.filledBasicInfo) {
-              localStorage.setItem("User", JSON.stringify(res?.user));
-              navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
+              navigate("/signup/info-input", {
+                state: { user: res?.user, viaLogin: true },
+              });
             } else {
-              localStorage.setItem("User", JSON.stringify(res?.user));
               handleAdminLogout();
               enqueueSnackbar("Login Successful!", { variant: "success" });
               navigate("/home");
@@ -28,16 +33,19 @@ export default function GoogleLogin() {
           } else {
             enqueueSnackbar("Login failed, please try again.", { variant: "error" });
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error(err);
           enqueueSnackbar("Error logging in with Google", { variant: "error" });
-        });
+        }
+      };
+
+      handleGoogleLogin(); // ✅ call the async function
     },
     onError: () => {
       enqueueSnackbar("Google Login Failed", { variant: "error" });
     },
   });
+
   return (
 
     <button

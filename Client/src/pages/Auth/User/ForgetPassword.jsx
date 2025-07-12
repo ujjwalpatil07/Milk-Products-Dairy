@@ -44,7 +44,6 @@ export default function ForgetPassword() {
     }
 
     const otpGenerated = generateOtp();
-    console.log(otpGenerated)
     setLoading(true);
 
     try {
@@ -73,15 +72,11 @@ export default function ForgetPassword() {
     if (enteredOtp.length !== 5) {
       return enqueueSnackbar("Please enter a valid 5-digit OTP", { variant: "error" });
     } else if (enteredOtp !== sentOTP) {
-      console.log(sentOTP)
       return enqueueSnackbar("Please enter a correct otp.", { variant: "error" });
     }
 
-    navigate("/login/reset-password", {state : {email : email}});
+    navigate("/login/reset-password", { state: { email: email } });
   };
-
-
-
 
   return (
     <div className={`flex flex-col md:flex-row min-h-screen transition bg-[#f5f5f5] dark:bg-[#121212] items-center justify-center px-4 py-10`}>
@@ -145,11 +140,8 @@ export default function ForgetPassword() {
               variant="contained"
               onClick={showOtpInput ? () => {
                 verifyOtp()
-                console.log("Verifying OTP")
               } : () => {
                 verifyEmail()
-                console.log("Verifying email")
-
               }}
               // disabled={loading}
               className="w-full !mt-6 font-semibold !bg-[#843E71] hover:!bg-[#6f3260] transition"
