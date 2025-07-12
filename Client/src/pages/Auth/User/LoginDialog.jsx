@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { loginAdmin } from "../../../services/adminService";
 import company from "../../../data/company.json";
+import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -24,6 +25,7 @@ export default function LoginDialog() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [loginType, setLoginType] = useState("user");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleUserLogin = async () => {
         const res = await loginUser(email, password);
@@ -51,7 +53,7 @@ export default function LoginDialog() {
     const handleAdminLogin = async () => {
         const res = await loginAdmin(email, password);
         if (res?.admin) {
-            
+
             localStorage.setItem("Admin", JSON.stringify(res.admin));
             await fetchAdminData(res.admin?._id);
 
@@ -148,14 +150,25 @@ export default function LoginDialog() {
                         required
                     />
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full pr-10 px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <Eye /> : <EyeOff />}
+                        </button>
+                    </div>
+
 
                     <button
                         type="submit"
