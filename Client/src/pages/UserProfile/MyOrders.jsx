@@ -119,7 +119,9 @@ export default function MyOrders() {
   } else if (!filteredOrders || filteredOrders?.length === 0) {
     content = (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16 w-full">
-        You haven't placed any orders yet.
+        {selectedStatus.title === "All"
+          ? "You haven't placed any orders yet."
+          : `No ${selectedStatus?.title.toLowerCase()} orders found.`}
       </div>
     );
   } else {

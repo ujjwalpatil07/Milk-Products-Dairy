@@ -193,7 +193,7 @@ export default function Navbar() {
                     )}
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <Tooltip title="Cart">
                         <button onClick={handleUserCart}>
                             <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
@@ -243,8 +243,8 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    <hr className='text-gray-500/40'/>
-                    
+                    <hr className='text-gray-500/40' />
+
                     <div className='flex-1 space-y-4'>
 
                         {navItems.map((item, idx) =>
@@ -306,14 +306,14 @@ export default function Navbar() {
                             maxHeight: "300px",
                             backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
                             right: {
-                                xs: 30,    
-                                sm: 100,   
-                                md: 150   
+                                xs: 30,
+                                sm: 100,
+                                md: 150
                             },
                             width: {
                                 xs: '300px',
                                 sm: '300px',
-                                md: '350px' 
+                                md: '350px'
                             }
                         },
                     },
@@ -330,7 +330,9 @@ export default function Navbar() {
                                 onClick={() => handleRemoveNotification(-1, "all")}
                                 className="text-xs text-red-500 hover:underline disabled:cursor-not-allowed"
                             >
-                                Clear All
+                                {
+                                    notificationLoadingIndex === "all" ? <div className="w-3 h-3 border-[2px] border-t-transparent border-gray-500 rounded-full animate-spin" /> : "Clear All"
+                                }
                             </button>
                         )}
                     </div>

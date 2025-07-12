@@ -51,7 +51,7 @@ export default function ForgetPassword() {
       if (res?.success) {
         setDisableInput(true);
 
-        const response = await sendOtpEmail(res?.email, otpGenerated); // ✅ correct usage
+        const response = await sendOtpEmail(res?.email, otpGenerated); 
         if (response?.success) {
           enqueueSnackbar("Otp sent successfully", { variant: "success" });
           setSentOTP(otpGenerated);

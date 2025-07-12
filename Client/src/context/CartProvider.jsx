@@ -1,24 +1,32 @@
-import { useEffect, useMemo, useState, createContext } from "react";
-import PropTypes from "prop-types"
+import { useEffect, useMemo, useState, createContext, useContext, useCallback } from "react";
+import PropTypes from "prop-types";
+import { UserAuthContext } from "./AuthProvider";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-
+    const { authUser } = useContext(UserAuthContext);
     const [cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
-        const stored = localStorage.getItem("cart");
+        if (!authUser?._id) {
+            setCartItems([]);
+            return;
+        }
+
+        const stored = localStorage.getItem(`cart_${authUser._id}`);
         if (stored) {
             setCartItems(JSON.parse(stored));
+        } else {
+            setCartItems([]);
         }
-    }, []);
+    }, [authUser]);
 
     useEffect(() => {
-        if (cartItems?.length > 0) {
-            localStorage.setItem("cart", JSON.stringify(cartItems));
+        if (authUser?._id) {
+            localStorage.setItem(`cart_${authUser._id}`, JSON.stringify(cartItems));
         }
-    }, [cartItems]);
+    }, [cartItems, authUser]);
 
     const addToCart = (productId, quantity, price) => {
         const formattedQuantity = Number(quantity.toFixed(3));
@@ -53,10 +61,12 @@ export const CartProvider = ({ children }) => {
         setCartItems(prev => prev.filter(item => item.productId !== productId));
     };
 
-    const clearCart = () => {
+    const clearCart = useCallback(() => {
         setCartItems([]);
-        localStorage.removeItem("cart");
-    };
+        if (authUser?._id) {
+            localStorage.removeItem(`cart_${authUser._id}`);
+        }
+    }, [authUser?._id]);
 
     const value = useMemo(() => ({
         cartItems,
@@ -64,15 +74,15 @@ export const CartProvider = ({ children }) => {
         updateCartItem,
         removeFromCart,
         clearCart
-    }), [cartItems]);
+    }), [cartItems, clearCart]);
 
     return (
         <CartContext.Provider value={value}>
             {children}
         </CartContext.Provider>
-    )
-}
+    );
+};
 
 CartProvider.propTypes = {
     children: PropTypes.node.isRequired
-};  
+};
