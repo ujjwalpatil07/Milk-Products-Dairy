@@ -194,14 +194,14 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <Tooltip title="Cart">
+                    { authUser && <Tooltip title="Cart">
                         <button onClick={handleUserCart}>
                             <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
                                 <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
                                 <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
                             </div>
                         </button>
-                    </Tooltip>
+                    </Tooltip> }
 
                     <div className="relative inline-block">
                         <button

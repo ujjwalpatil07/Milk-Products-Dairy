@@ -124,10 +124,10 @@ export default function SearchProducts({ query, handleInputChange }) {
                     </div>
 
                     {showHeaderExtras && <div className="flex items-center space-x-2">
-                        <button onClick={handleCart} className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
+                        { authUser && <button onClick={handleCart} className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
                             <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
                             <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
-                        </button>
+                        </button> }
                         {authUser ? (
                             <Link to={`/user-profile`} className="p-0">
                                 <Avatar alt={authUser?.firstName} src={authUser?.photo} />

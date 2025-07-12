@@ -26,7 +26,7 @@ import { useSnackbar } from "notistack";
 export default function ProductDetails({ productId }) {
 
     const navigate = useNavigate();
-    const { authUser, setAuthUser } = useContext(UserAuthContext);
+    const { authUser, setAuthUser, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
     const { products } = useContext(ProductContext);
     const { enqueueSnackbar } = useSnackbar();
@@ -66,6 +66,14 @@ export default function ProductDetails({ productId }) {
 
 
     const handleAddProduct = (productId) => {
+
+        if (!authUser?._id) {
+            enqueueSnackbar("Please log in to add items to cart.", { variant: "error" });
+            setOpenLoginDialog(true);
+            return;
+        }
+
+
         if (quantity <= 0) {
             enqueueSnackbar("Please select quantity.", { variant: "error" });
             return;
@@ -83,6 +91,7 @@ export default function ProductDetails({ productId }) {
     const handleLikeProduct = async (productId) => {
         if (!authUser?._id) {
             enqueueSnackbar("Please log in to like products.", { variant: "error" });
+            setOpenLoginDialog(true);
             return;
         }
 
@@ -114,6 +123,7 @@ export default function ProductDetails({ productId }) {
     const handleAddProductInWishlist = async (productId) => {
         if (!authUser?._id) {
             enqueueSnackbar("Please log in to add items to your wishlist.", { variant: "info" });
+            setOpenLoginDialog(true);
             return;
         }
 
@@ -363,7 +373,7 @@ export default function ProductDetails({ productId }) {
                         </Tooltip>
                         <input
                             type="number"
-                            className="hide-input-spin text-center w-17 md:text-2xl text-gray-800 dark:text-white font-semibold border-2 border-gray-300 dark:border-gray-500 rounded-lg  bg-white dark:bg-gray-500/20"
+                            className="hide-input-spin text-center w-17 text-2xl md:text-3xl text-gray-800 dark:text-white font-semibold border-2 border-gray-300 dark:border-gray-500 rounded-lg  bg-white dark:bg-gray-500/20"
                             value={quantity}
                             min={0}
                             max={Math.max(0, stock - (existing?.quantity || 0))}

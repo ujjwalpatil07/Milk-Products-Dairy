@@ -25,7 +25,7 @@ import { useSnackbar } from 'notistack';
 export default function ProductVarietyCard({ id, image, name, discount, rating, likes, price, minQuantity, stock, quantityUnit }) {
     const { enqueueSnackbar } = useSnackbar();
 
-    const { authUser, setAuthUser } = useContext(UserAuthContext);
+    const { authUser, setAuthUser, setOpenLoginDialog } = useContext(UserAuthContext);
     const { cartItems, addToCart } = useContext(CartContext);
     const minQty = Number(minQuantity) || 1;
     const existing = cartItems?.find(item => item?.productId === id);
@@ -40,12 +40,18 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
     const { discountedPrice, saved } = getDiscountedPrice(priceNumber, discountPercent);
     const isWishlisted = authUser?.wishlistedProducts?.includes(id);
 
-
     useEffect(() => {
         setLocalLikes(likes);
     }, [likes]);
 
     const handleAddProduct = (productId, price) => {
+
+        if (!authUser?._id) {
+            enqueueSnackbar("Please log in to add items to cart.", { variant: "error" });
+            setOpenLoginDialog(true);
+            return;
+        }
+        
         if (quantity <= 0) {
             enqueueSnackbar("Please select quantity.", { variant: "error" });
             return;
@@ -63,6 +69,7 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
     const handleLikeProduct = async (productId) => {
         if (!authUser?._id) {
             enqueueSnackbar("Please log in to like products.", { variant: "error" });
+            setOpenLoginDialog(true);
             return;
         }
 
@@ -87,6 +94,7 @@ export default function ProductVarietyCard({ id, image, name, discount, rating, 
     const handleAddProductInWishlist = async (productId) => {
         if (!authUser?._id) {
             enqueueSnackbar("Please log in to add items to your wishlist.", { variant: "info" });
+            setOpenLoginDialog(true);
             return;
         }
 
