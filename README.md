@@ -1,6 +1,8 @@
-# Madhur Dairy – Real-Time MERN Stack Based Dairy Products Platform 🚀
+# Madhur Dairy & Daily Needs – Real-Time MERN Stack Based Dairy Products Platform 
+
 
 ![Madhur Dairy Banner](./assets/landingpage.png)
+
 
 ## 📌 About the Project
 
@@ -57,7 +59,7 @@
 ## 🌐 Hosted Links
 
 - 🚀 **Frontend**: [https://milk-products-dairy.vercel.app](https://milk-products-dairy.vercel.app)
-- 🌐 **Backend**: [https://madhur-dairy.onrender.com](https://madhur-dairy.onrender.com)
+- 🌐 **Backend**: [https://madhur-dairy.onrender.com](https://madhur-dairy-daily-need-server.onrender.com/)
 
 ---
 
@@ -65,42 +67,62 @@
 
 >  Follow these steps to run the project on your local machine
 
----
 
 ### 1. Clone the repository
 Clones the full stack repo to your system.
 
 ```bash
 git clone https://github.com/nitingayke/MilkProductsDairy.git
+```
+
+### 2. Move to the Project Directory
+Navigate into the main project folder.
+
+```bash
 cd MilkProductsDairy
 ```
 
---- 
-
-### 2. Set up the Client (Frontend)  
-Installs React frontend dependencies and starts development server.
+### 3. Set Up the Client (Frontend) 
+Navigate to the Client directory.
 ```bash
 cd Client
+```
+
+Install all required frontend dependencies.
+```bash
 npm install
+```
+
+Start the frontend development server.
+```bash
 npm run dev
 ```
 
-#### Create .env files in Client/.env
+
+#### 4. Create Environment File for Client
 ```env
 VITE_EMAILJS_SERVICE_ID=<your_emailjs_service_id>
 VITE_EMAILJS_TEMPLATE_ID=<your_emailjs_template_id>
 VITE_EMAILJS_PUBLIC_KEY=<your_emailjs_public_key>
 ```
 
-### 3. Set up the Server (Backend)  
-Installs Express backend dependencies and starts server.
+### 5. Set Up the Server (Backend)
+Open a new terminal and navigate to the server folder.
 ```bash
-cd server
-npm install
-npm run dev or nodemon
+cd Server
 ```
 
-#### Create .env files in /Server/.env
+Install all backend dependencies.
+```bash
+npm install
+```
+
+Start the backend development server.
+```bash
+nodemon
+```
+
+### 6. Create Environment File for Server
 ```env
 DB_URL=<your_mongodb_uri>
 CLOUDINARY_CLOUD_NAME=<your_cloud_name>
