@@ -141,9 +141,9 @@ GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
 |----------|--------------|-----------------|
 | ![Homepage](./assets/homepage.png) | ![Product](./assets/productpage.png) | ![Dashboard](./assets/dashboard.png) |
 
-| Payment | Notifications | Admin Profile |
+| Payment | Related Products | Admin Profile |
 |--------|----------------|----------------|
-| ![Cart](./assets/cartPage.png) | ![Related Products](./assets/relatedProducts.png) | ![Orders](./assets/orders.png) |
+| ![Payment](./assets/payment.png) | ![Related Products](./assets/relatedProducts.png) | ![Orders](./assets/orders.png) |
 
 
 >  This project reflects real-world collaboration, planning, and execution — from designing the UI to deploying on production servers. Proudly built with
