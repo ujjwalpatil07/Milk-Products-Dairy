@@ -11,6 +11,7 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
+    "@express-rate-limit/tsconfig": "^1.0.2",
     "@getbrevo/brevo": "^1.0.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^1.41.3",
