@@ -22,7 +22,6 @@ export const signUpUser = async (req, res) => {
   }
 
   const isPasswordValidated = /^(?=.*\d).{8,}$/.test(password);
-  console.log(isPasswordValidated);
 
   if (!isPasswordValidated) {
     return res
@@ -90,7 +89,8 @@ export const loginUser = async (req, res) => {
 };
 
 export const loginWithGoogle = async (req, res) => {
-  const { token } = req.body;
+  let { token } = req.body;
+  console.log(token);
 
   if (!token) {
     return res.status(400).json({
@@ -108,19 +108,24 @@ export const loginWithGoogle = async (req, res) => {
   const payload = ticket.getPayload();
   const { email, name} = payload;
 
-  // Check if user already exists
   let user = await User.findOne({ email });
 
-  if (!user) {
-    // Create a new user
+  if (user) {
+    if (!user?.isGoogleUser) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is already registered. Please log in manually.",
+      });
+    }
+  } else {
     const nameParts = name?.split(" ") || [];
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "";
 
     user = new User({
-      email: email,
-      firstName : firstName,
-      lastName: lastName,
+      email,
+      firstName,
+      lastName,
       isGoogleUser: true,
       password: null,
     });
@@ -137,15 +142,11 @@ export const loginWithGoogle = async (req, res) => {
       user.address
   );
 
-  // // Optional: Create JWT token if needed for frontend auth
-  // const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-  //   expiresIn: "7d",
-  // });
 
   res.status(200).json({
     success: true,
     message: "Google login successful",
-    user: { _id: user._id, email },
+    user,
     filledBasicInfo: isfilledBasicInfo,
   });
 };

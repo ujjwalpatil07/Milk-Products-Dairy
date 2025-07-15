@@ -6,12 +6,12 @@ export const loginUser = async (email, password) => {
   return res?.data;
 };
 
-export const loginWithGoogle = async (credentialResponse) => {
+export const loginWithGoogle = async (token) => {
   const res = await api.post("/u/google-login", {
-    token: credentialResponse.credential,
+    token
   });
 
-  return res.data;
+  return res?.data;
 };
 
 export const signupUser = async (formData, otp) => {

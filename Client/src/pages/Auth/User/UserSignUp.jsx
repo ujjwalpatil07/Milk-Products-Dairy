@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack";
 import { motion } from "framer-motion";
 import GoogleLogin from "./GoogleLogin";
 import company from "../../../data/company.json";
+import GoogleLoginComponent from "./GoogleLogin";
 
 export default function UserSignUp() {
   const navigate = useNavigate();
@@ -197,7 +198,7 @@ export default function UserSignUp() {
 
         {/* Social login */}
         <div className=" w-full flex justify-center pt-2">
-          <GoogleLogin />
+          <GoogleLoginComponent />
         </div>
       </motion.div>
     </div>

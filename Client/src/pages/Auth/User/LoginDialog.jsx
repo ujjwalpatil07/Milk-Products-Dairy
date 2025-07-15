@@ -33,13 +33,14 @@ export default function LoginDialog() {
         const res = await loginUser(email, password);
         if (res?.success) {
 
-            localStorage.setItem("User", JSON.stringify(res?.user));
-            await fetchUserData(res?.user?._id);
-
             if (!res?.filledBasicInfo) {
                 navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
                 setOpenLoginDialog(false);
             } else {
+                
+                localStorage.setItem("User", JSON.stringify(res?.user));
+                await fetchUserData(res?.user?._id);
+
                 handleAdminLogout();
                 enqueueSnackbar("Login Successful!", { variant: "success" });
                 navigate("/home");
