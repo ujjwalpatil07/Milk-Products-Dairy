@@ -12,13 +12,13 @@ export const SidebarProvider = ({ children }) => {
     if (!term) return text;
 
     const regex = new RegExp(`(${term})`, "gi");
-    const parts = (text || "")?.split(regex);
+    const parts = String(text || "")?.split(regex);
 
     return parts.map((part, i) =>
       part.toLowerCase() === term.toLowerCase() ? (
         <span
           key={i * 0.9}
-          className="bg-yellow-300 dark:bg-yellow-600 font-semibold rounded px-1"
+          className="bg-yellow-300 dark:bg-yellow-600 font-semibold"
         >
           {part}
         </span>

@@ -160,9 +160,9 @@ export default function StoreOrdersHistory() {
                                                 <tr key={item._id} className="border-b border-gray-200 dark:border-gray-700 text-sm">
                                                     <td className="px-3 py-2">{item.productId?.name || "N/A"}</td>
                                                     <td className="px-3 py-2">{item.productQuantity}</td>
-                                                    <td className="px-3 py-2">&#8377; {item.productPrice}</td>
+                                                    <td className="px-3 py-2">₹{item.productPrice}</td>
                                                     <td className="px-3 py-2">
-                                                        &#8377; {(item.productPrice * item.productQuantity).toFixed(2)}
+                                                        ₹{(item.productPrice * item.productQuantity).toFixed}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -183,7 +183,7 @@ export default function StoreOrdersHistory() {
 
                                     <p className="flex items-center gap-1 font-semibold text-gray-800 dark:text-white">
                                         <span>Total Amount:</span>
-                                        <span>&#8377; {order.totalAmount}</span>
+                                        <span>₹{order.totalAmount}</span>
                                     </p>
                                 </div>
                             </div>
