@@ -139,7 +139,6 @@ export default function ProfileInfoInput() {
         enqueueSnackbar("Something went wrong!", { variant: "error" });
       }
     } catch (err) {
-      console.log(err)
       enqueueSnackbar(err?.response?.data?.message || "Server error occurred!", { variant: "error" });
     } finally {
       setIsLoading(false);
