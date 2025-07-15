@@ -170,12 +170,6 @@ export default function AdminLogin() {
           
         </form>
 
-        <div className="flex items-center my-6 w-full">
-          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
-          <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
-          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
-        </div>
-        
       </motion.div>
     </div>
   );

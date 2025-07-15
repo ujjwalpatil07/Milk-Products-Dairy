@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { loginAdmin } from "../../../services/adminService";
 import company from "../../../data/company.json";
+import GoogleLogin from "./GoogleLogin";
 import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -21,6 +22,7 @@ export default function LoginDialog() {
 
     const { openLoginDialog, setOpenLoginDialog, handleUserLogout, fetchUserData } = useContext(UserAuthContext);
     const { handleAdminLogout, fetchAdminData } = useContext(AdminAuthContext);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -150,7 +152,7 @@ export default function LoginDialog() {
                         required
                     />
 
-                    <div className="relative">
+                    <div className="relative w-full">
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
@@ -168,7 +170,6 @@ export default function LoginDialog() {
                             {showPassword ? <Eye /> : <EyeOff />}
                         </button>
                     </div>
-
 
                     <button
                         type="submit"
@@ -195,6 +196,27 @@ export default function LoginDialog() {
                         </Link>
                     </p>
                 </div>
+
+
+
+                {/* Social login */}
+                {loginType === "user" ? (
+                    <>
+                        {/* OR */}
+                        <div className="flex items-center w-full mt-3">
+                            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
+                            <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
+                            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
+                        </div>
+
+                        <div className=" w-full flex justify-center pt-3">
+                            <div className="w-1/2">
+                                <GoogleLogin />
+                            </div>
+                        </div>
+                    </>
+
+                ) : null}
             </DialogContent>
         </Dialog>
     );

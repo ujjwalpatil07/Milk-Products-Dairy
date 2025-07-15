@@ -50,7 +50,7 @@ export default function GoogleLogin() {
 
     <button
       onClick={() => login()}
-      className="w-full bg-[#843E71] text-white py-2 rounded-md hover:bg-[#6f3360] flex items-center justify-center gap-2 transition"
+      className="w-full bg-[#843E71] text-sm text-white py-1.5 rounded-md hover:bg-[#6f3360] flex items-center justify-center gap-2 transition"
     >
       <FaGoogle />
       Continue with Google

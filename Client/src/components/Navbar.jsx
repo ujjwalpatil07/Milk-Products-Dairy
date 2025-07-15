@@ -83,7 +83,7 @@ export default function Navbar() {
         setOpen(false);
         if (!authUser) {
             setOpenLoginDialog(true);
-            enqueueSnackbar("You are not logged in.", { variant: "error" });
+            enqueueSnackbar("You are not logged in ! Please login first ", { variant: "info" });
             return;
         }
 
