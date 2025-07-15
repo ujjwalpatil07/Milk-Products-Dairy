@@ -9,8 +9,11 @@ import { useSnackbar } from "notistack";
 import { submitSignupForm } from "../../../services/userProfileService";
 
 export default function ProfileInfoInput() {
+
   const navigate = useNavigate();
   const location = useLocation();
+  const userData = location?.state?.formData();
+
   const { enqueueSnackbar } = useSnackbar();
   const { fetchUserData } = useContext(UserAuthContext);
   const { handleAdminLogout } = useContext(AdminAuthContext);
@@ -20,12 +23,18 @@ export default function ProfileInfoInput() {
 
   const hasShownSnackbar = useRef(false);
 
+  // useEffect(() => {
+  //   if (viaLogin && !hasShownSnackbar.current) {
+  //     enqueueSnackbar("Fill the basic info before proceeding", { variant: "info" });
+  //     hasShownSnackbar.current = true;
+  //   }
+  // }, [viaLogin, enqueueSnackbar, location.pathname, navigate]);
+
   useEffect(() => {
     if (viaLogin && !hasShownSnackbar.current) {
       enqueueSnackbar("Fill the basic info before proceeding", { variant: "info" });
-      hasShownSnackbar.current = true;
     }
-  }, [viaLogin, enqueueSnackbar, location.pathname, navigate]);
+  }, [enqueueSnackbar, viaLogin]);
 
 
   const getTextFieldStyles = (theme) => ({
@@ -101,15 +110,15 @@ export default function ProfileInfoInput() {
     setIsLoading(true);
     try {
 
-      const userIdInLocalStorage = JSON.parse(localStorage.getItem("User"))?._id;
-      if (!viaLogin && !userIdInLocalStorage) {
+      const userId = userData?._id;
+      if (!viaLogin && !userId) {
         enqueueSnackbar("User not logged in, please login!", { variant: "error" });
         navigate("/login");
         return;
       }
 
       const formData = new FormData();
-      formData.append("id", userIdInLocalStorage);
+      formData.append("id", userId);
       formData.append("profileInfo", JSON.stringify(profileInfo));
       if (selectedFile) formData.append("photo", selectedFile);
 
@@ -117,6 +126,7 @@ export default function ProfileInfoInput() {
 
       if (data?.success) {
         localStorage.setItem("User", JSON.stringify(data?.user));
+        localStorage.removeItem("otp-status");
         await fetchUserData(data?.user?._id);
         handleAdminLogout();
         if (viaLogin) {

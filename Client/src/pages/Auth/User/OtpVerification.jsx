@@ -14,6 +14,13 @@ export default function OtpVerification() {
   const sentOtp = location?.state?.otp;
 
   useEffect(() => {
+    const otpStatus = localStorage.getItem("otp-status");
+    if(otpStatus?.email === formData?.email && otpStatus?.isOtpEntered) {
+      navigate("/signup/info-input");
+    }
+  }, [formData?.email, navigate]);
+  
+  useEffect(() => {
     if (!formData) {
       navigate("/signup");
     }
@@ -53,8 +60,9 @@ export default function OtpVerification() {
       const data = await verifyUserOTP(formData);
 
       if (data?.success) {
+        localStorage.setItem("otp-status", { email: formData.email, isOtpEntered: true });
         enqueueSnackbar("User signed up successfully", { variant: "success" });
-        navigate("/signup/info-input");
+        navigate("/signup/info-input", { state: { formData } });
       } else {
         enqueueSnackbar("Something went wrong", { variant: "error" });
       }
