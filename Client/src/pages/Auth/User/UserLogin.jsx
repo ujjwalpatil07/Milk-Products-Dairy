@@ -7,6 +7,7 @@ import GoogleLogin from "./GoogleLogin";
 import { loginUser } from "../../../services/userService";
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import company from "../../../data/company.json";
+import GoogleLoginComponent from "./GoogleLogin";
 
 export default function UserLogin() {
 
@@ -182,7 +183,7 @@ export default function UserLogin() {
         </div>
 
         <div className=" w-full flex justify-center pt-2">
-          <GoogleLogin />
+          <GoogleLoginComponent />
         </div>
       </motion.div>
     </div>

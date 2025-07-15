@@ -1,31 +1,40 @@
 import React, { useContext } from "react";
-import { useGoogleLogin } from "@react-oauth/google";
-import { FaGoogle } from "react-icons/fa"; // optional icon
+import { GoogleLogin } from "@react-oauth/google";
 import { loginWithGoogle } from "../../../services/userService";
 import { useSnackbar } from "notistack";
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
-export default function GoogleLogin() {
+
+export default function GoogleLoginComponent() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
-  const { fetchUserData } = useContext(UserAuthContext);
+  const { fetchUserData, setOpenLoginDialog } = useContext(UserAuthContext);
 
-  const login = useGoogleLogin({
-    onSuccess: (credentialResponse) => {
-      const handleGoogleLogin = async () => {
+  return (
+
+    <GoogleLogin
+      onSuccess={async (credentialResponse) => {
         try {
-          const res = await loginWithGoogle(credentialResponse);
+          const res = await loginWithGoogle(credentialResponse.credential); // Send { token }
+
           if (res?.success) {
-            localStorage.setItem("User", JSON.stringify(res?.user));
-            await fetchUserData(res?.user?._id);
+
+            setOpenLoginDialog(false);
 
             if (!res?.filledBasicInfo) {
               navigate("/signup/info-input", {
                 state: { user: res?.user, viaLogin: true },
               });
             } else {
+
+              localStorage.setItem("User", JSON.stringify({
+                email: res?.user?.email,
+                _id: res?.user?._id
+              }));
+              await fetchUserData(res?.user?._id);
+
               handleAdminLogout();
               enqueueSnackbar("Login Successful!", { variant: "success" });
               navigate("/home");
@@ -34,26 +43,16 @@ export default function GoogleLogin() {
             enqueueSnackbar("Login failed, please try again.", { variant: "error" });
           }
         } catch (err) {
-          console.error(err);
-          enqueueSnackbar("Error logging in with Google", { variant: "error" });
+          const message =
+            err.response?.data?.message || "Error logging in with Google.";
+          enqueueSnackbar(message, { variant: "error" });
         }
-      };
+      }}
 
-      handleGoogleLogin(); // ✅ call the async function
-    },
-    onError: () => {
-      enqueueSnackbar("Google Login Failed", { variant: "error" });
-    },
-  });
-
-  return (
-
-    <button
-      onClick={() => login()}
-      className="w-full bg-[#843E71] text-sm text-white py-1.5 rounded-md hover:bg-[#6f3360] flex items-center justify-center gap-2 transition"
-    >
-      <FaGoogle />
-      Continue with Google
-    </button>
+      onError={() => {
+        console.log("here")
+        enqueueSnackbar("Google Login Failed", { variant: "error" });
+      }}
+    />
   );
 }
