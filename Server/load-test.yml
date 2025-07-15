@@ -1,5 +1,5 @@
 config:
-  target: 'https://madhur-dairy-daily-need-server.onrender.com'
+  target: 'https://madhur-dairy-daily-need-server-1eu6.onrender.com'
   phases:
     - duration: 30
       arrivalRate: 3
