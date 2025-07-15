@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../services/userService";
 import { loginAdmin } from "../../../services/adminService";
 import company from "../../../data/company.json";
+import GoogleLogin from "./GoogleLogin";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -18,12 +19,14 @@ export default function LoginDialog() {
     const location = useLocation();
     const { enqueueSnackbar } = useSnackbar();
 
+
     const { openLoginDialog, setOpenLoginDialog, handleUserLogout } = useContext(UserAuthContext);
     const { handleAdminLogout } = useContext(AdminAuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [loginType, setLoginType] = useState("user");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleUserLogin = async () => {
         const res = await loginUser(email, password);
@@ -141,14 +144,24 @@ export default function LoginDialog() {
                         required
                     />
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
-                        required
-                    />
+                    <div className="relative w-full">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
+                            required
+                        />
+
+                        <button
+                            type="button"
+                            className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-300`}
+                            onClick={() => setShowPassword(!showPassword)}
+                        ></button>
+                    </div>
+
+
 
                     <button
                         type="submit"
@@ -175,6 +188,27 @@ export default function LoginDialog() {
                         </Link>
                     </p>
                 </div>
+
+
+
+                {/* Social login */}
+                {loginType === "user" ? (
+                    <>
+                        {/* OR */}
+                        <div className="flex items-center w-full mt-3">
+                            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
+                            <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
+                            <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
+                        </div>
+
+                        <div className=" w-full flex justify-center pt-3">
+                            <div className="w-1/2">
+                                <GoogleLogin />
+                            </div>
+                        </div>
+                    </>
+
+                ) : null}
             </DialogContent>
         </Dialog>
     );

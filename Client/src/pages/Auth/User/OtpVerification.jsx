@@ -54,7 +54,6 @@ export default function OtpVerification() {
       const data = await verifyUserOTP(formData);
 
       if (data?.success) {
-        localStorage.setItem("User", JSON.stringify(data?.user));
         enqueueSnackbar("User signed up successfully", { variant: "success" });
         navigate("/signup/info-input");
       } else {

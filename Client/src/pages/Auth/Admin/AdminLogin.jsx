@@ -168,21 +168,6 @@ export default function AdminLogin() {
           
         </form>
 
-        <div className="flex items-center my-6 w-full">
-          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow mr-3" />
-          <span className="text-gray-600 dark:text-gray-300 text-sm">or login with</span>
-          <div className="border-t border-gray-400 dark:border-gray-600 flex-grow ml-3" />
-        </div>
-
-        <div className="flex w-full justify-between pt-2">
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-            <i className="fa-brands fa-facebook"></i>
-          </div>
-          <div className="w-[47%] border p-2 text-center rounded-md border-[#843E71] hover:bg-[#843E71] hover:text-white transition cursor-pointer">
-            <i className="fa-brands fa-google"></i>
-          </div>
-        </div>
-
       </motion.div>
     </div>
   );

@@ -83,7 +83,7 @@ export default function Navbar() {
         setOpen(false);
         if (!authUser) {
             setOpenLoginDialog(true);
-            enqueueSnackbar("You are not logged in.", { variant: "error" });
+            enqueueSnackbar("You are not logged in ! Please login first ", { variant: "info" });
             return;
         }
 
@@ -243,8 +243,8 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    <hr className='text-gray-500/40'/>
-                    
+                    <hr className='text-gray-500/40' />
+
                     <div className='flex-1 space-y-4'>
 
                         {navItems.map((item, idx) =>
@@ -306,14 +306,14 @@ export default function Navbar() {
                             maxHeight: "300px",
                             backgroundColor: theme === "dark" ? "#0f0f0f" : "#ffffff",
                             right: {
-                                xs: 30,    
-                                sm: 100,   
-                                md: 150   
+                                xs: 30,
+                                sm: 100,
+                                md: 150
                             },
                             width: {
                                 xs: '300px',
                                 sm: '300px',
-                                md: '350px' 
+                                md: '350px'
                             }
                         },
                     },
