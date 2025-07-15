@@ -36,6 +36,7 @@ import AdminProfile from "../pages/Admin/AdminProfile";
 import { AdminAuthContext, UserAuthContext } from "../context/AuthProvider";
 import ForgetPassword from "../pages/Auth/User/ForgetPassword";
 import ResetPassword from "../pages/Auth/User/ResetPassword";
+import LoginDialog from "../pages/Auth/User/LoginDialog"
 
 export default function Routers() {
 
@@ -93,6 +94,8 @@ export default function Routers() {
 
                 <Route path="*" element={<Navigate to={localUser ? "/home" : "/login"} replace />} />
             </Routes>
+
+            <LoginDialog />
         </AnimatePresence>
 
     )

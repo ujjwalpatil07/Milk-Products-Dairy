@@ -17,7 +17,7 @@ export default function ResetPassword() {
 
 
   const isValidPassword = (password) => {
-    return /^(?=.*\d).{8,}$/.test(password); // 8 chars, 1 number
+    return /^(?=.*\d).{8,}$/.test(password);
   };
 
   const handleReset = async () => {

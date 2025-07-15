@@ -5,13 +5,14 @@ import { useSnackbar } from "notistack";
 import { motion } from "framer-motion";
 import GoogleLogin from "./GoogleLogin";
 import { loginUser } from "../../../services/userService";
-import { AdminAuthContext } from "../../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import company from "../../../data/company.json";
 
 export default function UserLogin() {
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+  const { fetchUserData } = useContext(UserAuthContext);
   const { handleAdminLogout } = useContext(AdminAuthContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -35,18 +36,19 @@ export default function UserLogin() {
     setIsLoading(true);
 
     try {
-
       const { email, password } = formData;
       const res = await loginUser(email, password);
 
       if (res?.success) {
+        localStorage.setItem("User", JSON.stringify(res?.user));
+        await fetchUserData(res?.user?._id);
+
+        handleAdminLogout();
+        enqueueSnackbar("Login Successful!", { variant: "success" });
+
         if (!res?.filledBasicInfo) {
-          localStorage.setItem("User", JSON.stringify(res?.user));
           navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
         } else {
-          localStorage.setItem("User", JSON.stringify(res?.user));
-          handleAdminLogout();
-          enqueueSnackbar("Login Successful!", { variant: "success" });
           navigate("/home");
         }
 
@@ -54,7 +56,6 @@ export default function UserLogin() {
         enqueueSnackbar("Login failed, please try again.", { variant: "error" });
       }
     } catch (error) {
-      console.log(error);
       enqueueSnackbar(error?.response?.data?.message || "Server error or invalid credentials.", { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -76,7 +77,7 @@ export default function UserLogin() {
           Welcome to
         </h2>
         <h1 className="text-lg mb-1 font-bold text-center bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 dark:from-yellow-300 dark:via-red-300 dark:to-pink-400 bg-clip-text text-transparent">
-          { company?.name }
+          {company?.name}
         </h1>
 
         <div className="mb-4 mt-3 flex justify-center">
@@ -180,9 +181,7 @@ export default function UserLogin() {
         </div>
 
         <div className=" w-full flex justify-center pt-2">
-          <div className="w-1/2">
-            <GoogleLogin />
-          </div>
+          <GoogleLogin />
         </div>
       </motion.div>
     </div>

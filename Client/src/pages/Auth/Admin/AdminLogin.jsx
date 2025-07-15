@@ -5,7 +5,7 @@ import { DialogContent } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { loginAdmin } from "../../../services/adminService";
-import { UserAuthContext } from "../../../context/AuthProvider";
+import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import company from "../../../data/company.json";
 
 export default function AdminLogin() {
@@ -13,6 +13,7 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleUserLogout } = useContext(UserAuthContext);
+  const { fetchAdminData } = useContext(AdminAuthContext);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +39,7 @@ export default function AdminLogin() {
 
       if (data) {
         localStorage.setItem("Admin", JSON.stringify(data.admin));
+        await fetchAdminData(data?.admin?._id);
         handleUserLogout();
         enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
         navigate("/admin/dashboard");

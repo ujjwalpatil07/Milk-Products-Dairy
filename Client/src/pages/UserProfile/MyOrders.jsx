@@ -119,7 +119,9 @@ export default function MyOrders() {
   } else if (!filteredOrders || filteredOrders?.length === 0) {
     content = (
       <div className="text-center text-gray-600 dark:text-gray-300 py-16 w-full">
-        You haven't placed any orders yet.
+        {selectedStatus.title === "All"
+          ? "You haven't placed any orders yet."
+          : `No ${selectedStatus?.title.toLowerCase()} orders found.`}
       </div>
     );
   } else {
@@ -218,7 +220,6 @@ export default function MyOrders() {
               {order?.status === "Delivered" && (
                 <a
                   href={`https://madhur-dairy-daily-need-server.onrender.com/pdf/generate-bill/${order?._id}`}
-                  // href={`https://localhost:9000/${order?._id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-fit px-4 py-1.5 text-sm font-semibold rounded bg-[#843E71] hover:bg-[#843E7190] text-white inline-block text-center"

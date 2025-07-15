@@ -193,15 +193,15 @@ export default function Navbar() {
                     )}
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <Tooltip title="Cart">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    { authUser && <Tooltip title="Cart">
                         <button onClick={handleUserCart}>
                             <div className="rounded-lg px-2 py-1 bg-[#FDE12D] flex items-center shadow-md">
                                 <ShoppingCartIcon className="text-gray-700 mt-1" sx={{ fontSize: "1.2rem" }} />
                                 <span className='ps-1 font-semibold text-lg text-gray-700'>{cartItems?.length || 0}</span>
                             </div>
                         </button>
-                    </Tooltip>
+                    </Tooltip> }
 
                     <div className="relative inline-block">
                         <button
@@ -330,7 +330,9 @@ export default function Navbar() {
                                 onClick={() => handleRemoveNotification(-1, "all")}
                                 className="text-xs text-red-500 hover:underline disabled:cursor-not-allowed"
                             >
-                                Clear All
+                                {
+                                    notificationLoadingIndex === "all" ? <div className="w-3 h-3 border-[2px] border-t-transparent border-gray-500 rounded-full animate-spin" /> : "Clear All"
+                                }
                             </button>
                         )}
                     </div>

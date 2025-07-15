@@ -44,7 +44,6 @@ export default function OtpVerification() {
       enqueueSnackbar("Please enter a valid 5-digit OTP", { variant: "error" });
       return;
     } else if (enteredOtp !== sentOtp) {
-      console.log(sentOtp, enteredOtp)
       enqueueSnackbar("Please enter a correct otp.", { variant: "error" })
       return;
     }

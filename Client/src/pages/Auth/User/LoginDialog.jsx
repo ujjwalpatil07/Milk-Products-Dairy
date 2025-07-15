@@ -8,6 +8,7 @@ import { loginUser } from "../../../services/userService";
 import { loginAdmin } from "../../../services/adminService";
 import company from "../../../data/company.json";
 import GoogleLogin from "./GoogleLogin";
+import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -19,9 +20,9 @@ export default function LoginDialog() {
     const location = useLocation();
     const { enqueueSnackbar } = useSnackbar();
 
+    const { openLoginDialog, setOpenLoginDialog, handleUserLogout, fetchUserData } = useContext(UserAuthContext);
+    const { handleAdminLogout, fetchAdminData } = useContext(AdminAuthContext);
 
-    const { openLoginDialog, setOpenLoginDialog, handleUserLogout } = useContext(UserAuthContext);
-    const { handleAdminLogout } = useContext(AdminAuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -31,11 +32,14 @@ export default function LoginDialog() {
     const handleUserLogin = async () => {
         const res = await loginUser(email, password);
         if (res?.success) {
+
+            localStorage.setItem("User", JSON.stringify(res?.user));
+            await fetchUserData(res?.user?._id);
+
             if (!res?.filledBasicInfo) {
                 navigate("/signup/info-input", { state: { user: res?.user, viaLogin: !res?.filledBasicInfo } });
                 setOpenLoginDialog(false);
             } else {
-                localStorage.setItem("User", JSON.stringify(res?.user));
                 handleAdminLogout();
                 enqueueSnackbar("Login Successful!", { variant: "success" });
                 navigate("/home");
@@ -51,12 +55,16 @@ export default function LoginDialog() {
     const handleAdminLogin = async () => {
         const res = await loginAdmin(email, password);
         if (res?.admin) {
+
             localStorage.setItem("Admin", JSON.stringify(res.admin));
+            await fetchAdminData(res.admin?._id);
+
             handleUserLogout();
             enqueueSnackbar("Logged in successfully as Admin", { variant: "success" });
             setEmail("");
             setPassword("");
             setOpenLoginDialog(false);
+
             if (!location.pathname.startsWith("/admin")) {
                 navigate("/admin/dashboard");
             }
@@ -150,18 +158,18 @@ export default function LoginDialog() {
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
+                            className="w-full pr-10 px-3 py-2 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#843E71]"
                             required
                         />
-
                         <button
                             type="button"
-                            className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"} absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-300`}
-                            onClick={() => setShowPassword(!showPassword)}
-                        ></button>
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <Eye /> : <EyeOff />}
+                        </button>
                     </div>
-
-
 
                     <button
                         type="submit"

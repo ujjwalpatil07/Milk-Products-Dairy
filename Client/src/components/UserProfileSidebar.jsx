@@ -12,8 +12,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserAuthContext } from "../context/AuthProvider";
 import { updateUserProfilePhoto } from "../services/userProfileService";
 import { enqueueSnackbar } from "notistack";
-import LanguageModalSidebar from "./LanguageModalSidebar";
-
+import { LanguagesIcon } from "lucide-react";
 
 export default function UserProfileSidebar() {
 
@@ -161,7 +160,11 @@ export default function UserProfileSidebar() {
                     </Link>
                 ))}
 
-                <LanguageModalSidebar />
+                <button
+                    className="w-full flex items-center gap-2 mt-2 px-4 py-2 text-left rounded text-gray-800 dark:text-white transition duration-300 hover:bg-[#D595C3] dark:hover:bg-[#843E71]"
+                >
+                    <LanguagesIcon /> Language
+                </button>
 
                 <button
                     onClick={handleLogout}
@@ -172,7 +175,5 @@ export default function UserProfileSidebar() {
             </nav>
 
         </aside>
-
-
     );
 };

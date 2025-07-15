@@ -119,6 +119,25 @@ export default function ProductDetailsPage() {
                                             alt={product?.name}
                                             className="w-full h-40 object-cover"
                                         />
+
+                                        {/* {(!product?.image?.[0] || product?.image?.[0] === "null") ? (
+                                            <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                                                <EmojiFoodBeverageIcon className="text-gray-400 dark:text-gray-300 text-5xl" />
+                                                <Link to={`/product-details/${slugify(product?.name)}`}>
+                                                    <span className="text-gray-500 dark:text-gray-300 text-sm font-medium hover:text-blue-500">
+                                                        {product?.name}
+                                                    </span>
+                                                </Link>
+                                            </div>
+                                        ) : (
+                                            <Link to={`/product-details/${slugify(product?.name)}`} className="w-full" >
+                                                <img
+                                                    src={product?.image?.[0]}
+                                                    alt={product?.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </Link>
+                                        )} */}
                                     </Link>
                                 )}
 
