@@ -6,7 +6,7 @@ import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider
 import { useNavigate } from "react-router-dom";
 
 
-export default function GoogleLoginComponent() {
+export default function GoogleLoginComponent( {setOpenLoginDialog, setGoogleLoginLoading} ) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
@@ -17,12 +17,11 @@ export default function GoogleLoginComponent() {
     <GoogleLogin
       onSuccess={async (credentialResponse) => {
         try {
+          setGoogleLoginLoading(true);
           const res = await loginWithGoogle(credentialResponse.credential);
-
           if (res?.success) {
 
             if (!res?.filledBasicInfo) {
-              console.log(res?.user)
               navigate("/signup/info-input", {
                 state: { user: res?.user, viaLogin: true },
               });
@@ -44,11 +43,13 @@ export default function GoogleLoginComponent() {
           const message =
             err.response?.data?.message || "Error logging in with Google.";
           enqueueSnackbar(message, { variant: "error" });
+        }finally{
+          setOpenLoginDialog(false);
+          setGoogleLoginLoading(false);
         }
       }}
 
       onError={() => {
-        console.log("here")
         enqueueSnackbar("Google Login Failed", { variant: "error" });
       }}
     />
