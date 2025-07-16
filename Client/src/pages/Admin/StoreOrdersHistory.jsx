@@ -63,8 +63,6 @@ export default function StoreOrdersHistory() {
     const textFilteredOrders = filterOrdersByQuery(orders || [], debouncedSearchText);
     const filteredOrders = filterOrdersByDateRange(textFilteredOrders, fromDate, toDate);
 
-    console.log(filteredOrders);
-
     return (
         <div className="p-3">
             <div className="bg-white dark:bg-gray-500/20 rounded-lg p-3">
