@@ -30,7 +30,7 @@ const cardVariants = {
     },
 };
 
-export default function SalesOverview({ totalRevenue, totalProfit, loading }) {
+export default function SalesOverview({ totalRevenue, totalSales, totalProfit, totalExpenses, loading }) {
 
     const salesData = [
         {
@@ -41,7 +41,7 @@ export default function SalesOverview({ totalRevenue, totalProfit, loading }) {
         },
         {
             name: "Sales",
-            value: totalRevenue,
+            value: totalSales,
             icon: <PercentIcon className="text-blue-600" />,
             bg: "bg-blue-100 dark:bg-blue-800/30",
         },
@@ -59,7 +59,7 @@ export default function SalesOverview({ totalRevenue, totalProfit, loading }) {
         },
         {
             name: "Expenses",
-            value: (totalProfit / 100) * 10,
+            value: totalExpenses,
             icon: <ListAltIcon className="text-red-600" />,
             bg: "bg-red-100 dark:bg-red-800/30",
         },
@@ -117,6 +117,8 @@ export default function SalesOverview({ totalRevenue, totalProfit, loading }) {
 
 SalesOverview.propTypes = {
     totalRevenue: PropTypes.number.isRequired,
+    totalSales: PropTypes.number.isRequired,
     totalProfit: PropTypes.number.isRequired,
+    totalExpenses: PropTypes.number.isRequired,
     loading: PropTypes.bool.isRequired
 };

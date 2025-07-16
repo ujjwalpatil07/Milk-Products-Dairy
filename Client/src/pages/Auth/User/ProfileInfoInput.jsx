@@ -321,32 +321,3 @@ export default function ProfileInfoInput() {
     </motion.div>
   );
 }
-
-
-// ProfilePhotoUpload.propTypes = {
-//   photo: PropTypes.string,
-//   isLoading: PropTypes.bool,
-//   handlePhotoChange: PropTypes.func.isRequired,
-// };
-
-// ProfileFormFields.propTypes = {
-//   profileInfo: PropTypes.object({
-//     firstName: PropTypes.string,
-//     lastName: PropTypes.string,
-//     mobileNo: PropTypes.string,
-//     gender: PropTypes.string,
-//     photo: PropTypes.string,
-//     username: PropTypes.string,
-//     address: PropTypes.object({
-//       streetAddress: PropTypes.string,
-//       city: PropTypes.string,
-//       pincode: PropTypes.string,
-//     }),
-//     shopName: PropTypes.string,
-//   }).isRequired,
-//   isLoading: PropTypes.bool,
-//   theme: PropTypes.string,
-//   handleInputChange: PropTypes.func.isRequired,
-//   getTextFieldStyles: PropTypes.func.isRequired,
-//   maharashtraCities: PropTypes.arrayOf(PropTypes.string).isRequired,
-// };

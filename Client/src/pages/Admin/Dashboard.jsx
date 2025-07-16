@@ -8,16 +8,17 @@ import { getExpiryStatusCounts, lowStockCount, outOfStockProducts } from "../../
 import { useContext } from "react";
 import OrdersOverview from "../../components/AdminComponents/DashboardComponents/PurchaseOverview";
 import { totalActiveOrders } from "../../services/orderService";
-import { calculateTotalProfit, getTotalRevenue, topSellingStocks } from "../../utils/DashboardHelpers/salesOverviewHelper";
+import { calculateTotalExpenses, calculateTotalProfit, getTotalRevenue, getTotalSales, topSellingStocks } from "../../utils/DashboardHelpers/salesOverviewHelper";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { ProductContext } from "../../context/ProductProvider";
 import { AdminOrderContext } from "../../context/AdminOrderProvider";
+import { totalCanceledOrders, totalDeliveredOrders } from "../../utils/DashboardHelpers/orderOverview";
 
 
 export default function Dashboard() {
 
-    const {allOrders} = useContext(AdminOrderContext)
+    const { allOrders } = useContext(AdminOrderContext)
     const { products, productLoading } = useContext(ProductContext)
 
     const { expiredCount, expiringSoonCount } = getExpiryStatusCounts(products);
@@ -32,6 +33,7 @@ export default function Dashboard() {
         visible: { opacity: 1, transition: { duration: 0.4 } }
     };
 
+    console.log(allOrders)
 
     return (
         <>
@@ -41,10 +43,15 @@ export default function Dashboard() {
                     initial="hidden"
                     animate="visible"
                 >
-                    <SalesOverview totalRevenue={getTotalRevenue(allOrders)} totalProfit={calculateTotalProfit(allOrders)} loading={productLoading} />
+                    <SalesOverview
+                        totalRevenue={getTotalRevenue(allOrders)}
+                        totalSales={getTotalSales(allOrders)}
+                        totalProfit={calculateTotalProfit(allOrders)}
+                        totalExpenses={calculateTotalExpenses(allOrders, 3)}
+                        loading={productLoading}
+                    />
                 </motion.div>
             </section>
-
 
             <motion.section
                 variants={fadeInVariant}
@@ -72,6 +79,8 @@ export default function Dashboard() {
                         <OrdersOverview
                             totalOrdersRecieved={allOrders?.length}
                             totalPendingOrders={totalActiveOrders(allOrders)}
+                            countCanceledOrders={totalCanceledOrders(allOrders)}
+                            countDeliveredOrders={totalDeliveredOrders(allOrders)}
                             loading={productLoading}
                         />
                     </motion.div>

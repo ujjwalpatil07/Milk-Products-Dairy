@@ -48,6 +48,7 @@ export const validateAndProcessProducts = async (productsData, socket) => {
       productId,
       productQuantity,
       productPrice: discountedPrice,
+      unitManufacturingCost: product.manufacturingCost || 0,
     });
   }
 
