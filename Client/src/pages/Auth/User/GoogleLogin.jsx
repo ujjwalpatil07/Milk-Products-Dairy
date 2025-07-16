@@ -17,20 +17,22 @@ export default function GoogleLoginComponent() {
     <GoogleLogin
       onSuccess={async (credentialResponse) => {
         try {
-          const res = await loginWithGoogle(credentialResponse.credential); // Send { token }
+          const res = await loginWithGoogle(credentialResponse.credential);
 
           if (res?.success) {
-            localStorage.setItem("User", JSON.stringify({
-              email: res?.user?.email,
-              _id: res?.user?._id
-            }));
-            await fetchUserData(res?.user?._id);
 
             if (!res?.filledBasicInfo) {
+              console.log(res?.user)
               navigate("/signup/info-input", {
                 state: { user: res?.user, viaLogin: true },
               });
+              
             } else {
+              localStorage.setItem("User", JSON.stringify({
+                email: res?.user?.email,
+                _id: res?.user?._id
+              }));
+              await fetchUserData(res?.user?._id);
               handleAdminLogout();
               enqueueSnackbar("Login Successful!", { variant: "success" });
               navigate("/home");

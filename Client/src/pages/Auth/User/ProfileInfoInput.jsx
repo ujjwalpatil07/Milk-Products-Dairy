@@ -7,7 +7,6 @@ import { maharashtraCities } from "../../../data/cities";
 import { AdminAuthContext, UserAuthContext } from "../../../context/AuthProvider";
 import { useSnackbar } from "notistack";
 import { submitSignupForm } from "../../../services/userProfileService";
-import PropTypes from "prop-types";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
@@ -166,9 +165,11 @@ export default function ProfileInfoInput() {
     },
   });
 
+  const userInfo = JSON.parse(localStorage?.getItem("tempUserData"))
+
   const [profileInfo, setProfileInfo] = useState({
-    firstName: JSON.parse(localStorage.getItem("tempUserData")).firstName || "",
-    lastName: JSON.parse(localStorage.getItem("tempUserData")).lastName || "",
+    firstName: userInfo?.firstName || "",
+    lastName: userInfo?.lastName || "",
     mobileNo: "",
     gender: "",
     photo: "",

@@ -9,6 +9,7 @@ import { loginAdmin } from "../../../services/adminService";
 import company from "../../../data/company.json";
 import GoogleLogin from "./GoogleLogin";
 import { Eye, EyeClosed, EyeOff } from "lucide-react";
+import GoogleLoginComponent from "./GoogleLogin";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -212,7 +213,7 @@ export default function LoginDialog() {
 
                         <div className=" w-full flex justify-center pt-3">
                             <div className="w-1/2">
-                                <GoogleLogin />
+                                <GoogleLoginComponent />
                             </div>
                         </div>
                     </>
