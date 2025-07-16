@@ -219,7 +219,7 @@ export default function MyOrders() {
 
               {order?.status === "Delivered" && (
                 <a
-                  href={`https://madhur-dairy-daily-need-server-1eu6.onrender.com/pdf/generate-bill/${order?._id}`}
+                  href={`https://madhur-dairy-daily-need-server.onrender.com/pdf/generate-bill/${order?._id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-fit px-4 py-1.5 text-sm font-semibold rounded bg-[#843E71] hover:bg-[#843E7190] text-white inline-block text-center"

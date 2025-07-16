@@ -152,7 +152,7 @@ export default function OrderDetails({ allOrders, loading, statusFilter, handleS
       const isProcessing = processingId?.orderId === _id;
 
       return (
-        <div key={_id} className="relative bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg space-y-3 w-full max-w-6xl mx-auto">
+        <div key={_id} className="relative bg-gray-100 dark:bg-gray-500/10 text-gray-800 dark:text-white rounded-lg p-3 md:p-6 shadow-lg space-y-3 w-full mx-auto">
           <div className="absolute top-3 right-3 text-right">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${getStatusBadgeClass(status)}`}>
               {status}

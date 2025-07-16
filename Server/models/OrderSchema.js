@@ -24,6 +24,10 @@ const OrderSchema = new Schema(
           required: true,
           min: 0,
         },
+        unitManufacturingCost: {
+          type: Number,
+          min: 0,
+        },
       },
     ],
 

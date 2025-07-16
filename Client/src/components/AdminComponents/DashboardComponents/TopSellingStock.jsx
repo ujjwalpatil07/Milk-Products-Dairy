@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import PropTypes from "prop-types"
 import { Pagination } from "@mui/material";
 import { ThemeContext } from "../../../context/ThemeProvider";
+import { getDiscountedPrice } from "../../../utils/helper";
 // Animation Variants
 const containerVariants = {
   hidden: {},
@@ -42,6 +43,7 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = topSellingStocks?.slice(indexOfFirstProduct, indexOfLastProduct);
+    
     content = (
       <div className="w-full overflow-x-auto scrollbar-hide">
         <table className="min-w-full table-auto text-left border-collapse">
@@ -85,6 +87,9 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
               ))
               : currentProducts?.map((product, index) => {
                 const isLowStock = product?.stock < product?.thresholdVal;
+                const { discountedPrice } = getDiscountedPrice(product?.price || 0, product?.discount || 0);
+                const hasDiscount = product?.discount > 0;
+
                 return (
                   <motion.tr
                     key={index * 0.9}
@@ -98,8 +103,19 @@ export default function TopSellingStock({ topSellingStocks, loading }) {
                     <td className="py-3 px-4">
                       {product?.stock} {product?.quantityUnit}
                     </td>
-                    <td className="py-3 px-4">&#8377; {product?.price}</td>
-                    <td className="py-3 px-4">{product?.discount} &#37;</td>
+                    <td className="py-3 px-4">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-green-700 dark:text-green-400">
+                          &#8377;{discountedPrice}
+                        </span>
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-500 line-through">
+                            &#8377;{product?.price}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">{product?.discount}&#37;</td>
                   </motion.tr>
                 );
               })}

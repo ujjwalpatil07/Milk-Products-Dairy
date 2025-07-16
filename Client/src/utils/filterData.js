@@ -8,7 +8,8 @@ export const searchProducts = (products, productId) => {
   return products.filter((product) => {
     const nameMatch = product?.name?.toLowerCase()?.includes(keyword) ?? false;
     const categoryMatch = product?.category?.toLowerCase()?.includes(keyword) ?? false;
-    return nameMatch || categoryMatch;
+    const priceMatch = String(product?.price || "")?.includes(keyword) || false;
+    return nameMatch || categoryMatch || priceMatch;
   });
 };
 

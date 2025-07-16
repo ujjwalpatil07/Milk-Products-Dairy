@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import User from "../../models/UserSchema.js";
 import bcryptjs from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
-import jwt from "jsonwebtoken";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -89,7 +88,8 @@ export const loginUser = async (req, res) => {
 };
 
 export const loginWithGoogle = async (req, res) => {
-  let { token } = req.body;
+  const { token } = req.body;
+
   if (!token) {
     return res.status(400).json({
       success: false,
@@ -139,6 +139,7 @@ export const loginWithGoogle = async (req, res) => {
       user.mobileNo &&
       user.address
   );
+
 
   res.status(200).json({
     success: true,

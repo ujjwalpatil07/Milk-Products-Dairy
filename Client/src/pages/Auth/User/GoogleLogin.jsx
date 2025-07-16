@@ -10,7 +10,7 @@ export default function GoogleLoginComponent( {setOpenLoginDialog, setGoogleLogi
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
-  const { fetchUserData } = useContext(UserAuthContext);
+  const { fetchUserData, setOpenLoginDialog } = useContext(UserAuthContext);
 
   return (
 

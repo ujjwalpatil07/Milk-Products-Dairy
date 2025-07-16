@@ -88,67 +88,77 @@ export default function CustomersList() {
   const filteredCustomers = filterCustomers(customers, navbarInput);
   const visibleCustomers = filteredCustomers?.slice(0, visibleCount) ?? [];
 
-  let tableContent;
+  let componentContent;
 
   if (loading) {
-    tableContent = (
-      <tr>
-        <td colSpan="6" className="text-center py-4 text-gray-500">
-          Loading...
-        </td>
-      </tr>
+    componentContent = (
+      <p colSpan="6" className="text-center py-4 text-gray-500">
+        Loading...
+      </p>
     );
   } else if (!visibleCustomers || visibleCustomers.length === 0) {
-    tableContent = (
-      <tr>
-        <td colSpan="6" className="text-center py-4 text-gray-500">
-          No customers found.
-        </td>
-      </tr>
+    componentContent = (
+      <p colSpan="6" className="text-center py-4 text-gray-500">
+        No customers found.
+      </p>
     );
   } else {
-    tableContent = visibleCustomers.map((cust) => (
-      <tr
-        key={cust?._id}
-        className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30"
-      >
-        <td className="px-3 py-2 font-medium text-purple-600 whitespace-nowrap max-w-50 line-clamp-1 dark:text-purple-400">
-          {cust?.firstName ?? ""} {cust?.lastName ?? ""}
-        </td>
-        <td className="px-3 py-2">{cust?.mobileNo ?? "N/A"}</td>
-        <td className="px-3 py-2">{cust?.email ?? "N/A"}</td>
-        <td className="px-3 py-2">{cust?.gender ?? "-"}</td>
-        <td className="px-3 py-2 font-semibold text-gray-800 dark:text-white">
-          {cust?.orders?.length ?? 0}
-        </td>
-        <td className="px-3 py-2 flex items-center flex-nowrap gap-2">
-          <button
-            onClick={() => {
-              setSelectedUser(cust);
-              setOpen(true);
-            }}
-            disabled={messageLoading}
-            className={`flex items-center gap-1 text-sm text-green-600 hover:underline 
+    componentContent = <table className="min-w-[750px] w-full text-sm text-left">
+      <thead>
+        <tr className="text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700">
+          <th className="px-3 py-2">Name</th>
+          <th className="px-3 py-2">Phone</th>
+          <th className="px-3 py-2">Email</th>
+          <th className="px-3 py-2">Gender</th>
+          <th className="px-3 py-2">Orders</th>
+          <th className="px-3 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {visibleCustomers.map((cust) => (
+          <tr
+            key={cust?._id}
+            className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30"
+          >
+            <td className="px-3 py-2 font-medium text-purple-600 whitespace-nowrap max-w-50 line-clamp-1 dark:text-purple-400">
+              {cust?.firstName ?? ""} {cust?.lastName ?? ""}
+            </td>
+            <td className="px-3 py-2">{cust?.mobileNo ?? "N/A"}</td>
+            <td className="px-3 py-2">{cust?.email ?? "N/A"}</td>
+            <td className="px-3 py-2">{cust?.gender ?? "-"}</td>
+            <td className="px-3 py-2 font-semibold text-gray-800 dark:text-white">
+              {cust?.orders?.length ?? 0}
+            </td>
+            <td className="px-3 py-2 flex items-center flex-nowrap gap-2">
+              <button
+                onClick={() => {
+                  setSelectedUser(cust);
+                  setOpen(true);
+                }}
+                disabled={messageLoading}
+                className={`flex items-center gap-1 text-sm text-green-600 hover:underline 
     ${messageLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
   `}
-          >
-            {messageLoading && selectedUser?._id === cust?._id ? (
-              <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <MessageCircleMore size={16} />
-            )}
-            Message
-          </button>
+              >
+                {messageLoading && selectedUser?._id === cust?._id ? (
+                  <div className="h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <MessageCircleMore size={16} />
+                )}
+                Message
+              </button>
 
-          <Link
-            to={`/admin/store/${cust?._id}/orders-history`}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:underline whitespace-nowrap"
-          >
-            <EyeIcon size={16} /> View
-          </Link>
-        </td>
-      </tr>
-    ));
+              <Link
+                to={`/admin/store/${cust?._id}/orders-history`}
+                className="flex items-center gap-1 text-sm text-blue-600 hover:underline whitespace-nowrap"
+              >
+                <EyeIcon size={16} /> View
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   }
 
   return (
@@ -165,19 +175,7 @@ export default function CustomersList() {
         </div>
 
         <div className="overflow-x-auto scrollbar-hide">
-          <table className="min-w-[750px] w-full text-sm text-left">
-            <thead>
-              <tr className="text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700">
-                <th className="px-3 py-2">Name</th>
-                <th className="px-3 py-2">Phone</th>
-                <th className="px-3 py-2">Email</th>
-                <th className="px-3 py-2">Gender</th>
-                <th className="px-3 py-2">Orders</th>
-                <th className="px-3 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>{tableContent}</tbody>
-          </table>
+          {componentContent}
         </div>
 
         {visibleCount < filteredCustomers?.length && (

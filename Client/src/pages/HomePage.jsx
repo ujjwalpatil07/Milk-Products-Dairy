@@ -10,14 +10,11 @@ import OfferingCard from "../components/HomeComponents/OfferingCard";
 import OfferingProductCard from "../components/HomeComponents/OfferingProductCard";
 import { fetchRecentReviews } from "../services/productServices";
 import company from "../data/company.json";
-import MadhurLoader from "../components/MadhurLoader";
 
 const Marquee = lazy(() => import("react-fast-marquee"));
 const DairyProductsCarousel = lazy(() => import("../components/HomeComponents/DairyProductsCarousel"));
 const ReviewCard = lazy(() => import("../components/HomeComponents/ReviewCard"));
 const ProductProcess = lazy(() => import("../components/ProductProcess"));
-
-
 
 export default function HomePage() {
 

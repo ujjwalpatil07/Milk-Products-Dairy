@@ -23,7 +23,7 @@ const cardVariants = {
   },
 };
 
-export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders, loading }) {
+export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders, countCanceledOrders, countDeliveredOrders, loading }) {
 
   const purchaseOverviewData = [
     {
@@ -33,14 +33,14 @@ export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders
       bg: "bg-green-100 dark:bg-green-800/30",
     },
     {
-      name: "Total Returns",
-      value: 0,
+      name: "Total Delivered",
+      value: countDeliveredOrders || 0,
       icon: <UndoIcon className="text-yellow-600" />,
       bg: "bg-yellow-100 dark:bg-yellow-800/30",
     },
     {
       name: "Total Canceled",
-      value: 0,
+      value: countCanceledOrders || 0,
       icon: <CancelIcon className="text-red-600" />,
       bg: "bg-red-100 dark:bg-red-800/30",
     },
@@ -100,5 +100,7 @@ export default function OrdersOverview({ totalOrdersRecieved, totalPendingOrders
 OrdersOverview.propTypes = {
   totalOrdersRecieved: PropTypes.number.isRequired,
   totalPendingOrders: PropTypes.number.isRequired,
+  countCanceledOrders: PropTypes.number.isRequired,
+  countDeliveredOrders: PropTypes.number.isRequired,
   loading: PropTypes.bool.isRequired,
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion"; import {
   Chart as ChartJS,
@@ -10,6 +10,8 @@ import { motion } from "framer-motion"; import {
   Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { AdminOrderContext } from '../../../context/AdminOrderProvider';
+import { getLast7DaysOrderStats } from '../../../utils/DashboardHelpers/statistics';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -40,33 +42,38 @@ const options = {
   },
 };
 
-const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-const data = {
-  labels,
-  datasets: [
-    {
-      label: 'Purchase',
-      data: [1200, 1900, 2700, 2500, 2800, 1200, 900],
-      backgroundColor: 'rgba(54, 162, 235, 0.6)',
-      borderRadius: 8,
-    },
-    {
-      label: 'Return',
-      data: [800, 1000, 1200, 900, 1100, 550, 880],
-      backgroundColor: 'rgba(255, 99, 132, 0.6)',
-      borderRadius: 8,
-    },
-    {
-      label: 'Cancel',
-      data: [600, 100, 20, 60, 45, 105, 78],
-      backgroundColor: 'rgba(70, 80, 188, 0.6)',
-      borderRadius: 8,
-    }
-  ],
-};
-
 const Statistics = () => {
+
+  const { allOrders } = useContext(AdminOrderContext);
+
+  const chartData = useMemo(() => {
+    const { labels, datasets } = getLast7DaysOrderStats(allOrders);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Purchase",
+          data: datasets?.Purchase,
+          backgroundColor: "rgba(54, 162, 235, 0.6)",
+          borderRadius: 8,
+        },
+        {
+          label: "Cancel",
+          data: datasets.Cancel,
+          backgroundColor: "rgba(70, 80, 188, 0.6)",
+          borderRadius: 8,
+        },
+        {
+          label: "Return",
+          data: datasets.Return,
+          backgroundColor: "rgba(255, 99, 132, 0.6)",
+          borderRadius: 8,
+        },
+      ]
+    }
+  }, [allOrders]);
+
   return (
     <motion.div
       className="bg-white dark:bg-gray-500/20 rounded-sm p-4"
@@ -82,7 +89,7 @@ const Statistics = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
       >
-        <Bar options={options} data={data} />
+        <Bar options={options} data={chartData} />
       </motion.div>
     </motion.div>
   );

@@ -37,7 +37,7 @@ export default function AdminOrderProvider({ children }) {
             setNotification(authAdmin?.notifications || []);
             fetchOrders();
         }
-    }, [authAdmin?._id, enqueueSnackbar, authAdmin?.notifications]);
+    }, [authAdmin?._id, authAdmin?.notifications, enqueueSnackbar]);
 
     useEffect(() => {
         const fetchAllOrders = async () => {
@@ -56,7 +56,7 @@ export default function AdminOrderProvider({ children }) {
         if (authAdmin?._id) {
             fetchAllOrders();
         }
-    }, [enqueueSnackbar, adminOrders, authAdmin?._id]);
+    }, [authAdmin?._id, enqueueSnackbar]);
 
     const handleAdminNotification = useCallback(({ title, description, date }) => {
         setNotification((prev) => [
@@ -72,13 +72,34 @@ export default function AdminOrderProvider({ children }) {
 
     const handleNewPendingOrder = ({ order }) => {
         setAdminOrders((prevOrders) => [...prevOrders, order]);
+        setAllOrders(prevOrders => [order, ...prevOrders]);
     };
 
-    const handleRemoveOrder = ({ orderId }) => {
+    const handleOrderAccept = ({ orderId }) => {
         if (!orderId) return;
 
         setAdminOrders((prevOrders) =>
             prevOrders?.filter((order) => order?._id !== orderId)
+        );
+
+        setAllOrders(prevOrders =>
+            prevOrders?.map(order =>
+                order._id === orderId ? { ...order, status: "Confirmed" } : order
+            )
+        );
+    };
+
+    const handleOrderReject = ({ orderId }) => {
+        if (!orderId) return;
+
+        setAdminOrders((prevOrders) =>
+            prevOrders?.filter((order) => order?._id !== orderId)
+        );
+
+        setAllOrders(prevOrders =>
+            prevOrders?.map(order =>
+                order._id === orderId ? { ...order, status: "Cancelled" } : order
+            )
         );
     };
 
@@ -88,19 +109,25 @@ export default function AdminOrderProvider({ children }) {
                 order._id === orderId ? { ...order, status: "Delivered" } : order
             )
         );
+
+        setAllOrders(prev =>
+            prev.map(order =>
+                order._id === orderId ? { ...order, status: "Delivered" } : order
+            )
+        );
     }
 
     useEffect(() => {
         socket.on("order:new-pending-order", handleNewPendingOrder);
-        socket.on("order:accept-success", handleRemoveOrder);
-        socket.on("order:reject-success", handleRemoveOrder);
+        socket.on("order:accept-success", handleOrderAccept);
+        socket.on("order:reject-success", handleOrderReject);
         socket.on("admin:notification", handleAdminNotification)
         socket.on("admin-order:delivered-success", handleOrderDelivered);
 
         return () => {
             socket.off("order:new-pending-order", handleNewPendingOrder);
-            socket.off("order:accept-success", handleRemoveOrder);
-            socket.off("order:reject-success", handleRemoveOrder);
+            socket.off("order:accept-success", handleOrderAccept);
+            socket.off("order:reject-success", handleOrderReject);
             socket.off("admin:notification", handleAdminNotification)
             socket.off("admin-order:delivered-success", handleOrderDelivered);
         }
@@ -125,7 +152,6 @@ export default function AdminOrderProvider({ children }) {
         </AdminOrderContext.Provider>
     );
 }
-
 
 AdminOrderProvider.propTypes = {
     children: PropTypes.node.isRequired,

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import UpdateProductModel from './Models/UpdateProductModel';
 import AddProductModel from "./Models/AddProductModel"
@@ -13,6 +13,9 @@ import { ThemeContext } from '../../../context/ThemeProvider';
 import {
   Pagination, Menu
 } from "@mui/material";
+import { searchProducts } from '../../../utils/filterData';
+import { useDebounce } from 'use-debounce';
+import { getDiscountedPrice } from '../../../utils/helper';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -38,7 +41,10 @@ const rowVariants = {
 };
 
 export default function ProductsList({ products, loading }) {
-  const { navbarInput, highlightMatch } = useContext(SidebarContext)
+
+  const { navbarInput, highlightMatch } = useContext(SidebarContext);
+  const { theme } = useContext(ThemeContext);
+
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openRemoveModel, setOpenRemoveModel] = useState(false)
@@ -49,9 +55,9 @@ export default function ProductsList({ products, loading }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const productsPerPage = 7;
+  const [debouncedQuery] = useDebounce(navbarInput);
 
-  const { theme } = useContext(ThemeContext)
+  const productsPerPage = 7;
 
   useEffect(() => {
     setProductList(products || []);
@@ -115,15 +121,19 @@ export default function ProductsList({ products, loading }) {
     setAnchorEl(null);
   };
 
+  const filteredProducts = useMemo(() => {
+    return searchProducts(productList || [], debouncedQuery);
+  }, [productList, debouncedQuery]);
+
   let content;
-  if ((!openAddModal && !openUpdateModal && !openRemoveModel) && loading) {
+  if (loading) {
     content = (
       <div className="flex items-center justify-center h-[50vh] text-gray-600 dark:text-white gap-3">
         <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-[#843E71]"></div>
         <span className="text-xl">Loading products...</span>
       </div>
     );
-  } else if (!products || products.length === 0) {
+  } else if (!filteredProducts || filteredProducts?.length === 0) {
     content = (
       <div className="text-center text-gray-500 dark:text-gray-300 py-4">
         No products found.
@@ -132,89 +142,96 @@ export default function ProductsList({ products, loading }) {
   } else {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = productList.slice(indexOfFirstProduct, indexOfLastProduct);
+    const currentProducts = filteredProducts?.slice(indexOfFirstProduct, indexOfLastProduct);
 
     content = (
       <>
         <div className="overflow-x-auto scrollbar-hide">
-          {products.length === 0 ? (
-            <div className="text-center py-10 text-gray-600 dark:text-gray-300">
-              <p className="text-lg font-medium">No products found.</p>
-              <p className="text-sm mt-2">Add a new product to get started.</p>
-            </div>
-          ) : (
-            <table className="min-w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-500/20 text-gray-600 dark:text-gray-300">
-                  <th className="pb-3 px-3 whitespace-nowrap">Products</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Category</th>
-                  <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
-                </tr>
-              </thead>
-              <motion.tbody
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {currentProducts?.map((product, index) => {
-                  const isLowStock = product.stock < product.thresholdVal;
+          <table className="min-w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-500/20 text-gray-600 dark:text-gray-300">
+                <th className="pb-3 px-3 whitespace-nowrap">Products</th>
+                <th className="pb-3 px-3 whitespace-nowrap">Selling Price</th>
+                <th className="pb-3 px-3 whitespace-nowrap">Quantity</th>
+                <th className="pb-3 px-3 whitespace-nowrap">Threshold Value</th>
+                <th className="pb-3 px-3 whitespace-nowrap">Category</th>
+                <th className="pb-3 px-3 whitespace-nowrap">Actions</th>
+              </tr>
+            </thead>
+            <motion.tbody
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {currentProducts?.map((product, index) => {
 
-                  return (
-                    <motion.tr
-                      key={product._id || index}
-                      variants={rowVariants}
+                const isLowStock = product?.stock < product?.thresholdVal;
+                const { discountedPrice } = getDiscountedPrice(product?.price || 0, product?.discount || 0);
+                const hasDiscount = product?.discount > 0;
 
-                      className={`border-b border-gray-200 dark:border-gray-500/20`}
-                    >
-                      <td className={`py-2 px-3 font-medium  ${isLowStock ? "text-red-500 animate-pulse" : "text-gray-700 dark:text-white"}`}>
-                        {highlightMatch(product.name, navbarInput)}
-                      </td>
-                      <td className="py-2 px-3 whitespace-nowrap">&#8377; {product.price}</td>
-                      <td className="py-2 px-3 whitespace-nowrap">
-                        {product.stock} {product.quantityUnit}
-                      </td>
-                      <td className="py-2 px-3 whitespace-nowrap">
-                        {product.thresholdVal} {product.quantityUnit}
-                      </td>
-                      <td className="py-2 px-3 whitespace-break-spaces">{product.category}</td>
-                      <td className="py-2 px-3 whitespace-nowrap">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => {
-                              setSelectedProduct(product);
-                              setOpenUpdateModal(true);
-                            }}
-                            className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-4 py-2 rounded hover:bg-green-300/80"
-                          >
-                            Update
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedProduct(product);
-                              setOpenRemoveModel(true);
-                            }}
-                            className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-4 py-2 rounded hover:bg-red-300/80"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
+                return (
+                  <motion.tr
+                    key={product?._id || index}
+                    variants={rowVariants}
 
-                  );
-                })}
-              </motion.tbody>
+                    className={`border-b border-gray-200 dark:border-gray-500/20`}
+                  >
+                    <td className={`py-2 px-3 font-medium  ${isLowStock ? "text-red-500 animate-pulse" : "text-gray-700 dark:text-white"}`}>
+                      {highlightMatch(product?.name, navbarInput)}
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-green-700 dark:text-green-400">
+                          &#8377;{discountedPrice}
+                        </span>
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-500 line-through">
+                            &#8377;{highlightMatch(product?.price, navbarInput)}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      {product?.stock} {product?.quantityUnit}
+                    </td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      {product?.thresholdVal} {product?.quantityUnit}
+                    </td>
+                    <td className="py-2 px-3 whitespace-break-spaces">{highlightMatch(product?.category, navbarInput)}</td>
+                    <td className="py-2 px-3 whitespace-nowrap">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setOpenUpdateModal(true);
+                          }}
+                          className="text-sm bg-green-200 text-black dark:bg-blue-800/40 dark:hover:bg-blue-800/50 dark:text-white px-4 py-2 rounded hover:bg-green-300/80"
+                        >
+                          Update
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setOpenRemoveModel(true);
+                          }}
+                          className="text-sm bg-red-200 text-black dark:bg-red-800/40 dark:hover:bg-red-800/50 dark:text-white px-4 py-2 rounded hover:bg-red-300/80"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
 
-            </table>
-          )}
+                );
+              })}
+            </motion.tbody>
+
+          </table>
         </div>
 
         <div className="p-4 mt-2 flex justify-center text-gray-800 dark:text-white">
           <Pagination
-            count={Math.ceil(productList?.length / productsPerPage)}
+            count={Math.ceil(filteredProducts?.length / productsPerPage)}
             page={currentPage}
             onChange={(event, value) => setCurrentPage(value)}
             variant="outlined"
