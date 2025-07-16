@@ -58,7 +58,7 @@
 
 ## 🌐 Hosted Links
 
-- 🚀 **Frontend**: [https://milk-products-dairy-kappa.vercel.app/](https://milk-products-dairy-kappa.vercel.app/)
+- 🚀 **Frontend**: [https://madhur-dairy-and-daily-needs.vercel.app/](https://madhur-dairy-and-daily-needs.vercel.app//)
 - 🌐 **Backend**: [https://madhur-dairy-daily-need-server-1eu6.onrender.com](https://madhur-dairy-daily-need-server-1eu6.onrender.com)
 
 ---
@@ -153,7 +153,6 @@ GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
 ##  Connect With Me
 If you're working on something similar, have questions, or want to collaborate, feel free to connect! I’d love to hear from you. 🚀
 
--  [LinkedIn](https://www.linkedin.com/in/nitin-gayke92/)
--  [Portfolio](https://nitin-portfolio-gilt.vercel.app/)
--  [Email](mailto:gaykenitin975@gmail.com)
+-  [LinkedIn](https://www.linkedin.com/in/ujjwal-patil-9908782b0/)
+-  [Email](mailto:ujjwal.patilofficial07@gmail.com)
   
