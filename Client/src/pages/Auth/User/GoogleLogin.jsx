@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import PropTypes from "prop-types";
 import { GoogleLogin } from "@react-oauth/google";
 import { loginWithGoogle } from "../../../services/userService";
 import { useSnackbar } from "notistack";
@@ -10,7 +11,7 @@ export default function GoogleLoginComponent( {setOpenLoginDialog, setGoogleLogi
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { handleAdminLogout } = useContext(AdminAuthContext);
-  const { fetchUserData, setOpenLoginDialog } = useContext(UserAuthContext);
+  const { fetchUserData } = useContext(UserAuthContext);
 
   return (
 
@@ -34,8 +35,8 @@ export default function GoogleLoginComponent( {setOpenLoginDialog, setGoogleLogi
               await fetchUserData(res?.user?._id);
               handleAdminLogout();
               enqueueSnackbar("Login Successful!", { variant: "success" });
-              navigate("/home");
             }
+            
           } else {
             enqueueSnackbar("Login failed, please try again.", { variant: "error" });
           }
@@ -55,3 +56,8 @@ export default function GoogleLoginComponent( {setOpenLoginDialog, setGoogleLogi
     />
   );
 }
+
+GoogleLoginComponent.propTypes = {
+  setOpenLoginDialog: PropTypes.func.isRequired,
+  setGoogleLoginLoading: PropTypes.func.isRequired,
+};

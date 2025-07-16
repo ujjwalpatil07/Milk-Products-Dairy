@@ -9,6 +9,8 @@ import { useSnackbar } from "notistack";
 import { submitSignupForm } from "../../../services/userProfileService";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import PropTypes from "prop-types";
+
 
 function ProfilePhotoUpload({ photo, isLoading, handlePhotoChange }) {
   return (
@@ -66,9 +68,9 @@ function ProfileFormFields({
         </select>
       </div>
 
-      <TextField label="Username" name="username" value={profileInfo.username} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
-      <TextField label="Shop Name" name="shopName" value={profileInfo.shopName} onChange={handleInputChange} fullWidth sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
-      <TextField label="Address" name="streetAddress" value={profileInfo.address.streetAddress} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
+      <TextField label="Username" name="username" value={profileInfo?.username} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
+      <TextField label="Shop Name" name="shopName" value={profileInfo?.shopName} onChange={handleInputChange} fullWidth sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
+      <TextField label="Address" name="streetAddress" value={profileInfo?.address?.streetAddress} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} className="!mb-5" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <select
@@ -86,7 +88,7 @@ function ProfileFormFields({
           ))}
         </select>
 
-        <TextField label="Pincode" name="pincode" value={profileInfo.address.pincode} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
+        <TextField label="Pincode" name="pincode" value={profileInfo?.address?.pincode} onChange={handleInputChange} fullWidth required sx={{ ...getTextFieldStyles(theme), ...(isLoading && { pointerEvents: "none", opacity: 0.7 }) }} />
       </div>
     </>
   );
@@ -97,7 +99,6 @@ export default function ProfileInfoInput() {
   const navigate = useNavigate();
   const location = useLocation();
   const userData = location?.state?.formData;
-  const userData = location?.state?.formData;
 
   const { enqueueSnackbar } = useSnackbar();
   const { fetchUserData } = useContext(UserAuthContext);
@@ -105,15 +106,8 @@ export default function ProfileInfoInput() {
   const { theme } = useContext(ThemeContext);
 
   const viaLogin = location?.state?.viaLogin;
-  const viaLogin = location?.state?.viaLogin;
   const hasShownSnackbar = useRef(false);
 
-  useEffect(() => {
-    if (!viaLogin && !userData) {
-      enqueueSnackbar("User not logged in, please login!", { variant: "error" });
-      navigate("/login");
-    }
-  }, [viaLogin, userData, enqueueSnackbar, navigate]);
   useEffect(() => {
     if (!viaLogin && !userData) {
       enqueueSnackbar("User not logged in, please login!", { variant: "error" });
@@ -125,31 +119,9 @@ export default function ProfileInfoInput() {
     if (viaLogin && !hasShownSnackbar.current) {
       enqueueSnackbar("Fill the basic info before proceeding", { variant: "info" });
       hasShownSnackbar.current = true;
-      hasShownSnackbar.current = true;
     }
   }, [enqueueSnackbar, viaLogin]);
 
-  useEffect(() => {
-    if (viaLogin) {
-      const userDataViaLogin = location?.state?.user;
-      localStorage.setItem("tempUserData", JSON.stringify(userDataViaLogin));
-    } else if (userData) {
-      localStorage.setItem("tempUserData", JSON.stringify(userData));
-    }
-  }, [viaLogin, userData, location?.state?.user]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
   useEffect(() => {
     if (viaLogin) {
       const userDataViaLogin = location?.state?.user;
@@ -247,9 +219,7 @@ export default function ProfileInfoInput() {
     setIsLoading(true);
     try {
       const user = JSON.parse(localStorage.getItem("tempUserData"));
-      const user = JSON.parse(localStorage.getItem("tempUserData"));
       const formData = new FormData();
-      formData.append("id", user?._id);
       formData.append("id", user?._id);
       formData.append("profileInfo", JSON.stringify(profileInfo));
       if (selectedFile) formData.append("photo", selectedFile);
@@ -260,13 +230,8 @@ export default function ProfileInfoInput() {
         localStorage.setItem("User", JSON.stringify(data?.user));
         localStorage.removeItem("otp-status");
         localStorage.removeItem("tempUserData");
-        localStorage.removeItem("tempUserData");
         await fetchUserData(data?.user?._id);
         handleAdminLogout();
-        enqueueSnackbar(
-          viaLogin ? "Basic details submitted!" : "Profile created successfully!",
-          { variant: "success" }
-        );
         enqueueSnackbar(
           viaLogin ? "Basic details submitted!" : "Profile created successfully!",
           { variant: "success" }
@@ -277,7 +242,6 @@ export default function ProfileInfoInput() {
       }
     } catch (err) {
       console.log(err);
-      console.log(err);
       enqueueSnackbar(err?.response?.data?.message || "Server error occurred!", { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -285,49 +249,6 @@ export default function ProfileInfoInput() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex items-center justify-center px-4 py-10 overflow-auto min-h-screen bg-[#F0F1F3] dark:bg-[#121212] text-black dark:text-white transition-colors duration-300"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="bg-white dark:bg-gray-500/20 rounded-2xl shadow-2xl px-4 md:px-6 py-8 w-full max-w-3xl"
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-3xl font-bold text-center text-[#843E71] mb-6 dark:text-[#e0b3d9]"
-        >
-          Complete Your Profile
-        </motion.h1>
-
-        <motion.form
-          className="space-y-5"
-          onSubmit={handleFormSubmit}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <ProfilePhotoUpload photo={profileInfo.photo} isLoading={isLoading} handlePhotoChange={handlePhotoChange} />
-          <ProfileFormFields
-            profileInfo={profileInfo}
-            isLoading={isLoading}
-            theme={theme}
-            handleInputChange={handleInputChange}
-            getTextFieldStyles={getTextFieldStyles}
-            maharashtraCities={maharashtraCities}
-          />
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col gap-2 mt-4 text-sm font-medium whitespace-break-spaces"
-          >
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
@@ -382,25 +303,7 @@ export default function ProfileInfoInput() {
               Subscribe to all offers and updates
             </label>
           </motion.div>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              className="!mt-6 !py-3 !text-lg !bg-[#843E71] hover:!bg-[#6f3260]"
-            >
-              {isLoading ? "Submitting..." : "Submit"}
-            </Button>
-          </motion.div>
-        </motion.form>
-      </motion.div>
-    </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
