@@ -1,4 +1,4 @@
-import React, { useContext, lazy, Suspense } from "react";
+import React, { useContext, lazy, Suspense, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -9,6 +9,7 @@ import ProductCard from "../components/LandingComponents/ProductCard";
 import { features } from "../data/productGoodness ";
 import { UserAuthContext } from "../context/AuthProvider";
 import company from "../data/company.json";
+import MadhurLoader from "../components/MadhurLoader";
 
 const QuestionAnswer = lazy(() => import("../components/LandingComponents/QuestionAnswer"));
 const FeatureCard = lazy(() => import("../components/LandingComponents/FeatureCard"));
@@ -18,6 +19,34 @@ export default function LandingPage() {
     const { authUser } = useContext(UserAuthContext);
     const { theme } = useContext(ThemeContext);
     const randomProducts = [...products]?.sort(() => Math.random() - 0.5)?.slice(0, 6); // sort(() => Math.random() - 0.5) // Shuffle the array
+
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        // Wait until browser has fully loaded (including images, fonts, etc.)
+        const handleWindowLoad = () => {
+            setPageLoading(false);
+        };
+
+        // If already loaded (e.g., fast refresh), skip
+        if (document.readyState === "complete") {
+            handleWindowLoad();
+        } else {
+            window.addEventListener("load", handleWindowLoad);
+        }
+
+        return () => {
+            window.removeEventListener("load", handleWindowLoad);
+        };
+    }, []);
+    
+    if (pageLoading) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-black">
+                <MadhurLoader />
+            </div>
+        );
+    }
 
     return (
         <>

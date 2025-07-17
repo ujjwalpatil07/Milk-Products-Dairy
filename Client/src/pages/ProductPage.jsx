@@ -24,6 +24,26 @@ export default function ProductPage() {
     const [visibleCount, setVisibleCount] = useState(5);
     const [visibleCount1, setVisibleCount1] = useState(3);
 
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        // Wait until browser has fully loaded (including images, fonts, etc.)
+        const handleWindowLoad = () => {
+            setPageLoading(false);
+        };
+
+        // If already loaded (e.g., fast refresh), skip
+        if (document.readyState === "complete") {
+            handleWindowLoad();
+        } else {
+            window.addEventListener("load", handleWindowLoad);
+        }
+
+        return () => {
+            window.removeEventListener("load", handleWindowLoad);
+        };
+    }, []);
+
     useEffect(() => {
         setQuery(productId);
     }, [productId]);
@@ -45,6 +65,15 @@ export default function ProductPage() {
     const sortedFilteredProducts = useMemo(() => {
         return sortProducts(filteredProducts ?? [], filter);
     }, [filteredProducts, filter]);
+
+
+    if (pageLoading) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-black">
+                <MadhurLoader />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -69,7 +98,7 @@ export default function ProductPage() {
                         //         <p>Loading...</p>
                         //     </div>
                         // </div>
-                        <MadhurLoader/>
+                        <MadhurLoader />
                     ) : (
                         <>
                             <section

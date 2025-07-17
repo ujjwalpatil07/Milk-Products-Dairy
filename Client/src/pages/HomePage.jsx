@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import heroImage from "../assets/heroImage.png"
 import { offerings, products } from "../data/products";
-
+import MadhurLoader from "../components/MadhurLoader";
 import { UserAuthContext } from "../context/AuthProvider";
 import OfferingCard from "../components/HomeComponents/OfferingCard";
 import OfferingProductCard from "../components/HomeComponents/OfferingProductCard";
@@ -23,6 +23,25 @@ export default function HomePage() {
 
     const [customerReviews, setCustomerReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pageLoading, setPageLoading] = useState(true);
+
+    useEffect(() => {
+        // Wait until browser has fully loaded (including images, fonts, etc.)
+        const handleWindowLoad = () => {
+            setPageLoading(false);
+        };
+
+        // If already loaded (e.g., fast refresh), skip
+        if (document.readyState === "complete") {
+            handleWindowLoad();
+        } else {
+            window.addEventListener("load", handleWindowLoad);
+        }
+
+        return () => {
+            window.removeEventListener("load", handleWindowLoad);
+        };
+    }, []);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -42,6 +61,14 @@ export default function HomePage() {
     const handleLoadMore = () => {
         setProductCount((prev) => prev + 3);
     };
+
+    if (pageLoading) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-black">
+                <MadhurLoader />
+            </div>
+        );
+    }
 
     return (
         <>
@@ -99,7 +126,17 @@ export default function HomePage() {
                             >
                                 {company?.tagline}
                             </p>
+
+                            <div className="flex justify-center mt-15">
+                                <Link
+                                    to="/products"
+                                    className="flex items-center gap-4 px-8 py-3 rounded-full font-semibold text-lg bg-[#843E71] text-white transition-colors duration-300 w-fit"
+                                >
+                                    Explore Our Products
+                                </Link>
+                            </div>
                         </div>
+
                     </motion.div>
                 </motion.div>
             </section>

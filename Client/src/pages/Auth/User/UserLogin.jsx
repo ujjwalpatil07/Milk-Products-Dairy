@@ -88,7 +88,7 @@ export default function UserLogin() {
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100, opacity: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: "easeIn" }}
         className={`p-6 bg-white dark:bg-gray-900 rounded-md w-lg transition duration-200 ease-in-out ${googleLoginLoading ? "opacity-50 blur-sm pointer-events-none select-none" : ""
           }`}
       >

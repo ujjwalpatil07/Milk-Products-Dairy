@@ -2,8 +2,39 @@ import ProductProcess from "../components/ProductProcess";
 import dairyImage from "../assets/dairyImage.png";
 import AboutCard from "../components/AboutComponents/AboutCard";
 import aboutData from "../data/about.json";
+import { useEffect, useState } from "react";
+import MadhurLoader from "../components/MadhurLoader";
 
 export default function AboutPage() {
+
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => {
+    // Wait until browser has fully loaded (including images, fonts, etc.)
+    const handleWindowLoad = () => {
+      setPageLoading(false);
+    };
+
+    // If already loaded (e.g., fast refresh), skip
+    if (document.readyState === "complete") {
+      handleWindowLoad();
+    } else {
+      window.addEventListener("load", handleWindowLoad);
+    }
+
+    return () => {
+      window.removeEventListener("load", handleWindowLoad);
+    };
+  }, []);
+
+    if (pageLoading) {
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-black">
+                <MadhurLoader />
+            </div>
+        );
+    }
+
   return (
     <>
       <section
